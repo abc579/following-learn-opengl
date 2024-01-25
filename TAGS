@@ -2470,9 +2470,10 @@ typedef void (APIENTRYP PFNGLSECONDARYCOLORP3UIVPROC)2120,108492
 GLAPI PFNGLSECONDARYCOLORP3UIVPROC glad_glSecondaryColorP3uiv;2121,108581
 #define glSecondaryColorP3uiv 2122,108644
 
-src/main.cpp,47
-main(9,148
-framebuffer_size_callback(50,1020
+src/main.cpp,71
+main(10,182
+framebuffer_size_callback(56,1166
+process_input(62,1296
 
 src/glad.c,23741
 #undef APIENTRY31,681

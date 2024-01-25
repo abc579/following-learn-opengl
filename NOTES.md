@@ -15,3 +15,7 @@ The state of OpenGL is called the context. We change the context manipulating bu
 # IDs
 
 We create objects and store their IDs to manipulate them later on.
+
+# Frame
+
+Each iteration inside the render loop is called a frame.
