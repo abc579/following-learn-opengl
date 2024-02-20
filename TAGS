@@ -2472,8 +2472,8 @@ GLAPI PFNGLSECONDARYCOLORP3UIVPROC glad_glSecondaryColorP3uiv;2121,108581
 
 src/main.cpp,73
 main(31,566
-framebuffer_size_callback(147,4036
-process_input(153,4166
+framebuffer_size_callback(155,4428
+process_input(161,4558
 
 src/glad.c,23741
 #undef APIENTRY31,681

@@ -1,0 +1,192 @@
+* Graphics Programming
+
+** OpenGL
+*** What is OpenGL?
+OpenGL is considered an API or specification that tells graphic driver developers (NVIDIA, AMD or Intel) what a function
+should do and how it should behave.  Because of this, each implementation can be a little bit different, although the
+function result has to be the same.
+
+*** OpenGL Websites
+API documentation: https://docs.gl/ Learn OpenGL: https://learnopengl.com/Getting-started/OpenGL
+
+*** Core-profile vs. Immediate Mode
+Immediate mode is the old way of doing things. Although OpenGL is easier to use with that mode, it's also very
+inefficient.  For that reason, we use *Core-profile* mode. The latter offers more flexibility but it's harder.
+
+*** State machine
+OpenGL is a big state machine, which means that it always has a context. We can change or use this context by calling
+OpenGL functions.
+
+*** 3D space
+Everything in OpenGL is in 3D space, but since screens are in 2D there exists a process that transforms 3D coordinates
+to 2D. This is done in the [[Graphics Pipeline][Graphics Pipeline]].
+
+*** Graphics Pipeline
+It's a series of phases where two main events happen:
+
+1) 3D coordinates are transformed into 2D. This is done at the "first part" of the pipeline.
+2) 2D coordinates are transformed into colored pixels. This is done at the "second part" of the pipeline.
+
+The pipeline is composed of different steps or phases, where each one requires as input the output of the previous phase
+or step.  The great benefit of this pipeline is that we can parallelize it.  Because graphic cards have a lot of cores,
+they can process our data quickly in programs that are called [[Shaders][shaders]].
+
+Initially, we give the pipeline, as input, the [[Vertex Data][vertex data]].
+
+#+CAPTION: Pipeline
+#+NAME: Pipeline.png
+[[./Pipeline.png]]
+
+The blue background colored phases or steps are the ones where we can inject our own shaders.
+
+Goal of each step:
+
+1. *Vertex Shader*: transform 3D coordinates into "different" 3D coordinates. This shader also allows us to tinker with
+   vertex attributes. These coordinates need to be [[Normalized Device Coordinates][normalized]].
+2. *Geometry Shader*: the output of the vertex shader is passed to this one. This shader can generate new shapes using the
+   ones we gave it. In the image above, we can see that it creates a second triangle. This shader is _optional_.
+3. *Shape Assembly*: the output of the geometry shader or vertex is passed to this one. It takes these vertices or vertex
+   (depending on the [[Primitives][primitive]] selected) and assembles all the points.
+4. *Rasterization*: takes the output of the shape assembly as input and maps the _resulting primitives_ to actual pixels on
+   the screen. The result is called [[Fragment][fragments]], and they're passed to the fragment shader. Before they're passed,
+   [[Clipping][clipping]] is performed.
+5. *Fragment Shader*: takes fragments as input and its goal is to compute the color for each one of the pixels. In this
+   step is where all the magic effects happen.
+6. *Tests and Blending*: after the color is determined for each pixel, two more events happen, [[Alpha Test][alpha test]] and
+   [[Blending][blending]]. Both can be summarized as a process where opacity and blending of different objects are computed.
+
+In modern OpenGL, we are *required* to define at least one vertex and fragment shader, otherwise the program won't run
+correctly.
+
+*** Shaders
+They're basically programs that run in the GPU. They need to be created, compiled and when we link them together they
+produce a [[Shader Program][shader program]].  Since we need to create shaders, we also need to _delete them_.
+
+*** Shader Program
+Linked version of multiple shaders combined.  To create a shader program, first, we need to create a program, then
+attach the corresponding shaders and finally link them:
+
+#+NAME: Example of creation of shader program.
+#+BEGIN_SRC cpp
+  unsigned int shaderProgram;
+  shaderProgram = glCreateProgram();
+  glAttachShader(shaderProgram, vertexShader);
+  glAttachShader(shaderProgram, fragmentShader);
+  glLinkProgram(shaderProgram);
+#+END_SRC
+
+To use it, we call the glUseProgram() function.
+
+*** Vertex Data
+It's an array of 3D coordinates (vertices) that should form a triangle.
+
+*** Vertex Format
+It refers to all the information (layout of data) associated with each vertex in an 3D object.
+It encompasses all the attributes that define a vertex.
+
+*** Vertex Attributes
+They are the individual properties of a particular vertex. A vertex can have different properties, for example, its
+color and position. We can add more attributes or properties to a vertex.
+
+We have to manually tell OpenGL what's the size in bytes of the information to a particular vertex.
+
+#+CAPTION: Vertex Attributes and Data Example
+#+NAME: VertexAttributesAndData.png
+[[./VertexAttributesAndData.png]]
+
+In this example:
+
+- Each coordinate is a float (4 bytes, 32 bits).
+- Each coordinate has three components: X, Y and Z.
+- Values are _tighly packed_.
+
+To inform OpenGL about this, we use the function glVertexAttribPointer.
+
+*** Primitives
+Hints we give to OpenGL to tell it how we want to draw our [[Vertex Data][vertex data]].  Some of these hints are:
+
+1. GL_POINTS.
+2. GL_TRIANGLES.
+3. GL_LINE_STRIP.
+
+*** Clipping
+Process that ignores parts or sections of shapes that are not going to be rendered on the screen.  For example, if we're
+looking forward, and we have a very extensive image in front of us, clipping will be performed on left and right,
+because we can't see it completely.  This process improves performance.
+
+*** Fragment
+It's all the data required to render a single pixel on the screen.
+
+*** Alpha Test
+Process where object's opacity is determined.
+
+*** Blending
+Process where OpenGL determines if one object is in front of another (for example) and blends them accordingly.
+
+*** Normalized Device Coordinates
+X, Y and Z coordinates that range from [-1.0, 1.0].
+
+*** Vertex Buffer Object (VBO)
+It's a chunk of memory that we use store all the vertices of a particular object. It can contain information such as
+position, color, normals, etc.
+
+When we use VBOs we also have to tell OpenGL how we want the GPU to interpret the data that's inside, among other things.
+
+Its buffer type is _GL_ARRAY_BUFFER_.
+
+*** GLSL (OpenGL Shading Language)
+Programming language used to program shaders in OpenGL.
+
+*** Vectors in GLSL
+In GLSL, a vector is composed of 4 components: x, y, z and w. W represents something called _perspective division_.
+
+*** Perspective division
+TODO
+
+*** Vertex Array Object (VAO)
+It's a container or a manager that stores all the state-related settings needed to render a particular object.
+
+In other words, it stores the current bound [[Vertex Buffer Object][VBO]] for us to use it later.
+
+This is very useful to save us from writing a lot of code, because when we want to draw something to the screen we need
+to do a series of steps.
+
+The workflow would look like this:
+
+1) Set up the vertex data, i.e, define vertices for a triangle.
+2) Set up the vertex format, i.e, define the layout of the vertex attributes.
+3) Create and bind a VAO, that way we save the current context.
+4) Link the VAO to the VBO.
+5) Render the triangle using the VAO.
+
+We can reuse VAOs (_shared VAOS_) if multiple objects have the same vertex format and rendering settings. However, if
+objects need to have, say, different shaders, then we'd need to use more than one VAO.
+
+_Modern OpenGL requires to use at least one VAO._
+
+*** Element Buffer Object (EBO)
+They're buffers that store the order (_indices_) in which we want vertices to be drawn.
+
+When we use this approach to draw things, we're doing [[Indexed Drawing][indexed drawing]]. Indices start from 0.
+
+We also need to bind them, just like [[Vertex Buffer Object][VBOs]], however, the main difference is that we'll use GL_ELEMENT_ARRAY_BUFFER when
+binding, and then we'll use glDrawElements instead of glDrawArrays.
+
+[[Vertex Array Object (VAO)][VAOs]] also store EBOs.
+
+NOTE:
+
+A VAO stores the glBindBuffer calls when the target is GL_ELEMENT_ARRAY_BUFFER. This also means it stores its unbind
+calls so make sure you don't unbind the element array buffer before unbinding your VAO, otherwise it doesn't have an EBO
+configured.
+
+*** Indexed Drawing
+TODO
+
+*** Wireframe Mode
+It's a mode that draws only the edges of triangles.
+
+** Render Loop
+The render loop is the main loop of the program where we _typically_ do 3 things: *process keyboard input*, *render stuff* and
+finally *draw to the screen*.  Statements executed within this loop are said to be executed in _one frame_.  Because of
+this, it's important for functions within this section to be as fast as possible.
