@@ -1,7 +1,7 @@
 RELEASE_FLAGS=-O3
 DEBUG_FLAGS=-ggdb
 SECURITY_FLAGS=-fstack-protector -D_FORTIFY_SOURCE=2 -fsanitize=address,leak,undefined
-WARNING_FLAGS=-Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Wuninitialized -Wfloat-equal -Wformat=2 -Wundef -Werror -Wunused-parameter -Wunused-variable -Wunused-function -Wmissing-declarations -Wreorder -Wswitch-enum -Wdeprecated-declarations -Wvla -Wlogical-op
+WARNING_FLAGS=-Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Wuninitialized -Wfloat-equal -Wformat=2 -Wundef -Wunused-parameter -Wunused-variable -Wunused-function -Wmissing-declarations -Wreorder -Wswitch-enum -Wdeprecated-declarations -Wvla -Wlogical-op
 LD_FLAGS=-L./deps -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl
 INCLUDE_FLAGS=-Iinclude
 

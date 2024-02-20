@@ -24,6 +24,16 @@ main()
 }
 )"};
 
+const std::string fragment_shader_src_second_triangle{R"(#version 330 core
+out vec4 FragColor;
+
+void
+main()
+{
+  FragColor = vec4(1.0f, 1.0f, 0.0f, 1.f);
+}
+)"};
+
 void framebuffer_size_callback(GLFWwindow *, int, int);
 void process_input(GLFWwindow *);
 
@@ -57,22 +67,32 @@ main()
 
   glViewport(0, 0, 1600, 1200);
 
-  unsigned int VBO;
-  unsigned int VAO;
-  unsigned int EBO;
+  unsigned int VBO, VBO2;
+  unsigned int VAO, VAO2;
+  unsigned int EBO, EBO2;
   unsigned int vertex_shader;
   unsigned int fragment_shader;
+  unsigned int fragment_shader_second_triangle;
   unsigned int shader_program;
+  unsigned int shader_program_second_triangle;
   int success;
   char info_log[512];
 
   shader_program = glCreateProgram();
+  shader_program_second_triangle = glCreateProgram();
+
   glGenVertexArrays(1, &VAO);
+  glGenVertexArrays(1, &VAO2);
+
   glGenBuffers(1, &VBO);
+  glGenBuffers(1, &VBO2);
+
   glGenBuffers(1, &EBO);
+  glGenBuffers(1, &EBO2);
 
   const char *vertex_shader_src_c = vertex_shader_src.c_str();
   const char *fragment_shader_src_c = fragment_shader_src.c_str();
+  const char *fragment_shader_src_second_triangle_c = fragment_shader_src_second_triangle.c_str();
 
   vertex_shader = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vertex_shader, 1, &vertex_shader_src_c, nullptr);
@@ -84,6 +104,7 @@ main()
       std::cout << info_log << '\n';
       return EXIT_FAILURE;
     }
+
   fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(fragment_shader, 1, &fragment_shader_src_c, nullptr);
   glCompileShader(fragment_shader);
@@ -105,26 +126,55 @@ main()
       return EXIT_FAILURE;
     }
 
-  std::array<float, 12> vertices{  0.5f,  0.5f, 0.0f,
-                                   0.5f, -0.5f, 0.0f,
-                                  -0.5f, -0.5f, 0.0f,
-                                  -0.5f,  0.5f, 0.0f,};
-  std::array<unsigned int, 6> indices{ 0, 1, 3,
-                                       1, 2, 3 };
+  fragment_shader_second_triangle = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(fragment_shader_second_triangle, 1, &fragment_shader_src_second_triangle_c, nullptr);
+  glCompileShader(fragment_shader_second_triangle);
+  glGetShaderiv(fragment_shader_second_triangle, GL_COMPILE_STATUS, &success);
+  if(!success)
+    {
+      glGetShaderInfoLog(fragment_shader_second_triangle, 512, nullptr, info_log);
+      std::cout << info_log << '\n';
+      return EXIT_FAILURE;
+    }
+  glAttachShader(shader_program_second_triangle, vertex_shader);
+  glAttachShader(shader_program_second_triangle, fragment_shader_second_triangle);
+  glLinkProgram(shader_program_second_triangle);
+  glGetShaderiv(shader_program_second_triangle, GL_LINK_STATUS, &success);
+  if(!success)
+    {
+      glGetShaderInfoLog(shader_program_second_triangle, 512, nullptr, info_log);
+      std::cout << info_log << '\n';
+      return EXIT_FAILURE;
+    }
+
+  std::array<float, 15> vertices{  -0.5f,  0.0f, 0.0f,
+                                   0.0f,  0.0f, 0.0f,
+                                   -0.25f, 0.5f, 0.0f,
+                                   0.5f,  0.0f, 0.0f,
+                                   0.25f, 0.5f, 0.0f };
+
+  std::array<unsigned int, 3> indicesFirstTriangle{ 0, 1, 2 };
+
+  std::array<unsigned int, 3> indicesSecondTriangle{ 1, 3, 4 };
 
   glBindVertexArray(VAO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), &indices[0], GL_STATIC_DRAW);
-  // 0 -> position vertex attribute
-  // 3 -> size of the vertex atribute (vec3)
-  // GL_FALSE -> we don't want (in this case) the data to be normalized.
-  // 3 * sizeof(float) -> stride, i.e, space in bytes between each vertex attribute.
-  // (void *)0 -> offset
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indicesFirstTriangle.size(), &indicesFirstTriangle[0], GL_STATIC_DRAW);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
-  // glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
+
+  glBindVertexArray(VAO2);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO2);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indicesSecondTriangle.size(), &indicesSecondTriangle[0], GL_STATIC_DRAW);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 
   while(!glfwWindowShouldClose(window))
@@ -135,9 +185,14 @@ main()
       glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
 
-      glUseProgram(shader_program);
       glBindVertexArray(VAO);
-      glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+      glUseProgram(shader_program);
+      glDrawElements(GL_TRIANGLES, indicesFirstTriangle.size(), GL_UNSIGNED_INT, 0);
+
+      glBindVertexArray(VAO2);
+      glUseProgram(shader_program_second_triangle);
+      glDrawElements(GL_TRIANGLES, indicesSecondTriangle.size(), GL_UNSIGNED_INT, 0);
+
       glBindVertexArray(0);
 
       glfwSwapBuffers(window);
@@ -146,6 +201,7 @@ main()
 
   glDeleteShader(vertex_shader);
   glDeleteShader(fragment_shader);
+  glDeleteShader(fragment_shader_second_triangle);
   glfwTerminate();
 
   return EXIT_SUCCESS;
