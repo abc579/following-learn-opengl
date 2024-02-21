@@ -48,7 +48,7 @@ int main()
 
     glGenBuffers(1, &EBO);
 
-    std::array<float, 30> vertices{
+    std::array<float, 18> vertices{
         0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f,  // bottom right
         -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom left
         0.0f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f   // top
