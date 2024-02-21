@@ -77,7 +77,6 @@ int main()
 
         glBindVertexArray(VAO);
         shader.use();
-        shader.setUniformFloat("horizontalOffsetUniform", -0.2f);
         glDrawElements(GL_TRIANGLES, indicesFirstTriangle.size(), GL_UNSIGNED_INT, 0);
 
         glBindVertexArray(0);
