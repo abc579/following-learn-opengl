@@ -1,5 +1,4 @@
 * Graphics Programming
-
 ** OpenGL
 *** What is OpenGL?
 OpenGL is considered an API or specification that tells graphic driver developers (NVIDIA, AMD or Intel) what a function
@@ -42,7 +41,8 @@ The blue background colored phases or steps are the ones where we can inject our
 Goal of each step:
 
 1. *Vertex Shader*: transform 3D coordinates into "different" 3D coordinates. This shader also allows us to tinker with
-   vertex attributes. These coordinates need to be [[Normalized Device Coordinates][normalized]].
+   vertex attributes. These coordinates need to be [[Normalized Device Coordinates][normalized]]. Input variables within this shader are usually referred
+   to as [[Vertex Attributes][vertex attributes]].
 2. *Geometry Shader*: the output of the vertex shader is passed to this one. This shader can generate new shapes using the
    ones we gave it. In the image above, we can see that it creates a second triangle. This shader is _optional_.
 3. *Shape Assembly*: the output of the geometry shader or vertex is passed to this one. It takes these vertices or vertex
@@ -61,6 +61,29 @@ correctly.
 *** Shaders
 They're basically programs that run in the GPU. They need to be created, compiled and when we link them together they
 produce a [[Shader Program][shader program]].  Since we need to create shaders, we also need to _delete them_.
+
+A shader typically has the following structure:
+
+#+NAME: Typical shader program
+#+BEGIN_SRC glsl
+  #version version_number
+  in type in_variable_name;
+  in type in_variable_name;
+
+  out type out_variable_name;
+
+  uniform type uniform_name;
+
+  void main() {
+    // process input and do something...
+
+    // output processed stuff to output variable
+    out_variable_name = weird_stuff_processed;
+  }
+#+END_SRC
+
+We can pass data between shaders (contiguous) if input and output variables have the same name and type. When we link the shaders
+together, OpenGL will take care of that.
 
 *** Shader Program
 Linked version of multiple shaders combined.  To create a shader program, first, we need to create a program, then
@@ -186,7 +209,88 @@ TODO
 *** Wireframe Mode
 It's a mode that draws only the edges of triangles.
 
+*** Uniforms
+Are global variables that live within shaders. They're useful when we need to change something -like a color- every
+frame or to pass information between shaders, since they're shared among all shaders that are linked together.
+
+The syntax is:
+
+#+NAME: Example of uniform variable
+#+BEGIN_SRC glsl
+  uniform vec4 myColor;
+#+END_SRC
+
+The way we initialize the uniform from our program/application (and also our CPU) is by invoking the function
+glUniform4f (or similar ones):
+
+#+NAME: Example of uniform variable
+#+BEGIN_SRC glsl
+  int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+  glUseProgram(shaderProgram);
+  glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+#+END_SRC
+
+_NOTE_:
+
+If you declare a uniform that isn't used anywhere in your GLSL code the compiler will silently remove the variable from
+the compiled version which is the cause for several frustrating errors; keep this in mind!
+
 ** Render Loop
 The render loop is the main loop of the program where we _typically_ do 3 things: *process keyboard input*, *render stuff* and
 finally *draw to the screen*.  Statements executed within this loop are said to be executed in _one frame_.  Because of
 this, it's important for functions within this section to be as fast as possible.
+** GLSL
+It's the language that we use to write shaders. Similar to C.
+
+It contains useful features to work with vectors and matrices.
+
+Types supported:
+
+- uint
+- int
+- float
+- double
+- bool
+
+Containers available:
+
+- vectors (n represents the number of components, [2, 4])
+  Components are: x, y, z and w.
+
+  Type of vectors:
+
+  - vecn (floats)
+  - bvecn (boolean)
+  - ivecn (integers)
+  - uvecn (unsigned integers)
+  - dvecn (double)
+
+- matrices
+
+*** Swizzling
+It's a syntax feature of GLSL that allows us to create vectors in a fancy way.
+
+For example:
+
+#+NAME: Typical shader program
+#+BEGIN_SRC glsl
+  void main() {
+    vec2 someVec;
+    vec4 differentVec = someVec.xyxx;
+    vec3 anotherVec = differentVec.zyw;
+    vec4 otherVec = someVec.xxxx + anotherVec.yxzy;
+  }
+#+END_SRC
+
+** Interpolation
+Imagine we had a right triangle with three vertices.
+
+Each vertex has a different color, for example, red, green and blue.
+
+Now, within the triangle there are a lot of fragments or pixels that are in-between these vertices, and because a change
+of color need to happen as we approach to one of the vertices, OpenGL computes a mix of colors with a smooth transition
+for each fragment. That process is called interpolation.
+
+For example, if we look from the red vertex to the green one, we'd see the color yellow exactly in the middle of the
+trajectory. As we approach the green vertex, the color will smoothly be converting to green.
+

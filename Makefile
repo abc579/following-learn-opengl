@@ -13,7 +13,8 @@ DEPS_BUILD_FLAGS=$(INCLUDE_FLAGS) $(DEBUG_FLAGS)
 all: output tags deps
 	g++ $(DEPS_BUILD_FLAGS) -c src/glad.c -o output/glad.o
 	g++ $(CURRENT_BUILD_FLAGS) -c src/main.cpp -o output/main.o $(LD_FLAGS)
-	g++ $(CURRENT_BUILD_FLAGS) output/main.o output/glad.o -o output/dumb_program $(LD_FLAGS)
+	g++ $(CURRENT_BUILD_FLAGS) -c src/Shader.cpp -o output/Shader.o $(LD_FLAGS)
+	g++ $(CURRENT_BUILD_FLAGS) output/Shader.o output/main.o output/glad.o -o output/dumb_program $(LD_FLAGS)
 
 output: clean
 	mkdir -p output
