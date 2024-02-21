@@ -77,7 +77,7 @@ int main()
 
         glBindVertexArray(VAO);
         shader.use();
-        shader.setUniformFloat("ourColor", 1.0f);
+        shader.setUniformFloat("testColor", 1.0f);
         glDrawElements(GL_TRIANGLES, indicesFirstTriangle.size(), GL_UNSIGNED_INT, 0);
 
         glBindVertexArray(0);
