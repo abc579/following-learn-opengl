@@ -2486,8 +2486,8 @@ void Shader::setUniformFloat(setUniformFloat81,2638
 
 src/main.cpp,76
 int main(12,232
-framebuffer_size_callback(95,2689
-process_input(101,2821
+framebuffer_size_callback(95,2704
+process_input(101,2836
 
 src/glad.c,23741
 #undef APIENTRY31,681
