@@ -235,6 +235,99 @@ _NOTE_:
 If you declare a uniform that isn't used anywhere in your GLSL code the compiler will silently remove the variable from
 the compiled version which is the cause for several frustrating errors; keep this in mind!
 
+*** Texture Wrapping
+When the texture coordinates fall outside the range, there are multiple behaviors available:
+
+- GL_REPEAT: repeats the texture image.
+- GL_MIRRORED_REPEAT: same as GL_REPEAT but mirrors the image in each repetition.
+- GL_CLAMP_TO_EDGE: clamps between 0 and 1. Stretch effect.
+- GL_CLAMP_TO_BORDER: coordinates outside the range are given a user-specified border color.
+
+#+CAPTION: Texture Wrapping Example
+#+NAME: TextureWrapping.png
+[[./TextureWrapping.png]]
+
+When setting these options, we have the ability to do it per coordinate-axis. Here, x, y and z are called:
+
+- s -> x
+- t -> y
+- r -> z
+
+#+NAME: Example
+#+BEGIN_SRC cpp
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+#+END_SRC
+
+*** Texture Filtering
+It's how OpenGL determines the color of a pixel on a textured object. When we give a floating point number, for example,
+0.5f, then OpenGL looks at nearby [[Texel][texels]] and blends their color together ([[Interpolation][interpolation]]), outputting the final colored
+pixel.
+
+There are two types of filtering:
+
+- GL_NEAREST: nearest point or point filtering. It's the default one. OpenGL selects the texel that center is closest to
+  the texture coordinate.
+
+#+CAPTION: Nearest Filtering
+#+NAME: NearestFiltering.png
+[[./NearestFiltering.png]]
+
+- GL_LINEAR: bilinear filtering. OpenGL takes an interpolated value from the neighboring texels, approximating a color.
+
+#+CAPTION: Linear Filtering
+#+NAME: LinearFiltering.png
+[[./LinearFiltering.png]]
+
+We can also use these two filtering options for [[Magnifying][magnifying]] or [[Minifying][minifying]] operations.
+
+*** Texel
+Texture pixel.
+
+*** MipMaps
+MipMaps are textures that OpenGL uses when rendering objects that are far away from the viewer.
+
+They're optimized and scaled down (twice per object) and OpenGL uses one or the other depending on the distance from the
+viewer to the object.
+
+As OpenGL changes from one texture to another, it may produce visible sharp edges between the two textures.
+
+Example:
+
+#+CAPTION: MipMap
+#+NAME: MipMap.png
+[[./MipMap.png]]
+
+As with regular textures, we can apply [[Texture Filtering][texture filtering]] too.
+
+Options are:
+
+- GL_NEAREST_MIPMAP_NEAREST: takes nearest mipmap to match the pixel size and uses nearest neighbor interpolation for
+  texture sampling.
+
+- GL_LINEAR_MIPMAP_NEAREST: takes nearest mipmap level and samples that level using linear interpolation.
+
+- GL_NEAREST_MIPMAP_LINEAR: linearly interpolates between the two mipmaps that most closely match the size of a pixel
+  and samples the interpolated level via nearest neighbor interpolation.
+
+- GL_LINEAR_MIPMAP_LINEAR: linearly interpolates between the two closest mipmaps and samples the interpolated level via
+  linear interpolation.
+
+#+NAME: Setting filtering method for mipmaps
+#+BEGIN_SRC cpp
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+#+END_SRC
+
+_NOTE_:
+
+A common mistake is to set one of the mipmap filtering options as the magnification filter. This doesn't have any
+effect since mipmaps are primarily used for when textures get downscaled: texture magnification doesn't use mipmaps
+and giving it a mipmap filtering option will generate an OpenGL GL_INVALID_ENUM error code.
+
+*** Texture Unit
+TODO
+
 ** Render Loop
 The render loop is the main loop of the program where we _typically_ do 3 things: *process keyboard input*, *render stuff* and
 finally *draw to the screen*.  Statements executed within this loop are said to be executed in _one frame_.  Because of
@@ -293,4 +386,24 @@ for each fragment. That process is called interpolation.
 
 For example, if we look from the red vertex to the green one, we'd see the color yellow exactly in the middle of the
 trajectory. As we approach the green vertex, the color will smoothly be converting to green.
+
+** Texture
+It's an image that can be 1D, 2D or 3D that we use to add detail to an object.
+
+Coordinates go from (0,0), which is lower left corner, to (1,1) upper right corner.
+
+Example:
+
+#+CAPTION: Texture Coordinates Example
+#+NAME: TextureCoordinates.png
+[[./TextureCoordinates.png]]
+
+** Sampling
+It refers to the process of obtaining the texture color from the texture's coordinates.
+** Magnifying
+Scaling up a texture.
+
+** Minifying
+Scaling down a texture.
+
 
