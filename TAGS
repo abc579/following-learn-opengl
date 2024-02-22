@@ -3054,8 +3054,8 @@ void Shader::setUniformFloat(setUniformFloat81,2638
 src/main.cpp,116
 #define STB_IMAGE_IMPLEMENTATION9,141
 int main(15,289
-framebuffer_size_callback(125,3989
-process_input(131,4121
+framebuffer_size_callback(148,4940
+process_input(154,5072
 
 src/glad.c,23741
 #undef APIENTRY31,681

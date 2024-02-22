@@ -16,6 +16,8 @@ int main()
 {
     std::ios::sync_with_stdio(false);
 
+    stbi_set_flip_vertically_on_load(true);
+
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -84,7 +86,7 @@ int main()
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
 
-    data = stbi_load("./assets/awesomeface.jpg", &width, &height, &numberChannels, 0);
+    data = stbi_load("./assets/awesomeface.png", &width, &height, &numberChannels, 0);
     if(!data) {
         std::cerr << "Could not load awesomeface image.\n";
         return EXIT_FAILURE;
@@ -95,7 +97,7 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
 
@@ -124,7 +126,11 @@ int main()
         glBindTexture(GL_TEXTURE_2D, textures[0]);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, textures[1]);
+
         shader.use();
+        shader.setUniformInt("ourTexture", 0);
+        shader.setUniformInt("ourTexture2", 1);
+
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, textureIndices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
