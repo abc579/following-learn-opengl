@@ -10,10 +10,9 @@
 #include <stb_image.h>
 
 void framebuffer_size_callback(GLFWwindow *, int, int);
-void process_input(GLFWwindow *);
+void process_input(GLFWwindow *, float&);
 
-int main()
-{
+int main() {
     std::ios::sync_with_stdio(false);
 
     stbi_set_flip_vertically_on_load(true);
@@ -53,10 +52,14 @@ int main()
 
     glGenBuffers(1, &EBO);
 
+    // 1.0 -> 1
+    // 2.0 -> 4
+    // 3.0 -> 9
+    // 4.0 -> 16
     std::array<float, 32> vertices{
-        // positions          // colors           // texture coords
-        0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-        0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+         // positions         // colors           // texture coords
+         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
         -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
         -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
     };
@@ -96,7 +99,7 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
@@ -115,8 +118,10 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    float blendFactor = 0.2f;
+
     while(!glfwWindowShouldClose(window)) {
-        process_input(window);
+        process_input(window, blendFactor);
 
         // Render part.
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -130,6 +135,7 @@ int main()
         shader.use();
         shader.setUniformInt("ourTexture", 0);
         shader.setUniformInt("ourTexture2", 1);
+        shader.setUniformFloat("blendFactor", blendFactor);
 
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, textureIndices.size(), GL_UNSIGNED_INT, 0);
@@ -144,17 +150,16 @@ int main()
     return EXIT_SUCCESS;
 }
 
-void
-framebuffer_size_callback([[maybe_unused]]GLFWwindow *window, int width, int height)
-{
+void framebuffer_size_callback([[maybe_unused]]GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-void
-process_input(GLFWwindow *window)
-{
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
+void process_input(GLFWwindow* window, float& blendFactor) {
+    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
+    } else if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+        blendFactor -= 0.01f;
+    } else if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+        blendFactor += 0.01f;
     }
 }

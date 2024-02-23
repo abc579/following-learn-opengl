@@ -326,7 +326,11 @@ effect since mipmaps are primarily used for when textures get downscaled: textur
 and giving it a mipmap filtering option will generate an OpenGL GL_INVALID_ENUM error code.
 
 *** Texture Unit
-TODO
+It's like a "shelf" where we can store a different number of textures, usually up to 16 (hardware dependant).
+
+GL_TEXTURE_0 -> GL_TEXTURE_15
+
+This means we can use up to 16 textures in a single shader.
 
 ** Render Loop
 The render loop is the main loop of the program where we _typically_ do 3 things: *process keyboard input*, *render stuff* and
@@ -397,6 +401,8 @@ Example:
 #+CAPTION: Texture Coordinates Example
 #+NAME: TextureCoordinates.png
 [[./TextureCoordinates.png]]
+
+What if we go outside this range? See [[Texture Wrapping][texture wrapping]].
 
 ** Sampling
 It refers to the process of obtaining the texture color from the texture's coordinates.

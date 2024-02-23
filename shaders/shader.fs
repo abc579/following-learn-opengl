@@ -7,7 +7,8 @@ in vec2 texCoordsOut;
 
 uniform sampler2D ourTexture;
 uniform sampler2D ourTexture2;
+uniform float blendFactor;
 
 void main() {
-    FragColor = mix(texture(ourTexture, texCoordsOut), texture(ourTexture2, texCoordsOut), 0.2);
+    FragColor = mix(texture(ourTexture, texCoordsOut), texture(ourTexture2, texCoordsOut), blendFactor);
 }
