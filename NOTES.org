@@ -413,3 +413,120 @@ Scaling up a texture.
 Scaling down a texture.
 
 
+** Mathematics
+
+*** Vectors
+Are just directions. They have a direction and a magnitude.
+
+We generally work with vectors from 2D to 4D.
+
+The direction tells us where the vector is heading to: left, right, up, down, etc.
+
+The magnitude (also known as strength or length) tells us how many "steps" or "units" we have to walk until we reach our
+destination.
+
+It's like a treasure map: (1, 3) means walk 1 step rightwards, then 3 steps upwards.
+
+Because they're directions, we don't care about the origin of them to define equality. For example, these two vectors w
+and v are equal:
+
+#+CAPTION: Equal vectors
+#+NAME: EqualVectors.png
+[[./EqualVectors.png]]
+
+Vectors in formulas are represented like this:
+
+#+CAPTION: Vector Representation
+#+NAME: VectorDefinition.png
+[[./VectorDefinition.png]]
+
+When we want to represent a vector as a coordinate or position, we pick an origin, generally (0, 0, 0), and from there
+we draw a line pointing to the position or point that we want. This is called a _position vector_.
+We could also pick some other origin and then say: "this vector points to that point in space from this origin".
+
+Using vectors we can represent _positions_ and _directions_ in 2D and 3D space.
+
+**** Scalar Vector Operations
+When we say scalar we just mean a constant. It's just about multiplying a vector by a constant.
+
+Addition, subtraction, multiplication and division by a scalar consists on adding/subtract/multiply and divide each
+vector component by that scalar, and that's it.
+
+For example:
+
+#+CAPTION: Vector Scalar Operations
+#+NAME: VectorScalarOperations.png
+[[./VectorScalarOperations.png]]
+
+This has the effect of [[Scaling][scaling]] the vector by some amount. For example: zooming in and out.
+
+**** Vector Negation
+When we negate a vector we get the same vector but in the reversed direction.
+
+If we have a vector that points to north-east and we negate it, we'd get a vector pointing to south-west.
+
+It's just about flipping the sign of each vector component, which means multiplying it by -1!
+
+#+CAPTION: Vector Negation
+#+NAME: VectorNegation.png
+[[./VectorNegation.png]]
+
+**** Addition and Subtraction
+Both operations are _component wise_:
+
+#+CAPTION: Vector Addition and Subtraction
+#+NAME: VectorAddSub.png
+[[./VectorAddSub.png]]
+
+If we had two vectors, v(4, 2) k(1, 2) and we'd add them together, we'd get a new vector that points directly to the end
+point, something like this:
+
+#+CAPTION: Adding Two Vectors Representation
+#+NAME: AddingTwoVectors.png
+[[./AddingTwoVectors.png]]
+
+Related stuff: [[Parallelogram Law][parallelogram law]].
+
+Subtraction yields another vector that's the difference between the two points the vectors are pointing at.
+In other words, we get a vector that points from the end of the first vector to the end of the second vector.
+Like this:
+
+#+CAPTION: Subtracting Two Vectors Representation
+#+NAME: SubtractingTwoVectors.png
+[[./SubtractingTwoVectors.png]]
+
+**** Length
+It can be understood as the distance or units we have to travel from an origin to the end point of a vector. This
+distance is in a straight line, meaning it's the shortest distance to get to that end point.
+
+We obtain it using Pythagoras theorem, because we can represent the vector as a rectangle triangle:
+
+#+CAPTION: Magnitude or Length of a Vector
+#+NAME: MagnitudeLengthVector.png
+[[./MagnitudeLengthVector.png]]
+
+We can even extend this to 3D by adding the \(z^2\) to the equation.
+
+**** Normalizing a Vector
+
+
+**** Vector-to-Vector Multiplication
+
+***** Dot Production
+
+***** Cross Product
+
+*** Matrices
+
+*** Matrix-Vector Multiplication
+
+*** Scaling
+
+*** Translation
+
+*** Rotation
+
+*** Combining Matrices
+
+*** Parallelogram Law
+TODO
