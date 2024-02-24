@@ -412,9 +412,7 @@ Scaling up a texture.
 ** Minifying
 Scaling down a texture.
 
-
 ** Mathematics
-
 *** Vectors
 Are just directions. They have a direction and a magnitude.
 
@@ -505,28 +503,240 @@ We obtain it using Pythagoras theorem, because we can represent the vector as a 
 #+NAME: MagnitudeLengthVector.png
 [[./MagnitudeLengthVector.png]]
 
-We can even extend this to 3D by adding the \(z^2\) to the equation.
+We can even extend this to 3D by adding the \(^{z^2}\) to the equation.
 
-**** Normalizing a Vector
+**** Unit Vector
+It's just a vector but with an important property: it's length is 1.
 
+This happens after [[Normalizing Vectors][normalizing]] a vector.
+
+We can calculate a unit vector from any vector by dividing each component by its length, like this:
+
+\(\hat{n} = \frac{\vec{v}}{\|\vec{v}\|}\)
+
+**** Normalizing Vectors
+Normalizing a vector means dividing each vector's component by the length of the vector.
+
+By doing this, we'll get a new vector that points in the same direction but with length 1.
+
+It's particularly useful when comparing different vectors.
+
+But what does it mean to normalize a vector? Here's an example:
+
+Imagine you have a bunch of arrows, each pointing in a different direction and with different lengths. Some arrows are
+longer, and some are shorter. Now, let's say you want to compare how strong each arrow is in pushing something. But the
+problem is, it's hard to tell how strong they are just by looking at them because some are longer than others.
+
+So, to make it fair and easier to compare, we decide to make all the arrows the same length. We don't care about their
+original lengths; we just want to see how strong they are compared to each other when they're all the same length.
+
+In math, vectors are like those arrows, and their 'strength' is how long they are. When we normalize a vector, we're
+making all the vectors the same length, like making all the arrows the same length. This makes it easier to compare and
+work with vectors in math and computer graphics.
 
 **** Vector-to-Vector Multiplication
+There's two ways of multiplying matrices: dot and cross product.
 
-***** Dot Production
+***** Dot Product
+The dot product of two vectors is the product of their lengths times the cosine of the angle between them.
+
+\(\vec{v} \cdot \vec{k} = \|\vec{v}\| \cdot \|\vec{k}\| \cdot \cos \theta\)
+
+If v and k were [[Unit Vector][unit vectors]] then we can say that _the dot product of two vectors defines the angle between them_.
+
+The letter (θ) is theta.
+
+Considering that the cosine of 90º is 0 and the cosine of 0º is 1, then we could _test, using the dot product, if two
+vectors are parallel or orthogonal to each other_. Orthogonal means perpendicular, which means that the two vectors form
+a right angle (90º).
+
+It's just a _component-wise_ multiplication where we add the results together.
+
+#+CAPTION: Dot Product
+#+NAME: DotProduct.png
+[[./DotProduct.png]]
+
+Having the dot product and knowing that theta can be obtained with the inverse of the cosine, then we have:
+
+\(\theta = \cos^{-1}(\vec{a} \cdot \vec{b})\)
+\(\theta = \cos^{-1}(-0.8)\)
+
+Which yields a degree of 143,1.
 
 ***** Cross Product
+It's only defined in 3D space.
+
+The output of this operation is a new vector that is orthogonal to both.
+
+#+CAPTION: Cross Product Representation
+#+NAME: CrossProduct.png
+[[./CrossProduct.png]]
+
+This is the formula. To really understand what's going on I should learn more linear algebra:
+
+#+CAPTION: Cross Product Formula
+#+NAME: CrossProductFormula.png
+[[./CrossProductFormula.png]]
 
 *** Matrices
+They're a rectangular array of numbers. Classic NxM array. NxM are called the _dimensions_ of the matrix.
+
+Each number is called an _element_ of the matrix.
+
+**** Matrix Addition and Subtraction
+Additions and subtractions are only defined for matrices with the same dimensions.
+
+They're _element-wise_ operations.
+
+#+CAPTION: Addition and Subtraction of Matrices
+#+NAME: AddSubMatrices.png
+[[./AddSubMatrices.png]]
+
+**** Matrix-scalar products
+It's similar to vectors. We multiply the scalar times each component:
+
+#+CAPTION: Matrix-scalar product
+#+NAME: MatrixScalarMultiplication.png
+[[./MatrixScalarMultiplication.png]]
+
+**** Matrix-Matrix Multiplication
+There are restrictions to multiply matrices:
+
+1. _We can only multiply matrices if the number of columns of the left-hand side matrix is equal to the number of rows of
+   the right-hand side matrix_.
+2. _It's not commutative, meaning A · B != B · A_.
+
+Example:
+
+#+CAPTION: Matrix-Matrix Multiplication
+#+NAME: MatrixMatrixMultiplication.png
+[[./MatrixMatrixMultiplication.png]]
+
+The output matrix is one with (N, M) dimensions, where N is the number of rows of the left-hand side matrix and M is the
+number of columns of the right-hand side matrix.
 
 *** Matrix-Vector Multiplication
+If we have a MxN matrix and we have a Nx1 vector, multiplication is defined.
 
-*** Scaling
+There are interesting properties when we perform these kind of multiplications.
 
-*** Translation
+_Multiplying that matrix with the vector transforms the vector!_
 
-*** Rotation
+**** Identity Matrix
+One _transformation_ matrix that we can think of is the _identity matrix_.
+
+This matrix is just a NxN matrix with all 0's except on its diagonal, which is filled with 1's.
+
+When we multiply a vector by this matrix, it leaves the vector unchanged:
+
+#+CAPTION: Identity Matrix
+#+NAME: IdentityMatrix.png
+[[./IdentityMatrix.png]]
+
+**** Scaling
+There are two types of scaling: _non-uniform_ and _uniform_.
+
+- Non-uniform: when we scale the matrix with different factors per axis.
+- Uniform: when we scale the matrix with the same factor per axis.
+
+Now, considering the identity matrix, we can scale a vector by changing the 1's in the diagonal with the factors we
+want:
+
+#+CAPTION: Scaling Vector With Matrix
+#+NAME: ScalingVectorWithMatrix.png
+[[./ScalingVectorWithMatrix.png]]
+
+We let the 4th component to 1 for now. This corresponds to the W component in OpenGL.
+
+**** Translation
+It's adding another vector on top of the original vector. This yields a new vector with a different position.
+
+This means we're "moving" the original vector based on a translation vector.
+
+Again, we use the identity matrix to perform this operation. In this case and because we have 4 components (it wouldn't
+work with 3) we can do this trick:
+
+#+CAPTION: Translation Matrix
+#+NAME: TranslationMatrix.png
+[[./TranslationMatrix.png]]
+
+Where T's are the components of the translation vector and x,y,z is the original vector.
+
+With a translation matrix we can move any object in the 3 axis directions.
+
+**** Homogeneous Coordinates
+The W component of a vector is known as a homogeneous coordinate.
+
+If we want to get the 3D vector of a homogeneous vector (4D), we need to divide each component by the W coordinate.
+
+Usually this component has the value 1.0.
+
+It helps us translate 3D vectors and to create 3D perspective.
+
+If the W coordinate is 0.0, then the vector is known to be a _direction vector_ because it cannot be translated.
+
+**** Rotation
+Rotation means rotating an object over an axis with a certain angle.
+
+To rotate 2D objects in OpenGL, we only need to provide the angle and the rotation axis as the Z-axis.
+
+To rotate 3D objects, we need to provide the angle and the rotation axis (the one that will remain fixed over the
+duration of the rotation).
+
+To transform vectors to rotate them (rotated vectors), depending on the axis we want to rotate on, we can use these
+matrices:
+
+Rotation around the X-axis:
+
+#+CAPTION: Rotation Matrix X Axis
+#+NAME: RotationMatrixXAxis.png
+[[./RotationMatrixXAxis.png]]
+
+Rotation around the Y-axis:
+
+#+CAPTION: Rotation Matrix Y Axis
+#+NAME: RotationMatrixYAxis.png
+[[./RotationMatrixYAxis.png]]
+
+Rotation around the Z-axis:
+
+#+CAPTION: Rotation Matrix Z Axis
+#+NAME: RotationMatrixZAxis.png
+[[./RotationMatrixZAxis.png]]
+
+NOTE: To rotate around an arbitrary 3D axis we'd need to use a more complex matrix or quaternions.
 
 *** Combining Matrices
+Matrices are awesome because we can mix multiple transformation matrices in a single matrix to then modify a vector.
+
+For example, say we have our vector (x, y, z) and we wanted to scale it by 2 and then translate it by (1, 2, 3).
+
+Our combination of scale and translate matrix would look like this:
+
+#+CAPTION: Transformation Matrix Combination
+#+NAME: TransformationMatrixCombination.png
+[[./TransformationMatrixCombination.png]]
+
+It's important _to remember that matrix multiplication is not commutative_, so we first translate and then scale.
+
+It's important to read the multiplication from right to left (math. properties).
+
+NOTE: _It is advised to first do scaling operations, then rotations and lastly translations when combining matrices
+otherwise they may (negatively) affect each other_.
+
+You can see in this image that the vector is firstly scaled by 2 and then translated by 1, 2 and 3!
+
+#+CAPTION: Transformation Matrix Combination End
+#+NAME: TransformationMatrixCombinationEnd.png
+[[./TransformationMatrixCombinationEnd.png]]
 
 *** Parallelogram Law
 TODO
+
+*** Read, TODO
+In order:
+
+- https://www.khanacademy.org/math/geometry-home/right-triangles-topic/intro-to-the-trig-ratios-geo/v/basic-trigonometry
+- https://www.khanacademy.org/math/algebra-home/alg-matrices
+- https://www.khanacademy.org/math/linear-algebra/matrix-transformations
+- https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab
