@@ -744,4 +744,5 @@ In order:
 - https://www.khanacademy.org/math/linear-algebra/matrix-transformations
 - https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab
 
-  First commit from Gentoo test!
+We need to understand the explanation and REALLY how the two exercises of the "Transformations" chapter work. If we
+don't, we'll never get good at this.

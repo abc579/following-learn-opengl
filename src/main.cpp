@@ -125,8 +125,8 @@ int main() {
         process_input(window, blendFactor);
 
         glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
         trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
 
         // Render part.
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -140,10 +140,19 @@ int main() {
         shader.use();
         shader.setUniformInt("ourTexture", 0);
         shader.setUniformInt("ourTexture2", 1);
-        int transformLoc = glGetUniformLocation(shader.id, "transform");
+        const int transformLoc = glGetUniformLocation(shader.id, "transform");
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 
         glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, textureIndices.size(), GL_UNSIGNED_INT, 0);
+
+        glm::mat4 trans2 = glm::mat4(1.0f);
+        trans2 = glm::translate(trans2, glm::vec3(-0.5f, 0.5f, 0.0f));
+        const float scale = std::sin((float)glfwGetTime());
+        trans2 = glm::scale(trans2, glm::vec3(scale, scale, scale));
+        const int transformLoc2 = glGetUniformLocation(shader.id, "transform");
+        glUniformMatrix4fv(transformLoc2, 1, GL_FALSE, glm::value_ptr(trans2));
+
         glDrawElements(GL_TRIANGLES, textureIndices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
