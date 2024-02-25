@@ -49,22 +49,56 @@ int main() {
     unsigned int VAO = 0;
     unsigned int EBO = 0;
 
+    glEnable(GL_DEPTH_TEST);
+
     glGenVertexArrays(1, &VAO);
 
     glGenBuffers(1, &VBO);
 
     glGenBuffers(1, &EBO);
 
-    // 1.0 -> 1
-    // 2.0 -> 4
-    // 3.0 -> 9
-    // 4.0 -> 16
-    std::array<float, 20> vertices{
-         // positions         // texture coords
-         0.5f,  0.5f, 0.0f,   1.0f, 1.0f,   // top right
-         0.5f, -0.5f, 0.0f,   1.0f, 0.0f,   // bottom right
-        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f,   // bottom left
-        -0.5f,  0.5f, 0.0f,   0.0f, 1.0f    // top left
+    std::array<float, 200> vertices {
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
     std::array<unsigned int, 6> textureIndices {
@@ -75,7 +109,7 @@ int main() {
     int width = 0;
     int height = 0;
     int numberChannels = 0;
-    unsigned char* data = stbi_load("./assets/container.jpg", &width, &height, &numberChannels, 0);
+    unsigned char* data = stbi_load("./assets/background.jpg", &width, &height, &numberChannels, 0);
     if(!data) {
         std::cerr << "Could not load container image.\n";
         return EXIT_FAILURE;
@@ -92,7 +126,7 @@ int main() {
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
 
-    data = stbi_load("./assets/awesomeface.png", &width, &height, &numberChannels, 0);
+    data = stbi_load("./assets/hang.png", &width, &height, &numberChannels, 0);
     if(!data) {
         std::cerr << "Could not load awesomeface image.\n";
         return EXIT_FAILURE;
@@ -121,16 +155,25 @@ int main() {
 
     float blendFactor = 0.2f;
 
+    std::array<glm::vec3, 10> cubePositions {
+        glm::vec3( 0.0f,  0.0f,  0.0f),
+        glm::vec3( 2.0f,  5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3( 2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f,  3.0f, -7.5f),
+        glm::vec3( 1.3f, -2.0f, -2.5f),
+        glm::vec3( 1.5f,  2.0f, -2.5f),
+        glm::vec3( 1.5f,  0.2f, -1.5f),
+        glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
+
     while(!glfwWindowShouldClose(window)) {
         process_input(window, blendFactor);
 
-        glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-
         // Render part.
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, textures[0]);
@@ -140,20 +183,28 @@ int main() {
         shader.use();
         shader.setUniformInt("ourTexture", 0);
         shader.setUniformInt("ourTexture2", 1);
-        const int transformLoc = glGetUniformLocation(shader.id, "transform");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
+        glm::mat4 view = glm::mat4(1.0f);
+        glm::mat4 projection = glm::mat4(1.0f);
+
+        projection = glm::perspective(glm::radians(45.0f), (float)1600.0 / (float)1200.0, 0.1f, 100.0f);
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+        shader.setMat4("projection", projection);
+        shader.setMat4("view", view);
 
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, textureIndices.size(), GL_UNSIGNED_INT, 0);
 
-        glm::mat4 trans2 = glm::mat4(1.0f);
-        trans2 = glm::translate(trans2, glm::vec3(-0.5f, 0.5f, 0.0f));
-        const float scale = std::sin((float)glfwGetTime());
-        trans2 = glm::scale(trans2, glm::vec3(scale, scale, scale));
-        const int transformLoc2 = glGetUniformLocation(shader.id, "transform");
-        glUniformMatrix4fv(transformLoc2, 1, GL_FALSE, glm::value_ptr(trans2));
+        for(int i = 0; i < cubePositions.size(); ++i) {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+            float angle = 20.0f * i;
+            // glm::radians(angle)
+            model = glm::rotate(model, (float) glfwGetTime(), glm::vec3(1.0f, 0.3f, 0.5f));
+            shader.setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
-        glDrawElements(GL_TRIANGLES, textureIndices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
         glfwSwapBuffers(window);

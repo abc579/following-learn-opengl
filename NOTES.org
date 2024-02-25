@@ -147,7 +147,7 @@ Process where object's opacity is determined.
 Process where OpenGL determines if one object is in front of another (for example) and blends them accordingly.
 
 *** Normalized Device Coordinates
-X, Y and Z coordinates that range from [-1.0, 1.0].
+X, Y and Z coordinates that range from [-1.0, 1.0]. NDC.
 
 *** Vertex Buffer Object (VBO)
 It's a chunk of memory that we use store all the vertices of a particular object. It can contain information such as
@@ -331,6 +331,9 @@ It's like a "shelf" where we can store a different number of textures, usually u
 GL_TEXTURE_0 -> GL_TEXTURE_15
 
 This means we can use up to 16 textures in a single shader.
+
+*** Coordinate Systems
+TODO
 
 ** Render Loop
 The render loop is the main loop of the program where we _typically_ do 3 things: *process keyboard input*, *render stuff* and
@@ -743,6 +746,7 @@ In order:
 - https://www.khanacademy.org/math/algebra-home/alg-matrices
 - https://www.khanacademy.org/math/linear-algebra/matrix-transformations
 - https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab
+- http://www.songho.ca/opengl/gl_projectionmatrix.html
 
 We need to understand the explanation and REALLY how the two exercises of the "Transformations" chapter work. If we
 don't, we'll never get good at this.
