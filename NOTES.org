@@ -743,3 +743,5 @@ In order:
 - https://www.khanacademy.org/math/algebra-home/alg-matrices
 - https://www.khanacademy.org/math/linear-algebra/matrix-transformations
 - https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab
+
+  First commit from Gentoo test!
