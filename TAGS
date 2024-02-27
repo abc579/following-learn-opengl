@@ -13654,11 +13654,26 @@ static int find_extensionsGL(1057,57652
 static void find_coreGL(1064,57762
 int gladLoadGLLoader(1118,59593
 
-src/main.cpp,127
+src/main.cpp,515
 #define STB_IMAGE_IMPLEMENTATION12,236
-int main(18,392
-void framebuffer_size_callback(219,7285
-void process_input(223,7417
+glm::vec3 cameraPosition 20,484
+glm::vec3 cameraFront 21,540
+glm::vec3 cameraUp 22,594
+constexpr int windowWidth 24,645
+constexpr int windowHeight 25,679
+float deltaTime 27,715
+float lastFrame 28,739
+float yaw 29,763
+float pitch 30,783
+bool firstMouse 31,804
+float lastX 32,828
+float lastY 33,861
+float fov 34,895
+int main(36,914
+void framebuffer_size_callback(249,8270
+void process_input(253,8402
+void mouse_callback(269,9152
+void scroll_callback(303,9923
 
 src/Shader.cpp,253
 Shader::Shader(Shader8,119
