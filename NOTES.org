@@ -416,6 +416,47 @@ Scaling up a texture.
 Scaling down a texture.
 
 ** Mathematics
+*** Basics of Trigonometry
+Trigonometry means the study of triangles.
+
+**** Pythagoras Theorem
+
+\(\vec{c} = \sqrt{\vec{a}^2 + \vec{b}^2}\)
+
+**** Acute Angle
+Angles under 90º.
+
+**** Right Triangle
+It's a triangle where at least one of its angles is 90º.
+
+Example:
+
+#+CAPTION: Right Triangle
+#+NAME: RightTriangle.png
+[[./RightTriangle.png]]
+
+**** Very Important Trigonometry Functions
+They're sine (sin), cosine (cos) and tangent (tan). They're known as trigonometric ratios.
+
+Mnemonic: soh, cah, toa.
+
+sine = opposite / hypotenuse
+cosine = adjacent / hypotenuse
+tangent = opposite / adjacent
+
+They're all defined for [[Acute Angle][acute angles]].
+
+**** Inverse Trigonometric Functions
+If we need to find angles of triangles we need to make use of inverse trigonometric functions.
+
+They do the opposite of trigonometric functions.
+
+- Inverse Sine: \(\sin^{-1}(x)\). Also called arcsin.
+- Inverse Cosine: \(\cos^{-1}(x)\). Also called arccos.
+- Inverse Tangent: \tan^{-1}(x)\). Also called arctan.
+
+_NOTE_: That -1 does not represent a power (that is called multiplicative inverse or reciprocal)!
+
 *** Vectors
 Are just directions. They have a direction and a magnitude.
 
@@ -743,6 +784,8 @@ TODO
 In order:
 
 - https://www.khanacademy.org/math/geometry-home/right-triangles-topic/intro-to-the-trig-ratios-geo/v/basic-trigonometry
+  Progress: Lesson 5: Modeling with right triangles
+
 - https://www.khanacademy.org/math/algebra-home/alg-matrices
 - https://www.khanacademy.org/math/linear-algebra/matrix-transformations
 - https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab

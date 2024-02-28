@@ -1,5 +1,7 @@
 #pragma once
 
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+
 #include "setup.hpp"
 
 namespace glm

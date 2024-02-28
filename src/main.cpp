@@ -7,7 +7,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <Shader.h>
+#include <Shader.hpp>
+#include <Camera.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -17,21 +18,16 @@ void process_input(GLFWwindow*);
 void mouse_callback(GLFWwindow*, double, double);
 void scroll_callback(GLFWwindow* , double, double);
 
-glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
-constexpr int windowWidth = 1600;
-constexpr int windowHeight = 1200;
+constexpr int windowWidth = 1024;
+constexpr int windowHeight = 768;
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
-float yaw = -90.0f;
-float pitch = 30.0f;
 bool firstMouse = true;
 float lastX = windowWidth / 2.f;
 float lastY = windowHeight / 2.f;
-float fov = 55.f;
+
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
 int main() {
     std::ios::sync_with_stdio(false);
@@ -174,17 +170,7 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    float aspectRatio = 1600.0f / 1200.0f;
-    float viewX = 0.0f;
-    float viewY = 0.0f;
-    float viewZ = -3.0f;
-    float rotateX = 1.0f;
-    float rotateY = 0.3f;
-    float rotateZ = 0.5f;
-
-    constexpr float radius = 30.0f;
-
-    std::array<glm::vec3, 10> cubePositions {
+    const std::array<glm::vec3, 10> cubePositions{
         glm::vec3( 0.0f,  0.0f,  0.0f),
         glm::vec3( 2.0f,  5.0f, -15.0f),
         glm::vec3(-1.5f, -2.2f, -2.5f),
@@ -198,13 +184,12 @@ int main() {
     };
 
     while(!glfwWindowShouldClose(window)) {
-        float currentFrame = glfwGetTime();
+        float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
         process_input(window);
 
-        // Render part.
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -217,26 +202,23 @@ int main() {
         shader.setUniformInt("ourTexture", 0);
         shader.setUniformInt("ourTexture2", 1);
 
-        glm::mat4 projection = glm::mat4(1.0f);
-        projection = glm::perspective(glm::radians(fov), (float) windowWidth / windowHeight, 0.1f, 100.f);
-
-        glm::mat4 view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
-
+        glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), (float) windowWidth / (float) windowHeight, 0.1f, 100.f);
         shader.setMat4("projection", projection);
+
+        glm::mat4 view = camera.getViewMatrix();
         shader.setMat4("view", view);
 
         glBindVertexArray(VAO);
-
-        for(int i = 0; i < cubePositions.size(); ++i) {
+        for(unsigned int i = 0; i < cubePositions.size(); ++i) {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, cubePositions[i]);
-            //float angle = 20.0f * i;
-            //model = glm::rotate(model, glm::radians(angle), glm::vec3(rotateX, rotateY, rotateZ));
+            float angle = 20.0f * i;
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
             shader.setMat4("model", model);
+
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
-        glBindVertexArray(0);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -251,64 +233,35 @@ void framebuffer_size_callback([[maybe_unused]]GLFWwindow* window, int width, in
 }
 
 void process_input(GLFWwindow* window) {
-    static const float cameraSpeed = 0.5f * deltaTime;
-
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     } else if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        cameraPosition += cameraSpeed * cameraFront;
+        camera.processKeyboard(CameraMovementOptions::FORWARD, deltaTime);
     } else if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        cameraPosition -= cameraSpeed * cameraFront;
+        camera.processKeyboard(CameraMovementOptions::BACKWARD, deltaTime);
     } else if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        cameraPosition += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        camera.processKeyboard(CameraMovementOptions::RIGHT, deltaTime);
     } else if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        cameraPosition -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        camera.processKeyboard(CameraMovementOptions::LEFT, deltaTime);
     }
 }
 
-void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+void mouse_callback([[maybe_unused]]GLFWwindow* window, double xpos, double ypos) {
     if(firstMouse) {
-        lastX = xpos;
-        lastY = ypos;
+        lastX = static_cast<float>(xpos);
+        lastY = static_cast<float>(ypos);
         firstMouse = false;
     }
 
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos;
-    lastX = xpos;
-    lastY = ypos;
+    float xOffset = static_cast<float>(xpos) - lastX;
+    float yOffset = lastY - static_cast<float>(ypos);
+    lastX = static_cast<float>(xpos);
+    lastY = static_cast<float>(ypos);
 
-    float sensitivity = 0.05f;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
-
-    yaw   += xoffset;
-    pitch += yoffset;
-
-    if(pitch > 89.0f) {
-        pitch = 89.0f;
-    }
-
-    if(pitch < -89.0f) {
-        pitch = -89.0f;
-    }
-
-    glm::vec3 direction;
-    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    direction.y = sin(glm::radians(pitch));
-    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    cameraFront = glm::normalize(direction);
+    camera.processMouseMovement(xOffset, yOffset, true);
 }
 
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+void scroll_callback([[maybe_unused]]GLFWwindow* window, [[maybe_unused]]double xoffset, double yoffset)
 {
-    fov -= (float)yoffset;
-
-    if(fov < 1.0f) {
-        fov = 1.0f;
-    }
-
-    if(fov > 45.0f) {
-        fov = 45.0f;
-    }
+    camera.processMouseScroll(static_cast<float>(yoffset));
 }
