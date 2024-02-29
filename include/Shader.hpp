@@ -1,7 +1,8 @@
 #pragma once
 
 #include <string>
-#include <glm/glm.hpp>
+
+#include <glm/mat4x4.hpp>
 
 struct Shader {
     unsigned int id;

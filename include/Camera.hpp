@@ -1,9 +1,11 @@
 #pragma once
 
 #include <glad/glad.h>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/matrix_clip_space.hpp>
+
 #include <iostream>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include <cmath>
 
 enum class CameraMovementOptions {
     FORWARD,
@@ -37,26 +39,49 @@ public:
     float zoom;
 
     // constructor with vectors
-    Camera(glm::vec3 aPosition = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 aUp = glm::vec3(0.0f, 1.0f, 0.0f), float aYaw = Yaw, float aPitch = Pitch) : front(glm::vec3(0.0f, 0.0f, -1.0f)), movementSpeed(Speed), mouseSensitivity(Sensitivity), zoom(Zoom) {
+    Camera(glm::vec3 aPosition = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 aUp = glm::vec3(0.0f, 1.0f, 0.0f), float aYaw = Yaw, float aPitch = Pitch) {
         position = aPosition;
         worldUp = aUp;
         yaw = aYaw;
         pitch = aPitch;
+        movementSpeed = Speed;
+        mouseSensitivity = Sensitivity;
+        zoom = Zoom;
+        front = glm::vec3(0.0f, 0.0f, -1.0f);
 
         updateCameraVectors();
     }
 
-    // constructor with scalar values
-    // Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float aYaw, float aPitch) : front(glm::vec3(0.0f, 0.0f, -1.0f)), movementSpeed(Speed), mouseSensitivity(Sensitivity), zoom(Zoom) {
-    //     position = glm::vec3(posX, posY, posZ);
-    //     worldUp = glm::vec3(upX, upY, upZ);
-    //     yaw = aYaw;
-    //     pitch = aPitch;
-    //     updateCameraVectors();
-    // }
-
     glm::mat4 getViewMatrix() const {
         return glm::lookAt(position, position + front, up);
+    }
+
+    glm::mat4 getMyOwnShittyViewMatrix(glm::vec3 aPosition, glm::vec3 aTarget, glm::vec3 aWorldUp) const {
+        // We already have the position, what we need to compute is:
+        // 1. X axis (direction)
+        // 2. Z axis (right)
+        // 3. Y axis (up)
+        glm::vec3 zAxisMat = glm::normalize(aPosition - aTarget);
+        glm::vec3 xAxisMat = glm::normalize(glm::cross(glm::normalize(aWorldUp), zAxisMat));
+        glm::vec3 yAxisMat = glm::normalize(glm::cross(zAxisMat, xAxisMat));
+
+        glm::mat4 rotationMat = glm::mat4(1.f);
+        rotationMat[0][0] = xAxisMat.x;
+        rotationMat[1][0] = xAxisMat.y;
+        rotationMat[2][0] = xAxisMat.z;
+        rotationMat[0][1] = yAxisMat.x;
+        rotationMat[1][1] = yAxisMat.y;
+        rotationMat[2][1] = yAxisMat.z;
+        rotationMat[0][2] = zAxisMat.x;
+        rotationMat[1][2] = zAxisMat.y;
+        rotationMat[2][2] = zAxisMat.z;
+
+        glm::mat4 translationMat = glm::mat4(1.f);
+        translationMat[3][0] = -position.x;
+        translationMat[3][1] = -position.y;
+        translationMat[3][2] = -position.z;
+
+        return rotationMat * translationMat;
     }
 
     void processKeyboard(const CameraMovementOptions direction, const float deltaTime) {
@@ -71,6 +96,9 @@ public:
         } else if(direction == CameraMovementOptions::RIGHT) {
             position += right * velocity;
         }
+
+        // XXX: nasty way of fixing the player to the XZ plane.
+        // front.y = 0.f;
     }
 
     void processMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch = true) {
@@ -104,13 +132,16 @@ public:
 private:
     void updateCameraVectors() {
         glm::vec3 newFront;
-        newFront.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-        newFront.y = sin(glm::radians(pitch));
-        newFront.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+        newFront.x = std::cos(glm::radians(yaw)) * std::cos(glm::radians(pitch));
+        newFront.y = std::sin(glm::radians(pitch));
+        newFront.z = std::sin(glm::radians(yaw)) * std::cos(glm::radians(pitch));
 
         front = glm::normalize(newFront);
 
         right = glm::normalize(glm::cross(front, worldUp));
         up = glm::normalize(glm::cross(right, front));
+
+        // XXX: another way of fixing the player to the XZ plane, doom style.
+        front.y = 0.f;
     }
 };

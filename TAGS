@@ -2470,29 +2470,30 @@ include/GLFW/glfw3native.h,248
    #undef GLAPIENTRY152,5281
    #undef GLFW_GLAPIENTRY_DEFINED153,5302
 
-include/Camera.hpp,618
-enum class CameraMovementOptions 8,121
-    FORWARD,9,156
-    BACKWARD,10,169
-    LEFT,11,183
-    RIGHT12,193
-class Camera 22,504
-    glm::vec3 position;24,527
-    glm::vec3 front;25,551
-    glm::vec3 up;26,572
-    glm::vec3 right;27,590
-    glm::vec3 worldUp;28,611
-    float yaw;31,656
-    float pitch;32,671
-    float movementSpeed;35,712
-    float mouseSensitivity;36,737
-    float zoom;37,765
-    Camera(40,814
-    glm::mat4 getViewMatrix(58,1646
-    void processKeyboard(62,1751
-    void processMouseMovement(76,2340
-    void processMouseScroll(94,2788
-    void updateCameraVectors(105,2996
+include/Camera.hpp,670
+enum class CameraMovementOptions 10,157
+    FORWARD,11,192
+    BACKWARD,12,205
+    LEFT,13,219
+    RIGHT14,229
+class Camera 24,540
+    glm::vec3 position;26,563
+    glm::vec3 front;27,587
+    glm::vec3 up;28,608
+    glm::vec3 right;29,626
+    glm::vec3 worldUp;30,647
+    float yaw;33,692
+    float pitch;34,707
+    float movementSpeed;37,748
+    float mouseSensitivity;38,773
+    float zoom;39,801
+    Camera(42,850
+    glm::mat4 getViewMatrix(55,1273
+    glm::mat4 getMyOwnShittyViewMatrix(59,1378
+    void processKeyboard(87,2524
+    void processMouseMovement(104,3204
+    void processMouseScroll(122,3652
+    void updateCameraVectors(133,3860
 
 include/stb_image.h,24493
 #define STBI_INCLUDE_STB_IMAGE_H129,6373
@@ -13243,8 +13244,8 @@ namespace glm24,785
 	GLM_FUNC_DECL vec<vec205,10551
 
 include/Shader.hpp,46
-struct Shader 6,56
-    unsigned int id;7,72
+struct Shader 7,60
+    unsigned int id;8,76
 
 src/glad.c,23741
 #undef APIENTRY31,681
@@ -13676,19 +13677,19 @@ static void find_coreGL(1064,57762
 int gladLoadGLLoader(1118,59593
 
 src/main.cpp,369
-#define STB_IMAGE_IMPLEMENTATION13,260
-constexpr int windowWidth 21,508
-constexpr int windowHeight 22,542
-float deltaTime 24,577
-float lastFrame 25,601
-bool firstMouse 26,625
-float lastX 27,649
-float lastY 28,682
-int main(32,762
-void framebuffer_size_callback(231,7785
-void process_input(235,7917
-void mouse_callback(249,8619
-void scroll_callback(264,9088
+#define STB_IMAGE_IMPLEMENTATION11,166
+constexpr int windowWidth 19,414
+constexpr int windowHeight 20,448
+float deltaTime 22,484
+float lastFrame 23,508
+bool firstMouse 24,532
+float lastX 25,556
+float lastY 26,589
+int main(30,669
+void framebuffer_size_callback(233,8014
+void process_input(237,8146
+void mouse_callback(251,8848
+void scroll_callback(266,9369
 
 src/Shader.cpp,253
 Shader::Shader(Shader8,121
@@ -13735,3 +13736,5 @@ include/glm/mat3x4.hpp,0
 include/glm/mat2x4.hpp,0
 
 include/glm/glm.hpp,0
+
+include/pch.hpp,0

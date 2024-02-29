@@ -426,6 +426,12 @@ Trigonometry means the study of triangles.
 **** Acute Angle
 Angles under 90º.
 
+**** Angle of Elevation
+When we see an object that's above us, there's an angle between our line of sight to that object and the horizontal line.
+
+**** Angle of Depression
+When we see an object that's below us, there's an angle between our line of sight to that object and the horizontal line.
+
 **** Right Triangle
 It's a triangle where at least one of its angles is 90º.
 
@@ -456,6 +462,13 @@ They do the opposite of trigonometric functions.
 - Inverse Tangent: \tan^{-1}(x)\). Also called arctan.
 
 _NOTE_: That -1 does not represent a power (that is called multiplicative inverse or reciprocal)!
+
+**** Sine and Cosine of Complementary Angles
+
+#+CAPTION: Sinne and Cosine Complementary Angles
+#+NAME: SineCosineComplementary.png
+[[./SineCosineComplementary.png]]
+
 
 *** Vectors
 Are just directions. They have a direction and a magnitude.
@@ -784,7 +797,7 @@ TODO
 In order:
 
 - https://www.khanacademy.org/math/geometry-home/right-triangles-topic/intro-to-the-trig-ratios-geo/v/basic-trigonometry
-  Progress: Lesson 5: Modeling with right triangles
+  Progress: Lesson 8: The reciprocal trigonometric ratios
 
 - https://www.khanacademy.org/math/algebra-home/alg-matrices
 - https://www.khanacademy.org/math/linear-algebra/matrix-transformations

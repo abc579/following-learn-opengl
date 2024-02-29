@@ -4,9 +4,7 @@
 #include <array>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+
 #include <Shader.hpp>
 #include <Camera.hpp>
 
@@ -18,8 +16,8 @@ void process_input(GLFWwindow*);
 void mouse_callback(GLFWwindow*, double, double);
 void scroll_callback(GLFWwindow* , double, double);
 
-constexpr int windowWidth = 1024;
-constexpr int windowHeight = 768;
+constexpr int windowWidth = 2560;
+constexpr int windowHeight = 1440;
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -205,7 +203,11 @@ int main() {
         glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), (float) windowWidth / (float) windowHeight, 0.1f, 100.f);
         shader.setMat4("projection", projection);
 
-        glm::mat4 view = camera.getViewMatrix();
+        // glm::mat4 view = camera.getViewMatrix();
+        float radius = 5.f;
+        camera.position.x = std::sin(static_cast<float>(glfwGetTime())) * radius;
+        camera.position.z = std::cos(static_cast<float>(glfwGetTime())) * radius;
+        glm::mat4 view = camera.getMyOwnShittyViewMatrix(camera.position, glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
         shader.setMat4("view", view);
 
         glBindVertexArray(VAO);
@@ -246,17 +248,17 @@ void process_input(GLFWwindow* window) {
     }
 }
 
-void mouse_callback([[maybe_unused]]GLFWwindow* window, double xpos, double ypos) {
+void mouse_callback([[maybe_unused]]GLFWwindow* window, double mouseXPos, double mouseYPos) {
     if(firstMouse) {
-        lastX = static_cast<float>(xpos);
-        lastY = static_cast<float>(ypos);
+        lastX = static_cast<float>(mouseXPos);
+        lastY = static_cast<float>(mouseYPos);
         firstMouse = false;
     }
 
-    float xOffset = static_cast<float>(xpos) - lastX;
-    float yOffset = lastY - static_cast<float>(ypos);
-    lastX = static_cast<float>(xpos);
-    lastY = static_cast<float>(ypos);
+    const float xOffset = static_cast<float>(mouseXPos) - lastX;
+    const float yOffset = lastY - static_cast<float>(mouseYPos);
+    lastX = static_cast<float>(mouseXPos);
+    lastY = static_cast<float>(mouseYPos);
 
     camera.processMouseMovement(xOffset, yOffset, true);
 }
