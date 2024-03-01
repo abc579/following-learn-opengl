@@ -465,10 +465,53 @@ _NOTE_: That -1 does not represent a power (that is called multiplicative invers
 
 **** Sine and Cosine of Complementary Angles
 
-#+CAPTION: Sinne and Cosine Complementary Angles
+#+CAPTION: Sine and Cosine Complementary Angles
 #+NAME: SineCosineComplementary.png
 [[./SineCosineComplementary.png]]
 
+**** Reciprocal Trigonometric Functions
+They are cosecant, secant and cotagent. They're also ratios.
+
+Cosecant: it's the reciprocal of the sine.
+
+#+CAPTION: Cosecant
+#+NAME: Cosecant.png
+[[./Cosecant.png]]
+
+Secant: it's the reciprocal of the cosine.
+
+#+CAPTION: Secant
+#+NAME: Secant.png
+[[./Secant.png]]
+
+Cotangent: it's the reciprocal of the tangent.
+
+#+CAPTION: Cotangent
+#+NAME: Cotangent.png
+[[./Cotangent.png]]
+
+**** Law of Sines and Cosines
+Given a triangle where we know two angles and one of its sides, then we can use the law of sines and
+cosines to "solve" the rest of the triangle.
+
+This shit is incredible useful for any kind of triangles.
+
+We just use this motherfucking formula to get what we want (remember to always think relative to an angle):
+
+#+CAPTION: Law of Sines
+#+NAME: LawOfSines.png
+[[./LawOfSines.png]]
+
+#+CAPTION: Law of Cosines
+#+NAME: LawOfCosines.png
+[[./LawOfCosines.png]]
+
+I'm not sure about this but I think the law of sines is best used when we know at least one side of the triangle and two
+angles. For the law of cosines, we need to know two sides of the triangle and at least one angle or the three sides, to
+then get a desired angle.
+With that information we can solve the triangle completely.
+
+The law of cosines is a bloody generalization of the [[Pythagoras Theorem][Pythagoras Theorem]].
 
 *** Vectors
 Are just directions. They have a direction and a magnitude.
@@ -671,8 +714,7 @@ Example:
 
 The output matrix is one with (N, M) dimensions, where N is the number of rows of the left-hand side matrix and M is the
 number of columns of the right-hand side matrix.
-
-*** Matrix-Vector Multiplication
+-Vector Multiplication
 If we have a MxN matrix and we have a Nx1 vector, multiplication is defined.
 
 There are interesting properties when we perform these kind of multiplications.
