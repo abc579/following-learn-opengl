@@ -98,7 +98,7 @@ public:
         }
 
         // XXX: nasty way of fixing the player to the XZ plane.
-        // front.y = 0.f;
+        //front.y = 0.f;
     }
 
     void processMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch = true) {
@@ -142,6 +142,6 @@ private:
         up = glm::normalize(glm::cross(right, front));
 
         // XXX: another way of fixing the player to the XZ plane, doom style.
-        front.y = 0.f;
+        // front.y = 0.f;
     }
 };

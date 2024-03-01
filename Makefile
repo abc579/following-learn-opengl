@@ -38,3 +38,6 @@ clean:
 
 run:
 	./output/dumb_program
+
+debug:
+	gdb $(OUTPUT_DIR)/dumb_program

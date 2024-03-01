@@ -16,8 +16,8 @@ void process_input(GLFWwindow*);
 void mouse_callback(GLFWwindow*, double, double);
 void scroll_callback(GLFWwindow* , double, double);
 
-constexpr int windowWidth = 2560;
-constexpr int windowHeight = 1440;
+constexpr int windowWidth = 1280;
+constexpr int windowHeight = 760;
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -51,6 +51,7 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    // NOTE: need to click on the inside the window first to the mouse doesn't go out of bounds.
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
@@ -124,15 +125,32 @@ int main() {
     int width = 0;
     int height = 0;
     int numberChannels = 0;
-    unsigned char* data = stbi_load("./assets/background.jpg", &width, &height, &numberChannels, 0);
+    std::array<unsigned int, 10> textures {0};
+
+    unsigned char* data = stbi_load("./assets/ha1.png", &width, &height, &numberChannels, 0);
     if(!data) {
-        std::cerr << "Could not load container image.\n";
+        std::cerr << "Could not load suicide girl 1 image.\n";
         return EXIT_FAILURE;
     }
-    std::array<unsigned int, 2> textures;
 
-    glGenTextures(2, &textures[0]);
+    glGenTextures(textures.size(), &textures[0]);
+
     glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(data);
+
+    data = stbi_load("./assets/background.jpg", &width, &height, &numberChannels, 0);
+    if(!data) {
+        std::cerr << "Could not load background image.\n";
+        return EXIT_FAILURE;
+    }
+
+    glBindTexture(GL_TEXTURE_2D, textures[1]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -141,13 +159,118 @@ int main() {
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
 
-    data = stbi_load("./assets/ha1.png", &width, &height, &numberChannels, 0);
+    data = stbi_load("./assets/ha2.png", &width, &height, &numberChannels, 0);
     if(!data) {
-        std::cerr << "Could not load awesomeface image.\n";
+        std::cerr << "Could not load suicide girl 2 image.\n";
         return EXIT_FAILURE;
     }
 
-    glBindTexture(GL_TEXTURE_2D, textures[1]);
+    glBindTexture(GL_TEXTURE_2D, textures[2]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(data);
+
+    data = stbi_load("./assets/awesomeface.png", &width, &height, &numberChannels, 0);
+    if(!data) {
+        std::cerr << "Could not load awesome face image.\n";
+        return EXIT_FAILURE;
+    }
+
+    glBindTexture(GL_TEXTURE_2D, textures[3]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(data);
+
+    data = stbi_load("./assets/container.jpg", &width, &height, &numberChannels, 0);
+    if(!data) {
+        std::cerr << "Could not load container image.\n";
+        return EXIT_FAILURE;
+    }
+
+    glBindTexture(GL_TEXTURE_2D, textures[4]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(data);
+
+    data = stbi_load("./assets/haloOfTheSun.png", &width, &height, &numberChannels, 0);
+    if(!data) {
+        std::cerr << "Could not load image halo of the sun.\n";
+        return EXIT_FAILURE;
+    }
+
+    glBindTexture(GL_TEXTURE_2D, textures[5]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(data);
+
+    data = stbi_load("./assets/hang.png", &width, &height, &numberChannels, 0);
+    if(!data) {
+        std::cerr << "Could not load hang image.\n";
+        return EXIT_FAILURE;
+    }
+
+    glBindTexture(GL_TEXTURE_2D, textures[6]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(data);
+
+    data = stbi_load("./assets/haruhi.jpg", &width, &height, &numberChannels, 0);
+    if(!data) {
+        std::cerr << "Could not load suicide girl 1 image.\n";
+        return EXIT_FAILURE;
+    }
+
+    glBindTexture(GL_TEXTURE_2D, textures[7]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(data);
+
+    data = stbi_load("./assets/lain.jpg", &width, &height, &numberChannels, 0);
+    if(!data) {
+        std::cerr << "Could not load lain image.\n";
+        return EXIT_FAILURE;
+    }
+
+    glBindTexture(GL_TEXTURE_2D, textures[8]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(data);
+
+    data = stbi_load("./assets/re-I.png", &width, &height, &numberChannels, 0);
+    if(!data) {
+        std::cerr << "Could not load re-I image.\n";
+        return EXIT_FAILURE;
+    }
+
+    glBindTexture(GL_TEXTURE_2D, textures[9]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -169,7 +292,7 @@ int main() {
     glBindVertexArray(0);
 
     const std::array<glm::vec3, 10> cubePositions{
-        glm::vec3( 0.0f,  0.0f,  0.0f),
+        glm::vec3( 0.1f,  0.0f,  0.0f),
         glm::vec3( 2.0f,  5.0f, -15.0f),
         glm::vec3(-1.5f, -2.2f, -2.5f),
         glm::vec3(-3.8f, -2.0f, -12.3f),
@@ -188,37 +311,41 @@ int main() {
 
         process_input(window);
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, textures[0]);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, textures[1]);
-
+        // shader.use();
+        // shader.setUniformInt("ourTexture", 0);
+        // shader.setUniformInt("ourTexture2", 1);
         shader.use();
-        shader.setUniformInt("ourTexture", 0);
-        shader.setUniformInt("ourTexture2", 1);
 
         glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), (float) windowWidth / (float) windowHeight, 0.1f, 100.f);
         shader.setMat4("projection", projection);
 
-        // glm::mat4 view = camera.getViewMatrix();
-        float radius = 5.f;
-        camera.position.x = std::sin(static_cast<float>(glfwGetTime())) * radius;
-        camera.position.z = std::cos(static_cast<float>(glfwGetTime())) * radius;
-        glm::mat4 view = camera.getMyOwnShittyViewMatrix(camera.position, glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+        glm::mat4 view = camera.getViewMatrix();
+        // float radius = 5.f;
+        // camera.position.x = std::sin(static_cast<float>(glfwGetTime())) * radius;
+        // camera.position.z = std::cos(static_cast<float>(glfwGetTime())) * radius;
+        // glm::mat4 view = camera.getMyOwnShittyViewMatrix(camera.position, glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
         shader.setMat4("view", view);
 
         glBindVertexArray(VAO);
+
         for(unsigned int i = 0; i < cubePositions.size(); ++i) {
+            // For each texture we activate and bind it.
+            glActiveTexture(GL_TEXTURE0 + i);
+            glBindTexture(GL_TEXTURE_2D, textures[i]);
+            shader.setUniformInt("ourTexture", i);
+
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, cubePositions[i]);
-            float angle = 20.0f * i;
-            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            // float angle = 20.0f * i;
+            // rotate cubes
+            model = glm::rotate(model, static_cast<float>(glfwGetTime()), glm::vec3(1.0f, 0.3f, 0.5f));
             shader.setMat4("model", model);
 
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+
+            glDrawArrays(GL_TRIANGLES, 0, 36); // 36 -> number of vertices in a cube
         }
 
         glfwSwapBuffers(window);
