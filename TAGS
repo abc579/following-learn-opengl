@@ -13676,28 +13676,30 @@ static int find_extensionsGL(1057,57652
 static void find_coreGL(1064,57762
 int gladLoadGLLoader(1118,59593
 
-src/main.cpp,373
+src/main.cpp,415
 #define STB_IMAGE_IMPLEMENTATION11,166
-constexpr int windowWidth 19,414
-constexpr int windowHeight 20,448
-float deltaTime 22,483
-float lastFrame 23,507
-bool firstMouse 24,531
-float lastX 25,555
-float lastY 26,588
-int main(30,668
-void framebuffer_size_callback(360,13777
-void process_input(364,13909
-void mouse_callback(378,14611
-void scroll_callback(393,15132
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f)f19,414
+constexpr int windowWidth 21,453
+constexpr int windowHeight 22,487
+float deltaTime 24,522
+float lastFrame 25,546
+bool firstMouse 26,570
+float lastX 27,594
+float lastY 28,627
+int main(32,707
+void framebuffer_size_callback(200,5940
+void process_input(204,6072
+void mouse_callback(218,6774
+void scroll_callback(233,7295
 
-src/Shader.cpp,253
+src/Shader.cpp,291
 Shader::Shader(Shader8,121
 void Shader::use(use69,2319
 void Shader::setUniformBool(setUniformBool73,2365
 void Shader::setUniformInt(setUniformInt77,2506
 void Shader::setUniformFloat(setUniformFloat81,2640
 void Shader::setMat4(setMat485,2778
+void Shader::setVec3(setVec389,2946
 
 include/glm/mat4x4.hpp,0
 

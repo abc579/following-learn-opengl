@@ -335,6 +335,11 @@ This means we can use up to 16 textures in a single shader.
 *** Coordinate Systems
 TODO
 
+*** Getting the Colour of an Object
+We just need to multiply the vector that represents the light source and the object's colour vector.
+
+The result will be the reflected colour.
+
 ** Render Loop
 The render loop is the main loop of the program where we _typically_ do 3 things: *process keyboard input*, *render stuff* and
 finally *draw to the screen*.  Statements executed within this loop are said to be executed in _one frame_.  Because of
@@ -417,7 +422,15 @@ Scaling down a texture.
 
 ** Lighting
 *** Colours
+They're represented with red, green and blue (RGB) colours.
 
+Values range from [0, 1].
+
+How do colours work? In very simple terms and skipping technicalities, objects in real life don't have a colour
+themselves. What we perceive as the object colour is the reflection of a light source to that object.
+
+In other words, when light hits an object, certain wavelengths (or colors) of the light spectrum are absorbed by the
+object, while others are reflected. The colors that are reflected are the ones we perceive.
 
 ** Mathematics
 *** Basics of Trigonometry
