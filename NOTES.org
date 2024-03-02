@@ -415,6 +415,10 @@ Scaling up a texture.
 ** Minifying
 Scaling down a texture.
 
+** Lighting
+*** Colours
+
+
 ** Mathematics
 *** Basics of Trigonometry
 Trigonometry means the study of triangles.
