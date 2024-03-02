@@ -432,6 +432,68 @@ themselves. What we perceive as the object colour is the reflection of a light s
 In other words, when light hits an object, certain wavelengths (or colors) of the light spectrum are absorbed by the
 object, while others are reflected. The colors that are reflected are the ones we perceive.
 
+_NOTE_: when doing lighting computations remember to always normalize the relevant vectors since it simplifies a lot of
+calculations!
+
+*** Phong Lighting Model
+It's a model that helps us represent light effects in Graphics Programming.
+
+This model considers three types of lighting:
+
+- [[Ambient Lighting][Ambient Lighting]]: objects in real life aren't completely dark. There's usually some light somewhere like the moon or a
+  distant light that "gives colour to objects". We simulate this effect by provoding an ambient lighting, which is just
+  a constant.
+
+- [[Diffuse Lighting][Diffuse Lighting]]: simulates the directional impact of the light source to an object.
+
+- [[Specular Lighting][Specular Lighting]]: simulates the bright part of a shiny object when the light source reaches it. Its colour tends to
+  be more like the light source colour rather than the object's.
+
+*** Ambient Lighting
+It consists on adding some light to the final colour of object's fragments. This way, we simulate that there are light
+particles scattered all around, even when there isn't any light source in the scene.
+
+*** Diffuse Lighting
+Consists on giving the object more brightness the closer the object's fragments are from the light source and also
+taking into consideration the direction of light's rays, e.g, if a side of a cube is facing the light source and is very
+close to it, it will be very bright. But the backside of that cube will be almost black (not completely, because ambient
+lighting), because light's rays are not getting there.
+
+When computing diffuse lighting we need to get the angle between the light source ray and the object's fragment. This is
+because, if it is 90º, i.e, the light source is perpendicular to the object's fragment, the impact will be the
+highest. The angle, then, is a parameter that we need to give more or less colour to the fragment.
+
+To measure that angle we use a [[Normal Vector][normal vector]], which, in this case, is a vector that is perpendicular to the object's
+fragment surface.
+
+The angle, then, is computed by a dot product bewteen the two vectors. _NOTE_: both vectors have to be normalized first!
+Because otherwise, the dot product will return something more than the cosine.
+
+When the angle between the vectors tends to 0º, the more impact light will have over that fragment. Likewise, when the
+angle tends to 90º, light will have less impact (almost nothing) over that fragment.
+
+The two things we need:
+
+- *Normal vector*: a vector that is perpendicular to the vertex' surface.
+- *The directed light ray*: a direction vector that is the difference vector between the light's position and the
+  fragment's position. To calculate this light ray we need the light's position vector and the fragment's position
+  vector.
+
+_NOTE_: computing local coordinates (vertex position attributes) with the view matrix gives us world space coordinates.
+
+*** Normal Vector
+Vector that is perpendicular to the fragment's surface.
+
+TODO: how to compute it? because there's no such a thing as a vertex surface... it's about using the cross product with
+nearby vertices....
+
+*** Specular Lighting
+TODO
+
+*** Global Illumination Algorithms
+Algorithms that compute light's behavior when light particles bounce and scatter all around, taking into consideration
+reflection on objects and much more stuff. They're expensive to compute, though.
+
 ** Mathematics
 *** Basics of Trigonometry
 Trigonometry means the study of triangles.
@@ -856,7 +918,7 @@ TODO
 In order:
 
 - https://www.khanacademy.org/math/geometry-home/right-triangles-topic/intro-to-the-trig-ratios-geo/v/basic-trigonometry
-  Progress: Lesson 8: The reciprocal trigonometric ratios
+Done
 
 - https://www.khanacademy.org/math/algebra-home/alg-matrices
 - https://www.khanacademy.org/math/linear-algebra/matrix-transformations
@@ -866,3 +928,5 @@ In order:
 
 We need to understand the explanation and REALLY how the two exercises of the "Transformations" chapter work. If we
 don't, we'll never get good at this.
+
+- http://www.lighthouse3d.com/tutorials/glsl-12-tutorial/the-normal-matrix/

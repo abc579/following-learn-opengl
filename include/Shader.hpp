@@ -15,4 +15,5 @@ struct Shader {
     void setUniformFloat(const std::string& name, float val) const;
     void setMat4(const std::string& name, const glm::mat4& val) const;
     void setVec3(const std::string& name, float valX, float valY, float valZ) const;
+    void setVec3(const std::string& name, const glm::vec3& val) const;
 };
