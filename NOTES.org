@@ -912,7 +912,13 @@ You can see in this image that the vector is firstly scaled by 2 and then transl
 [[./TransformationMatrixCombinationEnd.png]]
 
 *** Parallelogram Law
-TODO
+Imagine two vectors starting from the same point. This law says that if we place these two vectors tail to tail, they
+will form two sides of a parallelogram. The sum of these two vectors is represented by a diagonal of the parallelogram
+that starts at the same point as the two vectors.
+
+#+CAPTION: Parallelogram Law
+#+NAME: Parallelogram Law
+[[./ParallelogramLaw.png]]
 
 *** Read, TODO
 In order:
@@ -920,7 +926,11 @@ In order:
 - https://www.khanacademy.org/math/geometry-home/right-triangles-topic/intro-to-the-trig-ratios-geo/v/basic-trigonometry
 Done
 
+- https://www.khanacademy.org/math/algebra-home/alg-vectors
+Lesson 4: Vector Addition and Subtraction
+
 - https://www.khanacademy.org/math/algebra-home/alg-matrices
+
 - https://www.khanacademy.org/math/linear-algebra/matrix-transformations
 - https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab
 - http://www.songho.ca/opengl/gl_projectionmatrix.html
