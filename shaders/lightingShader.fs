@@ -2,6 +2,8 @@
 
 out vec4 FragColor;
 
+in vec3 result;
+/*
 in vec3 Normal;
 in vec3 FragmentViewSpaceCoordinates;
 in vec3 LightPositionViewSpaceCoordinates;
@@ -9,8 +11,12 @@ in vec3 ViewerPositionViewSpaceCoordinates;
 
 uniform vec3 objectColour;
 uniform vec3 lightColour;
+*/
+
+uniform vec3 objectColour;
 
 void main() {
+  /*
     // Ambient
     const float ambientFactor = .1f;
     vec3 ambient = ambientFactor * lightColour;
@@ -27,7 +33,8 @@ void main() {
     vec3 reflectionDirection = reflect(-lightDirection, normal);
     float spec = pow(max(dot(viewerDirection, reflectionDirection), 0.0), 32);
     vec3 specular = specularFactor * spec * lightColour;
-
     vec3 result = (ambient + diffuse + specular) * objectColour;
-    FragColor = vec4(result, 1.0);
+*/
+
+    FragColor = vec4(result * objectColour, 1.0);
 }

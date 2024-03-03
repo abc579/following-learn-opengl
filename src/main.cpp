@@ -134,7 +134,7 @@ int main() {
     glEnableVertexAttribArray(0);
 
     std::array<glm::vec3, 1> cubePositions{
-        glm::vec3(1.2f,  1.f,  2.0f)  // lightPosition
+        glm::vec3(1.2f,  1.f,  -1.f)  // lightPosition
     };
 
     glm::vec3 lightColour(1.f, 1.f, 1.f);
@@ -174,8 +174,8 @@ int main() {
         lightSourceShader.setMat4("projection", projection);
         lightSourceShader.setMat4("view", view);
         model = glm::mat4(1.f);
-        cubePositions[0].x = std::sin(static_cast<float>(glfwGetTime()));
-        cubePositions[0].z = std::cos(static_cast<float>(glfwGetTime()));
+        // cubePositions[0].x = std::sin(static_cast<float>(glfwGetTime()));
+        // cubePositions[0].z = std::cos(static_cast<float>(glfwGetTime()));
         model = glm::translate(model, cubePositions[0]);
         model = glm::scale(model, glm::vec3(.2f));
         lightSourceShader.setMat4("model", model);
