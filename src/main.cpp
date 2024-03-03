@@ -134,10 +134,9 @@ int main() {
     glEnableVertexAttribArray(0);
 
     std::array<glm::vec3, 1> cubePositions{
-        glm::vec3(1.2f,  1.f,  -1.f)  // lightPosition
+        glm::vec3(1.5f,  1.f,  1.f)  // lightPosition
     };
 
-    glm::vec3 lightColour(1.f, 1.f, 1.f);
 
     while(!glfwWindowShouldClose(window)) {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -149,12 +148,23 @@ int main() {
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        glm::vec3 lightColour(std::sin(glfwGetTime()) * 2.0f, std::cos(glfwGetTime()) * 0.7f, std::cos(glfwGetTime()) * 1.3f);
+        glm::vec3 diffuseColour = lightColour * glm::vec3(0.8f);
+        glm::vec3 ambientColour = diffuseColour * glm::vec3(0.2f);
+
         // Object
         lightingShader.use();
-        lightingShader.setVec3("objectColour", 1.f, 0.1f, .1f);
+        lightingShader.setVec3("objectColour", 0.5f, 0.5f, 0.5f);
         lightingShader.setVec3("lightColour", lightColour);
         lightingShader.setVec3("lightPosition", cubePositions[0]);
         lightingShader.setVec3("viewerPosition", camera.position);
+        lightingShader.setVec3("material.ambient", ambientColour);
+        lightingShader.setVec3("material.diffuse", diffuseColour);
+        lightingShader.setVec3("material.specular", .5f, .5f, .5f);
+        lightingShader.setUniformFloat("material.shininess", 32.f);
+        lightingShader.setVec3("light.ambient", .1f, .1f, .1f);
+        lightingShader.setVec3("light.diffuse", .5f, .5f, .5f);
+        lightingShader.setVec3("light.specular", 1.f, 1.f, 1.f);
 
         glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), (float) windowWidth / (float) windowHeight, 0.1f, 100.f);
         glm::mat4 view = camera.getViewMatrix();

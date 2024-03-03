@@ -927,9 +927,10 @@ In order:
 Done
 
 - https://www.khanacademy.org/math/algebra-home/alg-vectors
-Lesson 4: Vector Addition and Subtraction
+Done
 
 - https://www.khanacademy.org/math/algebra-home/alg-matrices
+Lesson 5: Adding & subtracting matrices
 
 - https://www.khanacademy.org/math/linear-algebra/matrix-transformations
 - https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab
