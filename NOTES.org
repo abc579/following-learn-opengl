@@ -884,7 +884,7 @@ Rotation around the Z-axis:
 
 NOTE: To rotate around an arbitrary 3D axis we'd need to use a more complex matrix or quaternions.
 
-NOTE: Keep in mind that the axis that we rotate around should be a unit vector, so be sure to normalize the vector first
+NOTE: Keep in mind that the axis that we rotate around should be a [[Unit Vector][unit vector]], so be sure to normalize the vector first
 if you're not rotating around the X, Y, or Z axis.
 
 *** Combining Matrices
