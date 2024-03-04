@@ -37,7 +37,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    auto *window = glfwCreateWindow(windowWidth, windowHeight, "Learn OpenGL", nullptr, nullptr);
+    auto *window = glfwCreateWindow(windowWidth, windowHeight, "Unloved", nullptr, nullptr);
     if(!window) {
         std::cout << "Couldn't create window!\n";
         glfwTerminate();
@@ -74,6 +74,40 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(data);
+
+    data = stbi_load("./assets/container2_specular.png", &width, &height, &numberChannels, 0);
+    if(!data) {
+        std::cerr << "Image container2_specular.png could not be loaded.\n";
+        return EXIT_FAILURE;
+    }
+
+    unsigned int specularMapTexture = 0;
+    glGenTextures(1, &specularMapTexture);
+    glBindTexture(GL_TEXTURE_2D, specularMapTexture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(data);
+
+    data = stbi_load("./assets/matrix.jpg", &width, &height, &numberChannels, 0);
+    if(!data) {
+        std::cerr << "Image lighting_maps_specular_color.png could not be loaded.\n";
+        return EXIT_FAILURE;
+    }
+
+    unsigned int emissionMapTexture = 0;
+    glGenTextures(1, &emissionMapTexture);
+    glBindTexture(GL_TEXTURE_2D, emissionMapTexture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
 
@@ -172,9 +206,16 @@ int main() {
         // Object
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, diffuseMapTexture);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, specularMapTexture);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, emissionMapTexture);
 
         lightingShader.use();
+
         lightingShader.setUniformInt("material.diffuse", 0);
+        lightingShader.setUniformInt("material.specular", 1);
+        lightingShader.setUniformInt("material.emission", 2);
 
         lightingShader.setVec3("lightColour", lightColour);
         lightingShader.setVec3("lightPosition", cubePositions[0]);
@@ -185,7 +226,6 @@ int main() {
         lightingShader.setVec3("light.specular", 1.f, 1.f, 1.f);
 
         lightingShader.setUniformFloat("material.shininess", 64.0f);
-        lightingShader.setVec3("material.specular", .5f, .5f, .5f);
 
         glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), (float) windowWidth / (float) windowHeight, 0.1f, 100.f);
         glm::mat4 view = camera.getViewMatrix();

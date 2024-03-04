@@ -494,8 +494,24 @@ TODO
 Algorithms that compute light's behavior when light particles bounce and scatter all around, taking into consideration
 reflection on objects and much more stuff. They're expensive to compute, though.
 
+*** Materials
+TODO
+
 *** Diffuse Maps
 TODO
+
+*** Specular Maps
+TODO
+
+*** Normal Maps
+TODO
+
+*** Bump Maps
+TODO
+
+*** Reflection Maps
+TODO
+
 ** Mathematics
 *** Basics of Trigonometry
 Trigonometry means the study of triangles.
