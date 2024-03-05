@@ -512,6 +512,16 @@ TODO
 *** Reflection Maps
 TODO
 
+*** Light Casters
+
+**** Directional Light
+
+**** Point Light
+
+**** Spotlight
+
+**** Smooth/Soft Edges
+
 ** Mathematics
 *** Basics of Trigonometry
 Trigonometry means the study of triangles.

@@ -16,7 +16,7 @@ enum class CameraMovementOptions {
 
 constexpr float Yaw{ -90.f };
 constexpr float Pitch{ 0.0f };
-constexpr float Speed{ 2.5f };
+constexpr float Speed{ 4.5f };
 constexpr float Sensitivity{ 0.1f };
 constexpr float Zoom{ 45.0f };
 

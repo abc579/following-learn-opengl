@@ -13676,7 +13676,7 @@ static int find_extensionsGL(1057,57652
 static void find_coreGL(1064,57762
 int gladLoadGLLoader(1118,59593
 
-src/main.cpp,373
+src/main.cpp,374
 #define STB_IMAGE_IMPLEMENTATION11,166
 constexpr int windowWidth 19,414
 constexpr int windowHeight 20,448
@@ -13685,11 +13685,11 @@ float lastFrame 23,508
 bool firstMouse 24,532
 float lastX 25,556
 float lastY 26,589
-int main(30,669
-void framebuffer_size_callback(266,10347
-void process_input(270,10479
-void mouse_callback(284,11181
-void scroll_callback(299,11702
+int main(44,1128
+void framebuffer_size_callback(264,10550
+void process_input(268,10682
+void mouse_callback(290,11787
+void scroll_callback(305,12308
 
 src/Shader.cpp,329
 Shader::Shader(Shader8,121

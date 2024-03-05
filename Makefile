@@ -7,6 +7,7 @@ LD_FLAGS := -L./deps -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl
 INCLUDE_FLAGS := -Iinclude
 
 OUTPUT_DIR := output
+OUTPUT_BIN := spot_light
 
 # Pre-compiled header flag
 PCH_HEADER := include/pch.hpp
@@ -22,7 +23,7 @@ all: output tags deps precompile_headers
 	$(CXX) $(DEPS_BUILD_FLAGS) -c src/glad.c -o $(OUTPUT_DIR)/glad.o
 	$(CXX) $(CURRENT_BUILD_FLAGS) -include $(PCH_HEADER) -c src/main.cpp -o $(OUTPUT_DIR)/main.o $(LD_FLAGS)
 	$(CXX) $(CURRENT_BUILD_FLAGS) -include $(PCH_HEADER) -c src/Shader.cpp -o $(OUTPUT_DIR)/Shader.o $(LD_FLAGS)
-	$(CXX) $(CURRENT_BUILD_FLAGS) -include $(PCH_HEADER) $(OUTPUT_DIR)/Shader.o $(OUTPUT_DIR)/main.o $(OUTPUT_DIR)/glad.o -o $(OUTPUT_DIR)/dumb_program $(LD_FLAGS)
+	$(CXX) $(CURRENT_BUILD_FLAGS) -include $(PCH_HEADER) $(OUTPUT_DIR)/Shader.o $(OUTPUT_DIR)/main.o $(OUTPUT_DIR)/glad.o -o $(OUTPUT_DIR)/$(OUTPUT_BIN) $(LD_FLAGS)
 
 precompile_headers:
 	$(CXX) $(DEPS_BUILD_FLAGS) -x c++-header $(PCH_HEADER) -o $(PCH_OUTPUT)
@@ -34,10 +35,10 @@ tags:
 	find . -name '*.c' -o -name '*.cpp' -o -name '*.h' -o -name '*.hpp' -type f | xargs etags
 
 clean:
-	rm -rf output/
+	rm -rf $(OUTPUT_DIR)/
 
 run:
-	./output/dumb_program
+	./$(OUTPUT_DIR)/$(OUTPUT_BIN)
 
 debug:
-	gdb $(OUTPUT_DIR)/dumb_program
+	gdb $(OUTPUT_DIR)/$(OUTPUT_BIN)
