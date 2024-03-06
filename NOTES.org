@@ -164,7 +164,11 @@ Programming language used to program shaders in OpenGL.
 In GLSL, a vector is composed of 4 components: x, y, z and w. W represents something called _perspective division_.
 
 *** Perspective division
-TODO
+After all vertices coordinates are transformed to [[Clip Space][clip space]], another operation is executed: perspective division. This
+operation converts 4D clip space (xw, yw, zw, w) to 3D _NDC_ and it does so by dividing each position vector component
+over the W component, which is known as the [[Homogeneous Coordinates][homogeneous coordinate]].
+
+It's about normalizing position vectors.
 
 *** Vertex Array Object (VAO)
 It's a container or a manager that stores all the state-related settings needed to render a particular object.
@@ -204,7 +208,25 @@ calls so make sure you don't unbind the element array buffer before unbinding yo
 configured.
 
 *** Indexed Drawing
-TODO
+It's a way of drawing figures on the screen and it works by specifying OpenGL the indices of the vertices that we want
+to use to draw our figure. When we do that, OpenGL draws them in the order specified.
+
+For instance, if we have a square, then we have 4 vertices.
+
+To draw two triangles (OpenGL draws triangles), we'd need to specify 6 indices, each one corresponding to a vertex in
+the square.
+
+We could specify these indices:
+
+1. top right index
+2. bottom right index
+3. top left index
+--
+1. bottom right index
+2. bottom left index
+3. top left index
+
+The benefits of this approach is that we can be less verbose and save memory.
 
 *** Wireframe Mode
 It's a mode that draws only the edges of triangles.
@@ -333,7 +355,55 @@ GL_TEXTURE_0 -> GL_TEXTURE_15
 This means we can use up to 16 textures in a single shader.
 
 *** Coordinate Systems
-TODO
+There are five different coordinates spaces that we use to transform the object's vertices coordinates to [[Normalized Device Coordinates][NDC]].
+
+This is done like that because some computations are easier to do depending on the coordinate system we're in.
+
+OpenGL generally _expects_ to work with [[Normalized Device Coordinates][NDC]] coordinates after each vertex shader run.
+
+#+CAPTION: CoordinateSystems
+#+NAME: CoordinateSystems.png
+[[./CoordinateSystems.png]]
+
+**** Local Space
+In local space, we deal with local coordinates, which are the coordinates we start from and they're relative to the
+object's origin point. When we are creating models in Blender, the coordinates that are shown are local coordinates.
+
+**** World Space
+To transform from local space coordinates to world space, we use the _model matrix_. Coordinates here are defined relative
+to a larger world, which has a origin point, too.
+
+It's the system that we use to place objects in.
+
+**** View Space
+To transform from world space coordinates to view space, we use the _view matrix_.
+
+This is also known as the camera space, or view space. Here coordinates are defined relative to the viewer's PoV.
+
+**** Clip Space
+To transform from view space coordinates to clip space, we use the _projection matrix_.
+
+Within this coordinate system, coordinates are normalized to a range that goes from -1.0 to 1.0. All the coordinates
+that are not between -1.0 and 1.0 will get clipped, which means that they won't get drawn to the screen.
+
+The projection matrix can be a _persective matrix_ or _orthogonal matrix_. Generally we use the persective matrix.
+
+**** Screen Space
+The last step is to transform the clip coordinates to screen coordinates.
+
+This is done in a process that's called _viewport transform_, which converts the coordinates between -1.0 and 1.0 to the
+coordinate range defined in glViewPort. This range is typically the width and height of the window.
+
+**** Frustum
+It refers to the "viewing box" that the projection matrix creates when transforming view space coordinates to clip
+space.
+
+**** Perspective
+It's the real life effect of seeing farthest objects as smaller and nearest objects as bigger, in very simple terms.
+
+#+CAPTION: Perspective Matrix
+#+NAME: PerspectiveMatrix.png
+[[./PerspectiveMatrix.png]]
 
 *** Getting the Colour of an Object
 We just need to multiply the vector that represents the light source and the object's colour vector.
@@ -386,6 +456,9 @@ For example:
     vec4 otherVec = someVec.xxxx + anotherVec.yxzy;
   }
 #+END_SRC
+
+*** Functions
+Just like C functions, nothing new.
 
 ** Interpolation
 Imagine we had a right triangle with three vertices.
@@ -481,12 +554,6 @@ The two things we need:
 
 _NOTE_: computing local coordinates (vertex position attributes) with the view matrix gives us world space coordinates.
 
-*** Normal Vector
-Vector that is perpendicular to the fragment's surface.
-
-TODO: how to compute it? because there's no such a thing as a vertex surface... it's about using the cross product with
-nearby vertices....
-
 *** Specular Lighting
 TODO
 
@@ -513,14 +580,30 @@ TODO
 TODO
 
 *** Light Casters
-
+TODO
 **** Directional Light
-
+TODO
 **** Point Light
-
+TODO
 **** Spotlight
-
+TODO
 **** Smooth/Soft Edges
+TODO
+
+*** Multiple Lights
+
+** Model Loading
+For complicated figures, we don't define every vertex manually. We use tools like blender to import these figures/models
+to our application.
+
+*** Assimp
+TODO
+
+*** Mesh
+TODO
+
+*** Model
+TODO
 
 ** Mathematics
 *** Basics of Trigonometry
@@ -969,3 +1052,4 @@ We need to understand the explanation and REALLY how the two exercises of the "T
 don't, we'll never get good at this.
 
 - http://www.lighthouse3d.com/tutorials/glsl-12-tutorial/the-normal-matrix/
+  
