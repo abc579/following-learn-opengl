@@ -183,10 +183,21 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
 
+    constexpr glm::vec3 sunPosition(0.f, 10.f, 0.f);
     constexpr glm::vec3 lightColour(1.f, 0.f, 0.f);
-    constexpr glm::vec3 lightAmbientValues(.2f, .2f, .2f);
-    constexpr glm::vec3 lightDiffuseValues(.4f, .4f, .4f);
-    constexpr glm::vec3 lightSpecularValues(1.f, 1.f, 1.f);
+
+    constexpr glm::vec3 directionalLightAmbientValues(.1f, .1f, .1f);
+    constexpr glm::vec3 directionalLightDiffuseValues(.1f, .1f, .1f);
+    constexpr glm::vec3 directionalLightSpecularValues(1.f, 1.f, 1.f);
+
+    constexpr glm::vec3 pointLightAmbientValues(.1f, .1f, .1f);
+    constexpr glm::vec3 pointLightDiffuseValues(.4f, .4f, .4f);
+    constexpr glm::vec3 pointLightSpecularValues(1.f, 1.f, 1.f);
+
+    constexpr glm::vec3 spotlightLightAmbientValues(.1f, .1f, .1f);
+    constexpr glm::vec3 spotlightLightDiffuseValues(.7f, .7f, .7f);
+    constexpr glm::vec3 spotlightLightSpecularValues(1.f, 1.f, 1.f);
+
     constexpr float lightCutOffAngle{ glm::cos(glm::radians(12.f)) };
     constexpr float lightOuterCutOffAngle{ glm::cos(glm::radians(17.5f)) };
     constexpr float attenuationConstantFactor{ 1.f };
@@ -212,21 +223,50 @@ int main() {
 
         lightingShader.use();
 
+        // Material stuff.
         lightingShader.setUniformFloat("material.shininess", materialShininess);
         lightingShader.setUniformInt("material.diffuse", 0);
         lightingShader.setUniformInt("material.specular", 1);
 
-        lightingShader.setVec3("light.colour", lightColour);
-        lightingShader.setVec3("light.position", camera.position);
-        lightingShader.setVec3("light.direction", camera.front);
-        lightingShader.setUniformFloat("light.cutOff", lightCutOffAngle);
-        lightingShader.setUniformFloat("light.outerCutOff", lightOuterCutOffAngle);
-        lightingShader.setVec3("light.ambient", lightAmbientValues);
-        lightingShader.setVec3("light.diffuse", lightDiffuseValues);
-        lightingShader.setVec3("light.specular", lightSpecularValues);
-        lightingShader.setUniformFloat("light.constant", attenuationConstantFactor);
-        lightingShader.setUniformFloat("light.linear", attenuationLinearFactor);
-        lightingShader.setUniformFloat("light.quadratic", attenuationQuadraticFactor);
+        // Lighting stuff.
+        lightingShader.setVec3("directionalLight.colour", lightColour);
+        lightingShader.setVec3("directionalLight.position", sunPosition);
+        lightingShader.setVec3("directionalLight.ambient", directionalLightAmbientValues);
+        lightingShader.setVec3("directionalLight.diffuse", directionalLightDiffuseValues);
+        lightingShader.setVec3("directionalLight.specular", directionalLightSpecularValues);
+
+        lightingShader.setVec3("pointLight.colour", lightColour);
+        lightingShader.setVec3("pointLight.position", cubePositions[0]);
+        lightingShader.setVec3("pointLight.ambient", pointLightAmbientValues);
+        lightingShader.setVec3("pointLight.diffuse", pointLightDiffuseValues);
+        lightingShader.setVec3("pointLight.specular", pointLightSpecularValues);
+        lightingShader.setUniformFloat("pointLight.constant", attenuationConstantFactor);
+        lightingShader.setUniformFloat("pointLight.linear", attenuationLinearFactor);
+        lightingShader.setUniformFloat("pointLight.quadratic", attenuationQuadraticFactor);
+
+        lightingShader.setVec3("spotlightLight.colour", lightColour);
+        lightingShader.setVec3("spotlightLight.position", camera.position);
+        lightingShader.setVec3("spotlightLight.direction", camera.front);
+        lightingShader.setVec3("spotlightLight.ambient", spotlightLightAmbientValues);
+        lightingShader.setVec3("spotlightLight.diffuse", spotlightLightDiffuseValues);
+        lightingShader.setVec3("spotlightLight.specular", spotlightLightSpecularValues);
+        lightingShader.setUniformFloat("spotlightLight.constant", attenuationConstantFactor);
+        lightingShader.setUniformFloat("spotlightLight.linear", attenuationLinearFactor);
+        lightingShader.setUniformFloat("spotlightLight.quadratic", attenuationQuadraticFactor);
+        lightingShader.setUniformFloat("spotlightLight.cutOff", lightCutOffAngle);
+        lightingShader.setUniformFloat("spotlightLight.outerCutOff", lightOuterCutOffAngle);
+
+        // lightingShader.setVec3("light.colour", lightColour);
+        // lightingShader.setVec3("light.position", camera.position);
+        // lightingShader.setVec3("light.direction", camera.front);
+        // lightingShader.setUniformFloat("light.cutOff", lightCutOffAngle);
+        // lightingShader.setUniformFloat("light.outerCutOff", lightOuterCutOffAngle);
+        // lightingShader.setVec3("light.ambient", lightAmbientValues);
+        // lightingShader.setVec3("light.diffuse", lightDiffuseValues);
+        // lightingShader.setVec3("light.specular", lightSpecularValues);
+        // lightingShader.setUniformFloat("light.constant", attenuationConstantFactor);
+        // lightingShader.setUniformFloat("light.linear", attenuationLinearFactor);
+        // lightingShader.setUniformFloat("light.quadratic", attenuationQuadraticFactor);
 
         lightingShader.setVec3("viewerPosition", camera.position);
 
@@ -292,6 +332,10 @@ void process_input(GLFWwindow* window) {
         cubePositions[0].t += 0.1f;
     } else if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
         cubePositions[0].t -= 0.1f;
+    } else if(glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
+        cubePositions[0].z += 0.1f;
+    } else if(glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) {
+        cubePositions[0].z -= 0.1f;
     }
 }
 
