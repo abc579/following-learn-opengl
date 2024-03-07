@@ -2495,6 +2495,25 @@ class Camera 24,540
     void processMouseScroll(122,3651
     void updateCameraVectors(133,3859
 
+include/Mesh.hpp,521
+enum class TextureType 5,37
+    DIFFUSE,6,62
+    SPECULAR7,75
+struct Vertex 10,92
+    glm::vec3 position;11,108
+    glm::vec3 normal;12,132
+    glm::vec2 textureCoordinates;13,154
+struct Texture 16,192
+    unsigned int id;17,209
+    TextureType textureType;18,230
+class Mesh 21,263
+    std::vector<Vertex> vertices;23,284
+    std::vector<Texture> textures;24,318
+    std::vector<unsigned int> indices;25,353
+    unsigned int VAO{VAO33,592
+    unsigned int VBO{VBO34,619
+    unsigned int EBO{EBO35,646
+
 include/stb_image.h,24493
 #define STBI_INCLUDE_STB_IMAGE_H129,6373
 #define STBI_VERSION 376,16984
@@ -13690,6 +13709,11 @@ void framebuffer_size_callback(320,13848
 void process_input(324,13980
 void mouse_callback(350,15317
 void scroll_callback(365,15838
+
+src/Mesh.cpp,86
+Mesh::Mesh(6,69
+void Mesh::draw(draw13,298
+void Mesh::setupMesh(setupMesh40,1208
 
 src/Shader.cpp,329
 Shader::Shader(Shader8,121

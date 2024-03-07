@@ -7,7 +7,7 @@ LD_FLAGS := -L./deps -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl -lassimp
 INCLUDE_FLAGS := -Iinclude
 
 OUTPUT_DIR := output
-OUTPUT_BIN := spot_light
+OUTPUT_BIN := mothafucka
 
 # Pre-compiled header flag
 PCH_HEADER := include/pch.hpp
@@ -23,6 +23,7 @@ all: output tags deps precompile_headers
 	$(CXX) $(DEPS_BUILD_FLAGS) -c src/glad.c -o $(OUTPUT_DIR)/glad.o
 	$(CXX) $(CURRENT_BUILD_FLAGS) -include $(PCH_HEADER) -c src/main.cpp -o $(OUTPUT_DIR)/main.o $(LD_FLAGS)
 	$(CXX) $(CURRENT_BUILD_FLAGS) -include $(PCH_HEADER) -c src/Shader.cpp -o $(OUTPUT_DIR)/Shader.o $(LD_FLAGS)
+	$(CXX) $(CURRENT_BUILD_FLAGS) -include $(PCH_HEADER) -c src/Mesh.cpp -o $(OUTPUT_DIR)/Mesh.o $(LD_FLAGS)
 	$(CXX) $(CURRENT_BUILD_FLAGS) -include $(PCH_HEADER) $(OUTPUT_DIR)/Shader.o $(OUTPUT_DIR)/main.o $(OUTPUT_DIR)/glad.o -o $(OUTPUT_DIR)/$(OUTPUT_BIN) $(LD_FLAGS)
 
 precompile_headers:
