@@ -523,43 +523,102 @@ This model considers three types of lighting:
   be more like the light source colour rather than the object's.
 
 *** Ambient Lighting
-It consists on adding some light to the final colour of object's fragments. This way, we simulate that there are light
-particles scattered all around, even when there isn't any light source in the scene.
+In games and reality, objects don't turn completely black. There's always a source of light somewhere. That could be the
+sun or a distant light.
+
+Ambient lighting tries to simulate this effect. We don't care about object's positions at all.
+
+What we need to compute ambient lighting is:
+
+- A constant representing the ambient factor.
+- Light's and object's colours.
+
+And that's it.
+
+#+NAME: Typical shader program
+#+BEGIN_SRC glsl
+  void main() {
+    vec3 ambient = (light.colour * light.ambient) * vec3(texture(material.diffuse, TexCoords)).rgb;
+  }
+#+END_SRC
 
 *** Diffuse Lighting
-Consists on giving the object more brightness the closer the object's fragments are from the light source and also
-taking into consideration the direction of light's rays, e.g, if a side of a cube is facing the light source and is very
-close to it, it will be very bright. But the backside of that cube will be almost black (not completely, because ambient
-lighting), because light's rays are not getting there.
+It's the process of giving more light to objects the more they're _aligned_ with the light source direction vector.
 
-When computing diffuse lighting we need to get the angle between the light source ray and the object's fragment. This is
-because, if it is 90º, i.e, the light source is perpendicular to the object's fragment, the impact will be the
-highest. The angle, then, is a parameter that we need to give more or less colour to the fragment.
+When computing diffuse lighting we need to get the angle between the light source ray and the object's fragment.
+To get the _light source ray vector_, we need to _subtract the vector position of the light from the vector position of the
+fragment's coordinates_.
 
-To measure that angle we use a [[Normal Vector][normal vector]], which, in this case, is a vector that is perpendicular to the object's
-fragment surface.
+The other vector we need is called a [[Normal Vector][normal vector]], and it's just a normalized vector that is perpendicular to the
+object's surface. We provide this data in the vertex data.
 
-The angle, then, is computed by a dot product bewteen the two vectors. _NOTE_: both vectors have to be normalized first!
-Because otherwise, the dot product will return something more than the cosine.
+Regarding the angle they form, the lower the angle, the more impact light will have. See this image:
 
-When the angle between the vectors tends to 0º, the more impact light will have over that fragment. Likewise, when the
-angle tends to 90º, light will have less impact (almost nothing) over that fragment.
+#+CAPTION: Diffuse Lighting
+#+NAME: DiffuseLighting.png
+[[./DiffuseLighting.png]]
 
-The two things we need:
+Once we have both vectors, we compute the _dot product between the normal and the light direction vector_. They both have
+to be normalized first! This product will produce the cosine value, which is the value that we use later to get the
+diffuse vector.
 
-- *Normal vector*: a vector that is perpendicular to the vertex' surface.
-- *The directed light ray*: a direction vector that is the difference vector between the light's position and the
-  fragment's position. To calculate this light ray we need the light's position vector and the fragment's position
-  vector.
+Something like this:
 
-_NOTE_: computing local coordinates (vertex position attributes) with the view matrix gives us world space coordinates.
+#+NAME: Diffuse Lighting Computation
+#+BEGIN_SRC glsl
+  void main() {
+    vec3 lightDirection = normalize(light.position - FragmentWorldSpaceCoordinates);
+    // Diffuse
+    vec3 normal = normalize(Normal);
+    float diff = max(dot(normal, lightDirection), 0.0);
+    // vec3(1.f, 1.f, 1.f) is light's colour.
+    vec3 diffuse = (light.diffuse * vec3(1.f, 1.f, 1.f)) * diff * vec3(texture(material.diffuse, TexCoords)).rgb;
+  }
+#+END_SRC
 
 *** Specular Lighting
-TODO
+Like [[Diffuse Lighting][diffuse lighting]], this type of lighting depends on the _light direction vector_ and on the normal vector of the
+fragment. However, this one also takes into account the _viewer's direction vector_.
+
+Specular lighting tries to simulate the light reflection that some materials produce, for example, steel.
+
+So, we need:
+
+- Light's direction vector: computed subtracting light's position vector from fragment's position vector.
+- Fragment's normal vector, which is perpendicular to it. We provide it in vertex data.
+- Viewer's direction vector: computed subtracting viewer's direction vector from fragment's position vector.
+- Reflection vector: computed by reflecting the light's direction vector over the normal vector.
+
+Visually, we have something like this:
+
+#+CAPTION: Specular Lighting
+#+NAME: SpecularLighting.png
+[[./SpecularLighting.png]]
+
+As we can see from the image, the closer the angle between light's reflection vector and the viewer's direction vector,
+the highest the impact of the reflection will be.
+
+To compute the specular factor, we perform _a dot product between viewer's direction vector and light reflection
+vector_. Then we use that scalar or factor to multiply it with light's specular intensity (we give this value) and
+light's colour.
+
+#+NAME: Specular Lighting Computation
+#+BEGIN_SRC glsl
+  void main() {
+      vec3 viewerDirection = normalize(viewerPosition - FragmentWorldSpaceCoordinates);
+      vec3 reflectionDirection = reflect(-lightDirection, normal);
+      float spec = pow(max(dot(viewerDirection, reflectionDirection), 0.0), material.shininess);
+      // vec3(1.f, 1.f, 1.f) is light's colour.
+      vec3 specular = (light.specular * vec3(1.f, 1.f, 1.f)) * spec * vec3(texture(material.specular, TexCoords)).rgb;
+      specular *= attenuation;
+      specular *= intensity;
+  }
+#+END_SRC
 
 *** Global Illumination Algorithms
 Algorithms that compute light's behavior when light particles bounce and scatter all around, taking into consideration
-reflection on objects and much more stuff. They're expensive to compute, though.
+reflection on objects and much more stuff. They're expensive to compute, though, that's why we use a simple algorithm
+for our scenes.
 
 *** Materials
 TODO
@@ -597,7 +656,7 @@ For complicated figures, we don't define every vertex manually. We use tools lik
 to our application.
 
 *** Assimp
-TODO
+It's a library that we use to load models from files.
 
 *** Mesh
 TODO
@@ -1052,4 +1111,10 @@ We need to understand the explanation and REALLY how the two exercises of the "T
 don't, we'll never get good at this.
 
 - http://www.lighthouse3d.com/tutorials/glsl-12-tutorial/the-normal-matrix/
-  
+
+* Normal Vector
+
+It's a unit vector that is perpendicular to the surface of a vertex. Because a vertex doesn't have a surface (it's just
+a point), we compute the normal vector by using its surrounding vertices.
+
+TODO: process. not explained yet.

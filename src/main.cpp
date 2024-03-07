@@ -183,6 +183,17 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
 
+    constexpr glm::vec3 lightColour(1.f, 0.f, 0.f);
+    constexpr glm::vec3 lightAmbientValues(.2f, .2f, .2f);
+    constexpr glm::vec3 lightDiffuseValues(.4f, .4f, .4f);
+    constexpr glm::vec3 lightSpecularValues(1.f, 1.f, 1.f);
+    constexpr float lightCutOffAngle{ glm::cos(glm::radians(12.f)) };
+    constexpr float lightOuterCutOffAngle{ glm::cos(glm::radians(17.5f)) };
+    constexpr float attenuationConstantFactor{ 1.f };
+    constexpr float attenuationLinearFactor{ .027f };
+    constexpr float attenuationQuadraticFactor{ .0028f };
+    constexpr float materialShininess{ 64.f };
+
     while(!glfwWindowShouldClose(window)) {
         const float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
@@ -190,10 +201,10 @@ int main() {
 
         process_input(window);
 
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Object
+        // Object textures.
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, diffuseMapTexture);
         glActiveTexture(GL_TEXTURE1);
@@ -201,23 +212,23 @@ int main() {
 
         lightingShader.use();
 
+        lightingShader.setUniformFloat("material.shininess", materialShininess);
         lightingShader.setUniformInt("material.diffuse", 0);
         lightingShader.setUniformInt("material.specular", 1);
 
+        lightingShader.setVec3("light.colour", lightColour);
         lightingShader.setVec3("light.position", camera.position);
         lightingShader.setVec3("light.direction", camera.front);
-        lightingShader.setUniformFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
-        lightingShader.setUniformFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
+        lightingShader.setUniformFloat("light.cutOff", lightCutOffAngle);
+        lightingShader.setUniformFloat("light.outerCutOff", lightOuterCutOffAngle);
+        lightingShader.setVec3("light.ambient", lightAmbientValues);
+        lightingShader.setVec3("light.diffuse", lightDiffuseValues);
+        lightingShader.setVec3("light.specular", lightSpecularValues);
+        lightingShader.setUniformFloat("light.constant", attenuationConstantFactor);
+        lightingShader.setUniformFloat("light.linear", attenuationLinearFactor);
+        lightingShader.setUniformFloat("light.quadratic", attenuationQuadraticFactor);
+
         lightingShader.setVec3("viewerPosition", camera.position);
-
-        lightingShader.setVec3("light.ambient", .2f, .2f, .2f);
-        lightingShader.setVec3("light.diffuse", .5f, .5f, .5f);
-        lightingShader.setVec3("light.specular", 1.f, 1.f, 1.f);
-        lightingShader.setUniformFloat("light.constant", 1.f);
-        lightingShader.setUniformFloat("light.linear", .027f);
-        lightingShader.setUniformFloat("light.quadratic", .0028f);
-
-        lightingShader.setUniformFloat("material.shininess", 64.0f);
 
         const glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 100.f);
         const glm::mat4 view = camera.getViewMatrix();
@@ -225,32 +236,30 @@ int main() {
         lightingShader.setMat4("projection", projection);
         lightingShader.setMat4("view", view);
 
-        // cubes that aren't light source
+        // Drawing cubes that aren't light sources.
         glBindVertexArray(VAO[0]);
         for (unsigned int i = 1; i < cubePositions.size(); ++i) {
             glm::mat4 model = glm::mat4(1.0f);
             const float angle = 30.f * i;
             model = glm::translate(model, cubePositions[i]);
-            // model = glm::rotate(model, static_cast<float>(glfwGetTime()) + angle, glm::vec3(1.f, .3f, .5f));
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.f, .3f, .5f));
             lightingShader.setMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
-        // Light Source
+        // Light Sources.
+        glBindVertexArray(VAO[1]);
         lightSourceShader.use();
-        lightSourceShader.setVec3("colour", glm::vec3(1.f, 1.f, 1.f));
+        lightSourceShader.setVec3("colour", lightColour);
         lightSourceShader.setMat4("projection", projection);
         lightSourceShader.setMat4("view", view);
         glm::mat4 model = glm::mat4(1.f);
-        // cubePositions[0].x = std::sin(static_cast<float>(glfwGetTime()));
-        // cubePositions[0].z = std::cos(static_cast<float>(glfwGetTime()));
         model = glm::translate(model, cubePositions[0]);
         model = glm::scale(model, glm::vec3(.2f));
         lightSourceShader.setMat4("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        glBindVertexArray(VAO[1]);
-        glDrawArrays(GL_TRIANGLES, 0, 36); // 36 -> number of vertices in a cube
-
+        // Render everything we computed.
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
