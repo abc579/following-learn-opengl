@@ -61,9 +61,14 @@ int main() {
     glViewport(0, 0, windowWidth, windowHeight);
 
     Shader modelLoadingShader("./shaders/modelLoading.vs", "./shaders/modelLoading.fs");
+    Shader modelLoadingShaderBorder("./shaders/modelLoadingBorder.vs", "./shaders/modelLoadingBorder.fs");
     Model ourModel("./assets/backpack/backpack.obj");
 
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     constexpr glm::vec3 sunPosition(0.f, 10.f, 0.f);
     constexpr glm::vec3 lightColour(1.f, 1.f, 1.f);
@@ -86,6 +91,7 @@ int main() {
     constexpr float attenuationConstantFactor{ 1.f };
     constexpr float attenuationLinearFactor{ .027f };
     constexpr float attenuationQuadraticFactor{ .0028f };
+    constexpr float scaleFactor{ 1.1f };
 
     while(!glfwWindowShouldClose(window)) {
         const float currentFrame = static_cast<float>(glfwGetTime());
@@ -94,8 +100,11 @@ int main() {
 
         process_input(window);
 
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         glClearColor(.2f, 0.2f, 0.2f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
 
         modelLoadingShader.use();
         modelLoadingShader.setVec3("directionalLight.position", sunPosition);
@@ -117,18 +126,44 @@ int main() {
         modelLoadingShader.setUniformFloat("spotlightLight.outerCutOff", lightOuterCutOffAngle);
 
         // render the loaded model
-        const glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 100.f);
-        const glm::mat4 view = camera.getViewMatrix();
-
+        glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 100.f);
+        glm::mat4 view = camera.getViewMatrix();
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+        // model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+        // model = glm::scale(model, glm::vec3(.2f, .2f, .2f));
 
         modelLoadingShader.setMat4("projection", projection);
         modelLoadingShader.setMat4("view", view);
         modelLoadingShader.setMat4("model", model);
 
         ourModel.draw(modelLoadingShader);
+
+        // ----------- STENCIL SHIT --------------------
+
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glStencilMask(0x00); // disable writing to the stencil buffer
+        glDisable(GL_DEPTH_TEST);
+
+        modelLoadingShaderBorder.use();
+        modelLoadingShaderBorder.setMat4("projection", projection);
+        modelLoadingShaderBorder.setMat4("view", view);
+
+        // render the loaded model
+        model = glm::mat4(1.f);
+        model = glm::translate(model, glm::vec3(-.1f, .0f, -.1f));
+        model = glm::scale(model, glm::vec3(scaleFactor, scaleFactor, scaleFactor));
+        modelLoadingShaderBorder.setMat4("model", model);
+        ourModel.draw(modelLoadingShaderBorder);
+
+        model = glm::mat4(1.f);
+        model = glm::translate(model, glm::vec3(.02f, .0f, .0f));
+        model = glm::scale(model, glm::vec3(scaleFactor, scaleFactor, scaleFactor));
+        modelLoadingShaderBorder.setMat4("model", model);
+        ourModel.draw(modelLoadingShaderBorder);
+
+        glStencilMask(0xFF);
+        glStencilFunc(GL_ALWAYS, 0, 0xFF);
+        glEnable(GL_DEPTH_TEST);
 
         // Render everything we computed.
         glfwSwapBuffers(window);

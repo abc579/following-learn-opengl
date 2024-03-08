@@ -13,10 +13,9 @@ out vec3 FragmentWorldSpaceCoordinates;
 out vec3 Normal;
 
 void main() {
-    FragmentWorldSpaceCoordinates = vec3(model * vec4(position, 1.0));
-    TexCoords = aTexCoords;
-    Normal = mat3(transpose(inverse(model))) * normal;
+    // FragmentWorldSpaceCoordinates = vec3(model * vec4(position, 1.0));
+    // TexCoords = aTexCoords;
+    // Normal = mat3(transpose(inverse(model))) * normal;
 
-    // gl_Position = projection * view * model * vec4(position, 1.0);
-    gl_Position = projection * view * vec4(position, 1.0);
+    gl_Position = projection * view * model * vec4(position, 1.0);
 }

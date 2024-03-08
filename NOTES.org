@@ -664,6 +664,12 @@ TODO
 *** Model
 TODO
 
+** Depth Testing
+TODO
+
+** Stencil Testing
+TODO
+
 ** Mathematics
 *** Basics of Trigonometry
 Trigonometry means the study of triangles.
