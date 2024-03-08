@@ -3,6 +3,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <iostream>
+
 Mesh::Mesh(const std::vector<Vertex>& aVertices, const std::vector<Texture>& aTextures,
            const std::vector<unsigned int>& aIndices)
     :vertices(aVertices), textures(aTextures), indices(aIndices)
@@ -10,7 +12,7 @@ Mesh::Mesh(const std::vector<Vertex>& aVertices, const std::vector<Texture>& aTe
     setupMesh();
 }
 
-void Mesh::draw(Shader& shader) {
+void Mesh::draw(Shader& shader) const {
     unsigned int diffuseNumber{ 0 };
     unsigned int specularNumber{ 0 };
 
@@ -19,18 +21,17 @@ void Mesh::draw(Shader& shader) {
         std::string texTypeStr;
 
         if(textures[i].textureType == TextureType::DIFFUSE) {
-            texTypeStr = "texture_diffuse" + diffuseNumber;
+            texTypeStr = "texture_diffuse" + std::to_string(diffuseNumber);
             ++diffuseNumber;
         } else if(textures[i].textureType == TextureType::SPECULAR) {
-            texTypeStr = "texture_specular" + specularNumber;
+            texTypeStr = "texture_specular" + std::to_string(specularNumber);
             ++specularNumber;
         }
 
-        shader.setUniformFloat("material." + texTypeStr, static_cast<float>(i));
+        // std::cout << "texTypeStr = " << texTypeStr << std::endl;
+        shader.setUniformInt(texTypeStr, i);
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
     }
-
-    // Do I need to call glActiveTexture(GL_TEXTURE0); ?
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, static_cast<int>(indices.size()), GL_UNSIGNED_INT, 0);

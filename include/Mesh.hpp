@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Shader.hpp>
+#include <string>
+#include <vector>
 
 enum class TextureType {
     DIFFUSE,
@@ -16,6 +18,7 @@ struct Vertex {
 struct Texture {
     unsigned int id;
     TextureType textureType;
+    std::string path;
 };
 
 class Mesh {
@@ -27,7 +30,7 @@ public:
     explicit Mesh(const std::vector<Vertex>& aVertices, const std::vector<Texture>& aTextures,
                   const std::vector<unsigned int>& aIndices);
 
-    void draw(Shader& shader);
+    void draw(Shader& shader) const;
 
 private:
     unsigned int VAO{ 0 };

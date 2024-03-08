@@ -1,9 +1,9 @@
-CXX=g++
+CXX=g++ -std=c++20
 RELEASE_FLAGS := -O3
 DEBUG_FLAGS := -ggdb -O2
 SECURITY_FLAGS := -fstack-protector -D_FORTIFY_SOURCE=2  -fsanitize=address,leak,undefined
 WARNING_FLAGS := -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wsign-conversion -Wuninitialized -Wfloat-equal -Wformat=2 -Wundef -Wunused-parameter -Wunused-variable -Wunused-function -Wmissing-declarations -Wreorder -Wswitch-enum -Wdeprecated-declarations -Wvla -Wlogical-op
-LD_FLAGS := -L./deps -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl -lassimp
+LD_FLAGS := -L./deps -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl -lassimp -lz
 INCLUDE_FLAGS := -Iinclude
 
 OUTPUT_DIR := output
@@ -24,7 +24,8 @@ all: output tags deps precompile_headers
 	$(CXX) $(CURRENT_BUILD_FLAGS) -include $(PCH_HEADER) -c src/main.cpp -o $(OUTPUT_DIR)/main.o $(LD_FLAGS)
 	$(CXX) $(CURRENT_BUILD_FLAGS) -include $(PCH_HEADER) -c src/Shader.cpp -o $(OUTPUT_DIR)/Shader.o $(LD_FLAGS)
 	$(CXX) $(CURRENT_BUILD_FLAGS) -include $(PCH_HEADER) -c src/Mesh.cpp -o $(OUTPUT_DIR)/Mesh.o $(LD_FLAGS)
-	$(CXX) $(CURRENT_BUILD_FLAGS) -include $(PCH_HEADER) $(OUTPUT_DIR)/Shader.o $(OUTPUT_DIR)/main.o $(OUTPUT_DIR)/glad.o -o $(OUTPUT_DIR)/$(OUTPUT_BIN) $(LD_FLAGS)
+	$(CXX) $(CURRENT_BUILD_FLAGS) -include $(PCH_HEADER) -c src/Model.cpp -o $(OUTPUT_DIR)/Model.o $(LD_FLAGS)
+	$(CXX) $(CURRENT_BUILD_FLAGS) -include $(PCH_HEADER) $(OUTPUT_DIR)/Shader.o $(OUTPUT_DIR)/Mesh.o $(OUTPUT_DIR)/Model.o $(OUTPUT_DIR)/main.o $(OUTPUT_DIR)/glad.o -o $(OUTPUT_DIR)/$(OUTPUT_BIN) $(LD_FLAGS)
 
 precompile_headers:
 	$(CXX) $(DEPS_BUILD_FLAGS) -x c++-header $(PCH_HEADER) -o $(PCH_OUTPUT)

@@ -2470,6 +2470,2238 @@ include/GLFW/glfw3native.h,248
    #undef GLAPIENTRY152,5281
    #undef GLFW_GLAPIENTRY_DEFINED153,5302
 
+include/assimp/AssertHandler.h,70
+#define INCLUDED_AI_ASSERTHANDLER_H45,1827
+namespace Assimp 50,1920
+
+include/assimp/RemoveComments.h,41
+#define AI_REMOVE_COMMENTS_H_INC47,1904
+
+include/assimp/ObjMaterial.h,255
+#define AI_OBJMATERIAL_H_INC48,1904
+#define AI_MATKEY_OBJ_ILLUM 59,2128
+#define _AI_MATKEY_OBJ_BUMPMULT_BASE 68,2441
+#define AI_MATKEY_OBJ_BUMPMULT(72,2587
+#define AI_MATKEY_OBJ_BUMPMULT_NORMALS(75,2690
+#define AI_MATKEY_OBJ_BUMPMULT_HEIGHT(78,2788
+
+include/assimp/ColladaMetaData.h,122
+#define AI_COLLADAMETADATA_H_INC47,1856
+#define AI_METADATA_COLLADA_ID 53,1940
+#define AI_METADATA_COLLADA_SID 54,1984
+
+include/assimp/BlobIOSystem.h,1321
+#define AI_BLOBIOSYSTEM_H_INCLUDED47,1970
+class BlobIOStream 67,2502
+    BlobIOStream(73,2747
+    ~BlobIOStream(85,3077
+    size_t Read(100,3474
+    size_t Write(105,3625
+    aiReturn Seek(119,4045
+    size_t Tell(147,4712
+    size_t FileSize(152,4852
+    void Flush(157,4999
+    void Grow(163,5136
+    uint8_t *buffer;buffer184,5862
+    size_t cur_size,185,5883
+    size_t cur_size, file_size,185,5883
+    size_t cur_size, file_size, cursor,185,5883
+    size_t cur_size, file_size, cursor, initial;185,5883
+    const std::string file;187,5933
+    BlobIOSystem *const creator;188,5961
+#define AI_BLOBIO_MAGIC 191,5998
+class BlobIOSystem 196,6262
+    typedef std::pair<std::string,std::string199,6333
+    typedef std::pair<std::string, aiExportDataBlob *> BlobEntry;199,6333
+    BlobIOSystem(204,6455
+    BlobIOSystem(210,6624
+    ~BlobIOSystem(215,6729
+    const char *GetMagicFileName(GetMagicFileName223,6936
+    aiExportDataBlob *GetBlobChain(GetBlobChain228,7094
+    bool Exists(274,8529
+    char getOsSeparator(279,8729
+    IOStream *Open(Open284,8874
+    void Close(294,9197
+    void OnDestruct(300,9353
+    std::string baseName;308,9643
+    std::set<std::string> created;309,9669
+    std::vector<BlobEntry> blobs;310,9704
+BlobIOStream::~BlobIOStream(~BlobIOStream314,9838
+
+include/assimp/cexport.h,499
+#define AI_EXPORT_H_INC47,1908
+struct aiExportFormatDesc 72,2486
+    const char *id;id76,2721
+    const char *description;description80,2883
+    const char *fileExtension;fileExtension83,2985
+struct aiExportDataBlob 200,10019
+    size_t size;202,10079
+    void *data;data205,10115
+    C_STRUCT aiString name;225,10923
+    C_STRUCT aiExportDataBlob *next;next228,11027
+    aiExportDataBlob(232,11112
+    ~aiExportDataBlob(237,11218
+    aiExportDataBlob &operator=operator243,11382
+
+include/assimp/color4.h,420
+#define AI_COLOR4D_H_INC46,1938
+class aiColor4t 61,2377
+    aiColor4t(63,2403
+    aiColor4t 64,2456
+    explicit aiColor4t 66,2551
+    TReal r,88,3337
+    TReal r, g,88,3337
+    TReal r, g, b,88,3337
+    TReal r, g, b, a;88,3337
+typedef aiColor4t<ai_real> aiColor4D;91,3385
+struct aiColor4D 95,3431
+    ai_real r,96,3450
+    ai_real r, g,96,3450
+    ai_real r, g, b,96,3450
+    ai_real r, g, b, a;96,3450
+
+include/assimp/StringUtils.h,851
+#define INCLUDED_AI_STRINGUTILS_H43,1748
+#define AI_SIZEFMT 60,2038
+#define AI_SIZEFMT 62,2069
+inline int c99_ai_vsnprintf(78,2785
+inline int ai_snprintf(90,3078
+#define ai_snprintf 102,3334
+#define ai_snprintf 104,3377
+AI_FORCE_INLINE std::string ai_to_string(115,3847
+float ai_strtof(130,4364
+AI_FORCE_INLINE std::string ai_decimal_to_hexa(153,5149
+AI_FORCE_INLINE std::string ai_rgba2hex(175,5849
+AI_FORCE_INLINE void ai_trim_left(188,6293
+AI_FORCE_INLINE void ai_trim_right(199,6806
+AI_FORCE_INLINE std::string ai_trim(209,7248
+AI_FORCE_INLINE char_t ai_tolower(219,7502
+AI_FORCE_INLINE std::string ai_tolower(228,7951
+AI_FORCE_INLINE char_t ai_toupper(238,8319
+AI_FORCE_INLINE std::string ai_str_toupper(246,8683
+AI_FORCE_INLINE std::string ai_str_toprintable(258,9288
+AI_FORCE_INLINE std::string ai_str_toprintable(274,10097
+
+include/assimp/Bitmap.h,651
+#define AI_BITMAP_H_INC49,1992
+    struct Header 72,2370
+        uint16_t type;73,2390
+        uint32_t size;74,2413
+        uint16_t reserved1;75,2436
+        uint16_t reserved2;76,2464
+        uint32_t offset;77,2492
+    struct DIB 88,2849
+        uint32_t size;89,2866
+        int32_t width;90,2889
+        int32_t height;91,2912
+        uint16_t planes;92,2936
+        uint16_t bits_per_pixel;93,2961
+        uint32_t compression;94,2994
+        uint32_t image_size;95,3024
+        int32_t x_resolution;96,3053
+        int32_t y_resolution;97,3083
+        uint32_t nb_colors;98,3113
+        uint32_t nb_important_colors;99,3141
+
+include/assimp/quaternion.h,398
+#define AI_QUATERNION_H_INC46,1860
+class aiQuaterniont 66,2325
+    aiQuaterniont(68,2355
+    aiQuaterniont(69,2415
+    TReal w,130,4624
+    TReal w, x,130,4624
+    TReal w, x, y,130,4624
+    TReal w, x, y, z;130,4624
+using aiQuaternion 133,4651
+struct aiQuaternion 137,4704
+    ai_real w,138,4726
+    ai_real w, x,138,4726
+    ai_real w, x, y,138,4726
+    ai_real w, x, y, z;138,4726
+
+include/assimp/Hash.h,157
+#define AI_HASH_H_INCLUDED43,1757
+#undef get16bits65,2472
+#  define get16bits(68,2633
+#  define get16bits(72,2717
+inline uint32_t SuperFastHash 77,2961
+
+include/assimp/vector2.h,313
+#define AI_VECTOR2D_H_INC46,1939
+class aiVector2t 66,2289
+    aiVector2t 68,2316
+    aiVector2t 69,2348
+    explicit aiVector2t 70,2402
+    TReal x,96,3230
+    TReal x, y;96,3230
+typedef aiVector2t<ai_real> aiVector2D;99,3250
+struct aiVector2D 103,3298
+    ai_real x,104,3318
+    ai_real x, y;104,3318
+
+include/assimp/IOStream.hpp,60
+#define AI_IOSTREAM_H_INC47,1907
+namespace Assimp 60,2140
+
+include/assimp/IOSystem.hpp,653
+#define AI_IOSYSTEM_H_INC49,1992
+namespace Assimp 74,2415
+AI_FORCE_INLINE IOStream* IOSystem::Open(Open246,9329
+AI_FORCE_INLINE bool IOSystem::Exists(Exists254,9694
+AI_FORCE_INLINE bool IOSystem::ComparePaths(ComparePaths262,10025
+AI_FORCE_INLINE bool IOSystem::PushDirectory(PushDirectory270,10405
+AI_FORCE_INLINE size_t IOSystem::StackSize(StackSize281,10670
+AI_FORCE_INLINE bool IOSystem::PopDirectory(PopDirectory286,10837
+AI_FORCE_INLINE bool IOSystem::CreateDirectory(CreateDirectory297,11076
+AI_FORCE_INLINE bool IOSystem::ChangeDirectory(ChangeDirectory310,11416
+AI_FORCE_INLINE bool IOSystem::DeleteFile(DeleteFile324,11751
+
+include/assimp/types.h,2857
+#define AI_TYPES_H_INC47,1925
+typedef int32_t ai_int32;71,2421
+typedef uint32_t ai_uint32;72,2447
+static const size_t MAXLEN 121,4160
+#define MAXLEN 123,4201
+struct aiPlane 129,4381
+    aiPlane(131,4417
+    aiPlane(132,4480
+    aiPlane(135,4585
+    ai_real a,141,4711
+    ai_real a, b,141,4711
+    ai_real a, b, c,141,4711
+    ai_real a, b, c, d;141,4711
+struct aiRay 147,4868
+    aiRay(149,4902
+    aiRay(150,4930
+    aiRay(153,5027
+    C_STRUCT aiVector3D pos,159,5160
+    C_STRUCT aiVector3D pos, dir;159,5160
+struct aiColor3D 165,5352
+    aiColor3D(167,5390
+    aiColor3D(168,5450
+    explicit aiColor3D(170,5537
+    aiColor3D(172,5609
+    aiColor3D &operator=(operator=175,5684
+    bool operator==(operator==184,5874
+    bool operator!=(operator!=188,6053
+    bool operator<(192,6224
+    aiColor3D operator+(197,6413
+    aiColor3D operator-(202,6563
+    aiColor3D operator*(207,6716
+    aiColor3D operator*(212,6862
+    bool IsBlack(234,7394
+    ai_real r,242,7639
+    ai_real r, g,242,7639
+    ai_real r, g, b;242,7639
+struct aiString 266,8869
+    aiString(269,8976
+    aiString(280,9243
+    explicit aiString(289,9543
+    void Set(297,9831
+    void Set(307,10121
+    aiString &operator=(operator=318,10407
+    aiString &operator=(operator=334,10795
+    aiString &operator=(operator=340,10930
+    bool operator==(operator==346,11066
+    bool operator!=(operator!=351,11245
+    void Append(356,11426
+    void Clear(370,11766
+    const char *C_Str(C_Str381,12073
+    ai_uint32 length;390,12388
+    char data[data393,12458
+typedef enum aiReturn 400,12693
+    aiReturn_SUCCESS 402,12769
+    aiReturn_FAILURE 405,12842
+    aiReturn_OUTOFMEMORY 410,12977
+    _AI_ENFORCE_ENUM_SIZE 415,13070
+} aiReturn;418,13127
+#define AI_SUCCESS 421,13229
+#define AI_FAILURE 422,13265
+#define AI_OUTOFMEMORY 423,13301
+enum aiOrigin 429,13547
+    aiOrigin_SET 431,13596
+    aiOrigin_CUR 434,13669
+    aiOrigin_END 437,13747
+    _AI_ORIGIN_ENFORCE_ENUM_SIZE 442,13833
+enum aiDefaultLogStream 452,14174
+    aiDefaultLogStream_FILE 454,14236
+    aiDefaultLogStream_STDOUT 457,14311
+    aiDefaultLogStream_STDERR 460,14388
+    aiDefaultLogStream_DEBUGGER 465,14546
+    _AI_DLS_ENFORCE_ENUM_SIZE 470,14645
+#define DLS_FILE 475,14808
+#define DLS_STDOUT 476,14849
+#define DLS_STDERR 477,14894
+#define DLS_DEBUGGER 478,14939
+struct aiMemoryInfo 485,15260
+    aiMemoryInfo(489,15333
+    unsigned int textures;502,15630
+    unsigned int materials;505,15706
+    unsigned int meshes;508,15778
+    unsigned int nodes;511,15847
+    unsigned int animations;514,15920
+    unsigned int cameras;517,15995
+    unsigned int lights;520,16066
+    unsigned int total;523,16148
+struct aiBuffer 529,16259
+    const char *data;data530,16277
+    const char *end;end531,16317
+    aiBuffer(535,16417
+
+include/assimp/Subdivision.h,97
+#define AI_SUBDISIVION_H_INC46,1830
+    enum Algorithm 66,2345
+        CATMULL_CLARKE 67,2367
+
+include/assimp/Exporter.hpp,889
+#define AI_EXPORT_HPP_INC47,1915
+namespace Assimp 59,2083
+class ASSIMP_API ExportProperties;83,3151
+    typedef void (*fpExportFunc)fpExportFunc88,3284
+    struct ExportFormatEntry 91,3454
+        aiExportFormatDesc mDescription;93,3575
+        fpExportFunc mExportFunction;96,3671
+        unsigned int mEnforcePP;99,3792
+        ExportFormatEntry(102,3869
+        ExportFormatEntry(110,4234
+    typedef unsigned int 326,15546
+    typedef std::map<KeyType, int> IntPropertyMap;330,15700
+    typedef std::map<KeyType, ai_real> FloatPropertyMap;331,15751
+    typedef std::map<KeyType, std::string> StringPropertyMap;332,15808
+    typedef std::map<KeyType, aiMatrix4x4> MatrixPropertyMap;333,15870
+    typedef std::map<KeyType,KeyType334,15932
+inline const aiExportDataBlob *Exporter::ExportToBlob(ExportToBlob494,22275
+inline aiReturn Exporter ::Export(Export500,22628
+
+include/assimp/StandardShapes.h,41
+#define AI_STANDARD_SHAPES_H_INC48,1908
+
+include/assimp/DefaultIOSystem.h,41
+#define AI_DEFAULTIOSYSTEM_H_INC47,1853
+
+include/assimp/CreateAnimMesh.h,47
+#define INCLUDED_AI_CREATE_ANIM_MESH_H47,1831
+
+include/assimp/NullLogger.hpp,96
+#define INCLUDED_AI_NULLLOGGER_H49,1819
+namespace Assimp 57,1926
+    : public Logger 65,2252
+
+include/assimp/Compiler/pstdint.h,8693
+#define _PSTDINT_H_INCLUDED202,9012
+#   define PRINTF_INT64_MODIFIER 205,9188
+#   define PRINTF_INT32_MODIFIER 208,9266
+#   define PRINTF_INT64_MODIFIER 212,9350
+#    define PRINTF_INT32_MODIFIER 216,9461
+#    define PRINTF_INT32_MODIFIER 218,9507
+#  define PRINTF_INT16_MODIFIER 223,9603
+#  define PRINTF_INTMAX_MODIFIER 226,9679
+#  define PRINTF_INT64_HEX_WIDTH 229,9774
+#  define PRINTF_UINT64_HEX_WIDTH 232,9853
+#  define PRINTF_INT32_HEX_WIDTH 235,9932
+#  define PRINTF_UINT32_HEX_WIDTH 238,10010
+#  define PRINTF_INT16_HEX_WIDTH 241,10088
+#  define PRINTF_UINT16_HEX_WIDTH 244,10166
+#  define PRINTF_INT8_HEX_WIDTH 247,10243
+#  define PRINTF_UINT8_HEX_WIDTH 250,10319
+#  define PRINTF_INT64_DEC_WIDTH 253,10396
+#  define PRINTF_UINT64_DEC_WIDTH 256,10475
+#  define PRINTF_INT32_DEC_WIDTH 259,10554
+#  define PRINTF_UINT32_DEC_WIDTH 262,10633
+#  define PRINTF_INT16_DEC_WIDTH 265,10712
+#  define PRINTF_UINT16_DEC_WIDTH 268,10790
+#  define PRINTF_INT8_DEC_WIDTH 271,10867
+#  define PRINTF_UINT8_DEC_WIDTH 274,10943
+#  define PRINTF_INTMAX_HEX_WIDTH 277,11021
+#  define PRINTF_UINTMAX_HEX_WIDTH 280,11121
+#  define PRINTF_INTMAX_DEC_WIDTH 283,11221
+#  define PRINTF_UINTMAX_DEC_WIDTH 286,11321
+#   define INT64_C(296,11623
+#   define UINT64_C(299,11712
+#   define INT32_C(302,11802
+#   define UINT32_C(305,11891
+#   define INT16_C(308,11981
+#   define UINT16_C(311,12044
+#   define INT8_C(314,12105
+#   define UINT8_C(317,12166
+#   define UINT64_MAX 320,12230
+#   define INT64_MAX 323,12313
+#   define UINT32_MAX 326,12394
+#   define INT32_MAX 329,12466
+#   define INTMAX_MAX 332,12537
+#   define INTMAX_MIN 335,12606
+#define _PSTDINT_H_INCLUDED351,13159
+#define _PSTDINT_H_INCLUDED355,13223
+# define SIZE_MAX 358,13269
+# define UINT8_MAX 368,13486
+    typedef unsigned char uint8_t;372,13636
+#   define UINT8_C(373,13671
+# define INT8_MAX 380,13782
+# define INT8_MIN 383,13829
+    typedef signed char int8_t;387,13983
+#   define INT8_C(388,14015
+# define UINT16_MAX 395,14126
+  typedef unsigned int uint16_t;399,14280
+#  define PRINTF_INT16_MODIFIER 401,14344
+# define UINT16_C(403,14387
+  typedef unsigned short uint16_t;405,14457
+# define UINT16_C(406,14492
+#  define PRINTF_INT16_MODIFIER 408,14561
+# define INT16_MAX 416,14676
+# define INT16_MIN 419,14727
+  typedef signed int int16_t;423,14885
+# define INT16_C(424,14915
+#  define PRINTF_INT16_MODIFIER 426,14982
+  typedef signed short int16_t;429,15055
+# define INT16_C(430,15087
+#  define PRINTF_INT16_MODIFIER 432,15154
+# define UINT32_MAX 440,15270
+  typedef unsigned long uint32_t;444,15433
+# define UINT32_C(445,15467
+#  define PRINTF_INT32_MODIFIER 447,15527
+  typedef unsigned int uint32_t;450,15602
+#  define PRINTF_INT32_MODIFIER 452,15666
+# define UINT32_C(454,15709
+  typedef unsigned short uint32_t;456,15769
+# define UINT32_C(457,15804
+#  define PRINTF_INT32_MODIFIER 459,15879
+# define INT32_MAX 467,15993
+# define INT32_MIN 470,16051
+  typedef signed long int32_t;474,16214
+# define INT32_C(475,16245
+#  define PRINTF_INT32_MODIFIER 477,16303
+  typedef signed int int32_t;480,16376
+# define INT32_C(481,16406
+#  define PRINTF_INT32_MODIFIER 483,16459
+  typedef signed short int32_t;486,16532
+# define INT32_C(487,16564
+#  define PRINTF_INT32_MODIFIER 489,16629
+#undef stdint_int64_defined503,16942
+#  define stdint_int64_defined506,17118
+   typedef long long int64_t;507,17149
+   typedef unsigned long long uint64_t;508,17179
+#  define UINT64_C(509,17219
+#  define  INT64_C(510,17250
+#   define PRINTF_INT64_MODIFIER 512,17312
+#  define stdint_int64_defined519,17455
+   __extension__ typedef long long int64_t;520,17486
+   __extension__ typedef unsigned long long uint64_t;521,17530
+#  define UINT64_C(522,17584
+#  define  INT64_C(523,17615
+#   define PRINTF_INT64_MODIFIER 525,17677
+#  define stdint_int64_defined528,17894
+   typedef long long int64_t;529,17925
+   typedef unsigned long long uint64_t;530,17955
+#  define UINT64_C(531,17995
+#  define  INT64_C(532,18026
+#   define PRINTF_INT64_MODIFIER 534,18088
+#  define stdint_int64_defined537,18338
+   typedef __int64 int64_t;538,18369
+   typedef unsigned __int64 uint64_t;539,18397
+#  define UINT64_C(540,18435
+#  define  INT64_C(541,18467
+#   define PRINTF_INT64_MODIFIER 543,18530
+# define LONG_LONG_MAX 549,18644
+# define ULONG_LONG_MAX 552,18727
+# define INT64_MAX 556,18837
+# define INT64_MIN 559,18939
+# define UINT64_MAX 562,19043
+# define PRINTF_INT64_HEX_WIDTH 570,19185
+# define PRINTF_INT32_HEX_WIDTH 573,19260
+# define PRINTF_INT16_HEX_WIDTH 576,19334
+# define PRINTF_INT8_HEX_WIDTH 579,19407
+# define PRINTF_INT64_DEC_WIDTH 582,19480
+# define PRINTF_INT32_DEC_WIDTH 585,19555
+# define PRINTF_INT16_DEC_WIDTH 588,19630
+# define PRINTF_INT8_DEC_WIDTH 591,19703
+# define PRINTF_UINT64_DEC_WIDTH 594,19777
+# define PRINTF_UINT32_DEC_WIDTH 597,19854
+# define PRINTF_UINT16_DEC_WIDTH 600,19931
+# define PRINTF_UINT8_DEC_WIDTH 603,20006
+  typedef int64_t intmax_t;613,20274
+  typedef uint64_t uintmax_t;614,20302
+# define  INTMAX_MAX 615,20332
+# define  INTMAX_MIN 616,20365
+# define UINTMAX_MAX 617,20398
+# define UINTMAX_C(618,20431
+# define  INTMAX_C(619,20465
+#   define PRINTF_INTMAX_MODIFIER 621,20531
+#  define PRINTF_INTMAX_HEX_WIDTH 624,20628
+#  define PRINTF_INTMAX_DEC_WIDTH 627,20726
+  typedef int32_t intmax_t;630,20797
+  typedef uint32_t uintmax_t;631,20825
+# define  INTMAX_MAX 632,20855
+# define UINTMAX_MAX 633,20888
+# define UINTMAX_C(634,20921
+# define  INTMAX_C(635,20955
+#   define PRINTF_INTMAX_MODIFIER 637,21021
+#  define PRINTF_INTMAX_HEX_WIDTH 640,21118
+#  define PRINTF_INTMAX_DEC_WIDTH 643,21216
+  typedef   int8_t   int_least8_t;655,21586
+  typedef  uint8_t  uint_least8_t;656,21621
+  typedef  int16_t  int_least16_t;657,21656
+  typedef uint16_t uint_least16_t;658,21691
+  typedef  int32_t  int_least32_t;659,21726
+  typedef uint32_t uint_least32_t;660,21761
+# define PRINTF_LEAST32_MODIFIER 661,21796
+# define PRINTF_LEAST16_MODIFIER 662,21851
+# define  UINT_LEAST8_MAX 663,21906
+# define   INT_LEAST8_MAX 664,21943
+# define UINT_LEAST16_MAX 665,21980
+# define  INT_LEAST16_MAX 666,22017
+# define UINT_LEAST32_MAX 667,22054
+# define  INT_LEAST32_MAX 668,22091
+# define   INT_LEAST8_MIN 669,22128
+# define  INT_LEAST16_MIN 670,22165
+# define  INT_LEAST32_MIN 671,22202
+    typedef  int64_t  int_least64_t;673,22268
+    typedef uint64_t uint_least64_t;674,22305
+#   define PRINTF_LEAST64_MODIFIER 675,22342
+#   define UINT_LEAST64_MAX 676,22399
+#   define  INT_LEAST64_MAX 677,22438
+#   define  INT_LEAST64_MIN 678,22477
+#undef stdint_least_defined681,22531
+typedef   int_least8_t   int_fast8_t;694,23067
+typedef  uint_least8_t  uint_fast8_t;695,23105
+typedef  int_least16_t  int_fast16_t;696,23143
+typedef uint_least16_t uint_fast16_t;697,23181
+typedef  int_least32_t  int_fast32_t;698,23219
+typedef uint_least32_t uint_fast32_t;699,23257
+#define  UINT_FAST8_MAX 700,23295
+#define   INT_FAST8_MAX 701,23336
+#define UINT_FAST16_MAX 702,23377
+#define  INT_FAST16_MAX 703,23418
+#define UINT_FAST32_MAX 704,23459
+#define  INT_FAST32_MAX 705,23500
+#define   INT_FAST8_MIN 706,23541
+#define  INT_FAST16_MIN 707,23582
+#define  INT_FAST32_MIN 708,23623
+  typedef  int_least64_t  int_fast64_t;710,23692
+  typedef uint_least64_t uint_fast64_t;711,23732
+# define UINT_FAST64_MAX 712,23772
+# define  INT_FAST64_MAX 713,23814
+# define  INT_FAST64_MIN 714,23856
+#undef stdint_int64_defined717,23906
+#  define WCHAR_MIN 727,24159
+#  define WCHAR_MAX 730,24208
+# define STDINT_H_UINTPTR_T_DEFINED740,24453
+#  define stdint_intptr_bits 745,24646
+#    define stdint_intptr_bits 748,24800
+#    define stdint_intptr_bits 750,24842
+#  define stdint_intptr_bits 753,24973
+#  define stdint_intptr_glue3_i(761,25184
+#  define stdint_intptr_glue3(762,25232
+#    define PRINTF_INTPTR_MODIFIER 764,25334
+#    define PTRDIFF_MAX 767,25466
+#    define PTRDIFF_MIN 770,25586
+#    define UINTPTR_MAX 773,25706
+#    define INTPTR_MAX 776,25826
+#    define INTPTR_MIN 779,25945
+#    define INTPTR_C(782,26062
+#    define UINTPTR_C(785,26181
+  typedef stdint_intptr_glue3(uint,stdint_intptr_bits,_t)787,26281
+  typedef stdint_intptr_glue3( int,stdint_intptr_bits,_t)788,26350
+  typedef ptrdiff_t intptr_t;792,26544
+# define STDINT_H_UINTPTR_T_DEFINED794,26582
+# define SIG_ATOMIC_MAX 802,26729
+#define glue3_aux(818,27057
+#define glue3(819,27094
+#define DECLU(821,27133
+#define DECLI(822,27215
+#define DECL(824,27296
+#define TESTUMAX(826,27342
+#define REPORTERROR(828,27496
+int main 830,27589
+#define STR(892,30709
+#define Q(893,30727
+
+include/assimp/Compiler/pushpack1.h,127
+#	define PACK_STRUCT27,755
+#		define PACK_STRUCT	30,850
+#		define PACK_STRUCT	32,907
+#define AI_PUSHPACK_IS_DEFINED43,1180
+
+include/assimp/Compiler/poppack1.h,63
+#undef PACK_STRUCT20,743
+#undef AI_PUSHPACK_IS_DEFINED22,763
+
+include/assimp/StreamReader.h,410
+#define AI_STREAMREADER_H_INCLUDED47,1970
+    StreamReader &operator>>(operator>>279,10308
+typedef StreamReader<true> StreamReaderLE;331,12023
+typedef StreamReader<false> StreamReaderBE;332,12066
+typedef StreamReader<true> StreamReaderBE;334,12116
+typedef StreamReader<false> StreamReaderLE;335,12159
+typedef StreamReader<true,true340,12367
+typedef StreamReader<true, true> StreamReaderAny;340,12367
+
+include/assimp/version.h,283
+#define AI_VERSION_H_INC48,1962
+#define ASSIMP_CFLAGS_SHARED 98,3834
+#define ASSIMP_CFLAGS_STLPORT 100,3908
+#define ASSIMP_CFLAGS_DEBUG 102,3983
+#define ASSIMP_CFLAGS_NOBOOST 105,4085
+#define ASSIMP_CFLAGS_SINGLETHREADED 107,4194
+#define ASSIMP_CFLAGS_DOUBLE_SUPPORT 109,4304
+
+include/assimp/matrix4x4.h,1138
+#define AI_MATRIX4X4_H_INC48,1945
+class aiMatrix4x4t 73,2693
+    TReal a1,260,11395
+    TReal a1, a2,260,11395
+    TReal a1, a2, a3,260,11395
+    TReal a1, a2, a3, a4;260,11395
+    TReal b1,261,11421
+    TReal b1, b2,261,11421
+    TReal b1, b2, b3,261,11421
+    TReal b1, b2, b3, b4;261,11421
+    TReal c1,262,11447
+    TReal c1, c2,262,11447
+    TReal c1, c2, c3,262,11447
+    TReal c1, c2, c3, c4;262,11447
+    TReal d1,263,11473
+    TReal d1, d2,263,11473
+    TReal d1, d2, d3,263,11473
+    TReal d1, d2, d3, d4;263,11473
+typedef aiMatrix4x4t<ai_real> aiMatrix4x4;266,11503
+struct aiMatrix4x4 270,11554
+    ai_real a1,271,11575
+    ai_real a1, a2,271,11575
+    ai_real a1, a2, a3,271,11575
+    ai_real a1, a2, a3, a4;271,11575
+    ai_real b1,272,11603
+    ai_real b1, b2,272,11603
+    ai_real b1, b2, b3,272,11603
+    ai_real b1, b2, b3, b4;272,11603
+    ai_real c1,273,11631
+    ai_real c1, c2,273,11631
+    ai_real c1, c2, c3,273,11631
+    ai_real c1, c2, c3, c4;273,11631
+    ai_real d1,274,11659
+    ai_real d1, d2,274,11659
+    ai_real d1, d2, d3,274,11659
+    ai_real d1, d2, d3, d4;274,11659
+
+include/assimp/fast_atof.h,701
+#define FAST_A_TO_F_H_INCLUDED18,801
+namespace Assimp 40,1189
+inline unsigned int strtoul10(66,1838
+inline unsigned int strtoul8(86,2378
+inline unsigned int strtoul16(105,2915
+inline unsigned int HexDigitToDecimal(129,3741
+inline uint8_t HexOctetToDecimal(146,4358
+inline int strtol10(153,4704
+inline unsigned int strtoul_cppstyle(176,5403
+template<typename ExceptionType 187,5946
+template<typename ExceptionType 240,7451
+#define AI_FAST_ATOF_RELAVANT_DECIMALS 255,7875
+template<typename Real,262,8281
+template<typename Real, typename ExceptionType 262,8281
+template<typename ExceptionType 351,11626
+template<typename ExceptionType 359,11818
+template<typename ExceptionType 368,12038
+
+include/assimp/Base64.hpp,86
+#define AI_BASE64_HPP_INC44,1842
+namespace Assimp 52,1952
+namespace Base64 53,1971
+
+include/assimp/pbrmaterial.h,1225
+#define AI_PBRMATERIAL_H_INC47,1911
+#define AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_BASE_COLOR_FACTOR 59,2352
+#define AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_BASE_COLOR_TEXTURE 60,2435
+#define AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLIC_FACTOR 61,2527
+#define AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_ROUGHNESS_FACTOR 62,2613
+#define AI_MATKEY_GLTF_PBRSPECULARGLOSSINESS 64,2702
+#define AI_MATKEY_GLTF_PBRSPECULARGLOSSINESS_GLOSSINESS_FACTOR 65,2775
+#define AI_MATKEY_GLTF_UNLIT 68,2929
+#define AI_MATKEY_GLTF_MATERIAL_SHEEN_COLOR_FACTOR 71,3015
+#define AI_MATKEY_GLTF_MATERIAL_SHEEN_ROUGHNESS_FACTOR 72,3095
+#define AI_MATKEY_GLTF_MATERIAL_SHEEN_COLOR_TEXTURE 73,3183
+#define AI_MATKEY_GLTF_MATERIAL_SHEEN_ROUGHNESS_TEXTURE 74,3265
+#define AI_MATKEY_GLTF_MATERIAL_CLEARCOAT_FACTOR 77,3392
+#define AI_MATKEY_GLTF_MATERIAL_CLEARCOAT_ROUGHNESS_FACTOR 78,3468
+#define AI_MATKEY_GLTF_MATERIAL_CLEARCOAT_TEXTURE 79,3564
+#define AI_MATKEY_GLTF_MATERIAL_CLEARCOAT_ROUGHNESS_TEXTURE 80,3642
+#define AI_MATKEY_GLTF_MATERIAL_CLEARCOAT_NORMAL_TEXTURE 81,3740
+#define AI_MATKEY_GLTF_MATERIAL_TRANSMISSION_FACTOR 84,3872
+#define AI_MATKEY_GLTF_MATERIAL_TRANSMISSION_TEXTURE 85,3954
+#define AI_MATKEY_GLTF_TEXTURE_TEXCOORD(87,4039
+
+include/assimp/cimport.h,333
+#define AI_ASSIMP_H_INC47,1928
+typedef void (*aiLogStreamCallback)aiLogStreamCallback63,2137
+struct aiLogStream 72,2590
+    aiLogStreamCallback callback;74,2644
+    char *user;user77,2729
+struct aiPropertyStore 91,3215
+    char sentinel;92,3240
+typedef int aiBool;96,3293
+#define AI_FALSE 98,3314
+#define AI_TRUE 99,3333
+
+include/assimp/IOStreamBuffer.h,1379
+#define AI_IOSTREAMBUFFER_H_INC44,1747
+class IOStreamBuffer 63,2112
+    IOStreamBuffer(66,2182
+    ~IOStreamBuffer(69,2269
+    bool open(74,2442
+    bool close(78,2558
+    size_t size(82,2647
+    IOStream *m_stream;m_stream120,3868
+    size_t m_filesize;121,3892
+    size_t m_cacheSize;122,3915
+    size_t m_numBlocks;123,3939
+    size_t m_blockIdx;124,3963
+    std::vector<T> m_cache;125,3986
+    size_t m_cachePos;126,4014
+    size_t m_filePos;127,4037
+AI_FORCE_INLINE IOStreamBuffer<T>::IOStreamBuffer(IOStreamBuffer131,4082
+AI_FORCE_INLINE bool IOStreamBuffer<T>::open(open147,4505
+AI_FORCE_INLINE bool IOStreamBuffer<T>::close(close176,5095
+        IOStreamBuffer<T>::size(size195,5436
+        IOStreamBuffer<T>::cacheSize(cacheSize202,5554
+AI_FORCE_INLINE bool IOStreamBuffer<T>::readNextBlock(readNextBlock207,5647
+AI_FORCE_INLINE size_t IOStreamBuffer<T>::getNumBlocks(getNumBlocks224,6054
+AI_FORCE_INLINE size_t IOStreamBuffer<T>::getCurrentBlockIndex(getCurrentBlockIndex229,6165
+AI_FORCE_INLINE size_t IOStreamBuffer<T>::getFilePos(getFilePos234,6283
+AI_FORCE_INLINE bool IOStreamBuffer<T>::getNextDataLine(getNextDataLine239,6390
+static AI_FORCE_INLINE bool isEndOfCache(283,7442
+AI_FORCE_INLINE bool IOStreamBuffer<T>::getNextLine(getNextLine288,7568
+AI_FORCE_INLINE bool IOStreamBuffer<T>::getNextBlock(getNextBlock334,8689
+
+include/assimp/Importer.hpp,362
+#define AI_ASSIMP_HPP_INC49,1937
+namespace Assimp 64,2209
+#define AI_PROPERTY_WAS_NOT_EXISTING 88,2867
+namespace Assimp 96,3039
+AI_FORCE_INLINE const aiScene *Importer::ReadFile(ReadFile669,30645
+AI_FORCE_INLINE void Importer::GetExtensionList(GetExtensionList673,30870
+AI_FORCE_INLINE bool Importer::IsExtensionSupported(IsExtensionSupported679,31089
+
+include/assimp/ByteSwapper.h,2061
+#define AI_BYTESWAPPER_H_INC47,1858
+class ByteSwap 68,2489
+    ByteSwap(69,2506
+    static inline void Swap2(76,2735
+    static inline void Swap4(92,3259
+    static inline void Swap8(109,3821
+    static inline void Swap(128,4420
+    static inline void Swap(135,4646
+    static inline void Swap(143,4875
+    static inline void Swap(147,4948
+    static inline void Swap(154,5178
+    static inline void Swap(158,5250
+    static inline void Swap(165,5479
+    static inline void Swap(169,5552
+    static inline Type Swapped(177,5800
+private:private182,5907
+    T operator() operator()188,6032
+    T operator() operator()195,6168
+    T operator() operator()202,6304
+#   define AI_LE(213,6654
+#   define AI_BE(214,6678
+#   define AI_LSWAP2(215,6727
+#   define AI_LSWAP4(216,6751
+#   define AI_LSWAP8(217,6775
+#   define AI_LSWAP2P(218,6799
+#   define AI_LSWAP4P(219,6824
+#   define AI_LSWAP8P(220,6849
+#   define LE_NCONST 221,6874
+#   define AI_SWAP2(222,6901
+#   define AI_SWAP4(223,6954
+#   define AI_SWAP8(224,7007
+#   define AI_SWAP2P(225,7060
+#   define AI_SWAP4P(226,7113
+#   define AI_SWAP8P(227,7166
+#   define BE_NCONST228,7219
+#   define AI_BE(230,7246
+#   define AI_LE(231,7270
+#   define AI_SWAP2(232,7319
+#   define AI_SWAP4(233,7342
+#   define AI_SWAP8(234,7365
+#   define AI_SWAP2P(235,7388
+#   define AI_SWAP4P(236,7412
+#   define AI_SWAP8P(237,7436
+#   define BE_NCONST 238,7460
+#   define AI_LSWAP2(239,7487
+#   define AI_LSWAP4(240,7545
+#   define AI_LSWAP8(241,7603
+#   define AI_LSWAP2P(242,7661
+#   define AI_LSWAP4P(243,7718
+#   define AI_LSWAP8P(244,7775
+#   define LE_NCONST245,7832
+namespace Intern 249,7862
+template <typename T,252,7978
+struct ByteSwapper 253,8011
+    void operator() operator()254,8033
+    void operator() operator()261,8159
+template <bool SwapEndianess,266,8292
+template <bool SwapEndianess, typename T,266,8292
+struct Getter 267,8354
+    void operator() operator()268,8370
+template <bool SwapEndianess,281,8637
+    void operator() operator()284,8719
+
+include/assimp/cfileio.h,944
+#define AI_FILEIO_H_INC47,1932
+typedef size_t          (*aiFileWriteProc)aiFileWriteProc63,2130
+typedef size_t          (*aiFileReadProc)aiFileReadProc64,2224
+typedef size_t          (*aiFileTellProc)aiFileTellProc65,2311
+typedef void            (*aiFileFlushProc)aiFileFlushProc66,2374
+typedef C_ENUM aiReturn (*aiFileSeek)aiFileSeek67,2437
+typedef C_STRUCT aiFile* (*aiFileOpenProc)aiFileOpenProc70,2548
+typedef void             (*aiFileCloseProc)aiFileCloseProc71,2640
+typedef char* aiUserData;74,2757
+struct aiFileIO83,3174
+    aiFileOpenProc OpenProc;87,3241
+    aiFileCloseProc CloseProc;91,3327
+    aiUserData UserData;94,3396
+struct aiFile 107,3933
+    aiFileReadProc ReadProc;109,3989
+    aiFileWriteProc WriteProc;112,4058
+    aiFileTellProc TellProc;117,4185
+    aiFileTellProc FileSizeProc;122,4291
+    aiFileSeek SeekProc;127,4414
+    aiFileFlushProc FlushProc;131,4492
+    aiUserData UserData;135,4566
+
+include/assimp/ai_assert.h,166
+#define AI_ASSERT_H_INC48,1926
+#   define ai_assert(67,2431
+#   define ai_assert_entry(68,2556
+#   define  ai_assert(70,2608
+#   define  ai_assert_entry(71,2642
+
+include/assimp/DefaultIOStream.h,159
+#define AI_DEFAULTIOSTREAM_H_INC48,1843
+AI_FORCE_INLINE DefaultIOStream::DefaultIOStream(120,4267
+AI_FORCE_INLINE DefaultIOStream::DefaultIOStream 128,4512
+
+include/assimp/Vertex.h,1213
+#define AI_VERTEX_H_INC52,2136
+struct Vertex 100,4130
+    friend Vertex operator 103,4266
+    friend Vertex operator / (const Vertex&,ai_real)104,4320
+    friend Vertex operator 105,4374
+    aiVector3D position;107,4430
+    aiVector3D normal;108,4455
+    aiVector3D tangent,109,4478
+    aiVector3D tangent, bitangent;109,4478
+    aiVector3D texcoords[texcoords111,4514
+    aiColor4D colors[colors112,4572
+    explicit Vertex(118,4814
+    explicit Vertex(142,5622
+    void SortBack(188,6824
+    template <template <typename t> class op> static Vertex BinaryOp(214,7625
+    template <template <typename,typename234,8595
+    template <template <typename, typename,234,8595
+    template <template <typename, typename, typename> class op> static Vertex BinaryOp(234,8595
+    template <template <typename,typename254,9629
+    template <template <typename, typename,254,9629
+    template <template <typename, typename, typename> class op> static Vertex BinaryOp(254,9629
+AI_FORCE_INLINE Vertex operator - operator -278,10730
+AI_FORCE_INLINE Vertex operator * operator *282,10853
+AI_FORCE_INLINE Vertex operator / operator /286,10976
+AI_FORCE_INLINE Vertex operator * operator *290,11103
+
+include/assimp/texture.h,701
+#define AI_TEXTURE_H_INC52,2169
+#   define AI_EMBEDDED_TEXNAME_PREFIX	70,2508
+#   define AI_MAKE_EMBEDDED_TEXNAME(80,2890
+struct aiTexel 90,3188
+    unsigned char b,91,3205
+    unsigned char b,g,91,3205
+    unsigned char b,g,r,91,3205
+    unsigned char b,g,r,a;91,3205
+    bool operator=95,3280
+    operator aiColor4D(107,3664
+} PACK_STRUCT;112,3785
+#define HINTMAXTEXTURELEN 116,3835
+struct aiTexture 132,4679
+    unsigned int mWidth;139,4933
+    unsigned int mHeight;146,5118
+    char achFormatHint[achFormatHint167,6439
+    C_STRUCT aiTexel* pcData;178,6906
+    C_STRUCT aiString mFilename;184,7024
+    bool CheckFormat(193,7360
+    aiTexture(202,7564
+    ~aiTexture 211,7780
+
+include/assimp/camera.h,449
+#define AI_CAMERA_H_INC48,1911
+struct aiCamera 103,3988
+    C_STRUCT aiString mName;110,4227
+    C_STRUCT aiVector3D mPosition;117,4415
+    C_STRUCT aiVector3D mUp;127,4805
+    C_STRUCT aiVector3D mLookAt;136,5125
+    float mHorizontalFOV;144,5383
+    float mClipPlaneNear;151,5613
+    float mClipPlaneFar;161,6037
+    float mAspect;170,6338
+    float mOrthographicWidth;181,6765
+    aiCamera(184,6815
+    void GetCameraMatrix(196,7227
+
+include/assimp/postprocess.h,1592
+#define AI_POSTPROCESS_H_INC48,1845
+enum aiPostProcessSteps72,2495
+    aiProcess_CalcTangentSpace 85,3144
+    aiProcess_JoinIdenticalVertices 99,3913
+    aiProcess_MakeLeftHanded 115,4712
+    aiProcess_Triangulate 131,5486
+    aiProcess_RemoveComponent 157,7053
+    aiProcess_GenNormals 171,7769
+    aiProcess_GenSmoothNormals 188,8602
+    aiProcess_SplitLargeMeshes 207,9620
+    aiProcess_PreTransformVertices 233,11033
+    aiProcess_LimitBoneWeights 249,11864
+    aiProcess_ValidateDataStructure 277,13348
+    aiProcess_ImproveCacheLocality 292,14095
+    aiProcess_RemoveRedundantMaterials 313,15267
+    aiProcess_FixInfacingNormals 327,16017
+    aiProcess_PopulateArmatureData 340,16605
+    aiProcess_SortByPType 354,17358
+    aiProcess_FindDegenerates 397,19417
+    aiProcess_FindInvalidData 412,20275
+    aiProcess_GenUVCoords 429,21145
+    aiProcess_TransformUVCoords 446,22027
+    aiProcess_FindInstances 461,22816
+    aiProcess_OptimizeMeshes 472,23327
+    aiProcess_OptimizeGraph 501,24777
+    aiProcess_FlipUVs 521,25508
+    aiProcess_FlipWindingOrder 536,25911
+    aiProcess_SplitByBoneCount 542,26187
+    aiProcess_Debone 557,26961
+    aiProcess_GlobalScale 571,27584
+    aiProcess_EmbedTextures 582,28118
+    aiProcess_ForceGenNormals 589,28300
+    aiProcess_DropNormals 601,28868
+    aiProcess_GenBoundingBoxes 606,29006
+#define aiProcess_ConvertToLeftHanded 621,29555
+#define aiProcessPreset_TargetRealtime_Fast 642,30528
+#define aiProcessPreset_TargetRealtime_Quality 667,31818
+#define aiProcessPreset_TargetRealtime_MaxQuality 697,33372
+
+include/assimp/BaseImporter.h,169
+#define INCLUDED_AI_BASEIMPORTER_H46,1839
+#define AI_MAKE_MAGIC(74,2323
+    enum TextFileMode 342,14218
+        ALLOW_EMPTY,343,14242
+        FORBID_EMPTY344,14263
+
+include/assimp/DefaultLogger.hpp,109
+#define INCLUDED_AI_DEFAULTLOGGER48,1802
+namespace Assimp 59,1982
+#define ASSIMP_DEFAULT_LOG_NAME 65,2160
+
+include/assimp/LogAux.h,281
+#define INCLUDED_AI_LOGAUX_H47,1854
+class LogFunctions 62,2179
+    static void ThrowException(66,2340
+    static void LogWarn(73,2598
+    static void LogError(81,2897
+    static void LogInfo(89,3199
+    static void LogDebug(97,3499
+    static void LogVerboseDebug(105,3801
+
+include/assimp/SGSpatialSort.h,313
+#define AI_D3DSSPATIALSORT_H_INC47,1849
+    struct Entry 122,4915
+        unsigned int mIndex;123,4934
+        aiVector3D mPosition;124,5005
+        uint32_t mSmoothGroups;125,5051
+        float mDistance;126,5083
+        Entry(128,5166
+        Entry(136,5324
+        bool operator < operator <144,5572
+
+include/assimp/vector3.h,469
+#define AI_VECTOR3D_H_INC46,1939
+class aiVector3t 69,2465
+    aiVector3t(72,2539
+    aiVector3t(78,2804
+    explicit aiVector3t 82,2983
+    TReal x,149,5056
+    TReal x, y,149,5056
+    TReal x, y, z;149,5056
+typedef aiVector3t<ai_real> aiVector3D;153,5080
+typedef aiVector3t<float> aiVector3f;154,5120
+typedef aiVector3t<double> aiVector3d;155,5158
+struct aiVector3D 159,5205
+    ai_real x,160,5225
+    ai_real x, y,160,5225
+    ai_real x, y, z;160,5225
+
+include/assimp/scene.h,1645
+#define AI_SCENE_H_INC47,1941
+#define AI_SCENE_FLAGS_INCOMPLETE 185,6551
+#define AI_SCENE_FLAGS_VALIDATED 192,6839
+#define AI_SCENE_FLAGS_VALIDATION_WARNING 202,7342
+#define AI_SCENE_FLAGS_NON_VERBOSE_FORMAT 210,7686
+#define AI_SCENE_FLAGS_TERRAIN 224,8359
+#define AI_SCENE_FLAGS_ALLOW_SHARED	232,8679
+struct aiScene243,9216
+    unsigned int mFlags;250,9454
+    C_STRUCT aiNode* mRootNode;259,9750
+    unsigned int mNumMeshes;262,9829
+    C_STRUCT aiMesh** mMeshes;271,10119
+    unsigned int mNumMaterials;274,10200
+    C_STRUCT aiMaterial** mMaterials;283,10498
+    unsigned int mNumAnimations;286,10587
+    C_STRUCT aiAnimation** mAnimations;293,10777
+    unsigned int mNumTextures;296,10875
+    C_STRUCT aiTexture** mTextures;304,11118
+    unsigned int mNumLights;309,11295
+    C_STRUCT aiLight** mLights;316,11483
+    unsigned int mNumCameras;321,11644
+    C_STRUCT aiCamera** mCameras;330,11921
+    C_STRUCT aiMetadata* mMetaData;339,12262
+    C_STRUCT aiString mName;343,12345
+    unsigned int mNumSkeletons;348,12398
+    C_STRUCT aiSkeleton **mSkeletons;mSkeletons353,12454
+    inline bool HasMeshes(365,12765
+    inline bool HasMaterials(371,12984
+    inline bool HasLights(376,13137
+    inline bool HasTextures(381,13283
+    inline bool HasCameras(386,13434
+    inline bool HasAnimations(391,13585
+    bool hasSkeletons(395,13693
+    static const char* GetShortFilename(400,13841
+    const aiTexture* GetEmbeddedTexture(410,14214
+    std::pair<std::pair415,14400
+    std::pair<const aiTexture*, int> GetEmbeddedTextureAndIndex(415,14400
+    void* mPrivate;445,15603
+    char* mPrivate;447,15629
+
+include/assimp/anim.h,3135
+#define AI_ANIM_H_INC49,1965
+struct aiVectorKey 64,2291
+    double mTime;66,2344
+    C_STRUCT aiVector3D mValue;69,2396
+    aiVectorKey(74,2490
+    aiVectorKey(82,2659
+    typedef aiVector3D elem_type;87,2780
+    bool operator=90,2870
+struct aiQuatKey 111,3529
+    double mTime;113,3580
+    C_STRUCT aiQuaternion mValue;116,3632
+    aiQuatKey(119,3686
+    aiQuatKey(126,3846
+    typedef aiQuaternion elem_type;129,3945
+    bool operator=132,4037
+struct aiMeshKey 153,4615
+    double mTime;155,4666
+    unsigned int mValue;161,4927
+    aiMeshKey(165,4973
+    aiMeshKey(171,5117
+    typedef unsigned int elem_type;174,5215
+    bool operator=177,5307
+struct aiMeshMorphKey 197,5874
+    double mTime;199,5930
+    unsigned int *mValues;mValues205,6200
+    double *mWeights;mWeights206,6227
+    unsigned int mNumValuesAndWeights;209,6294
+    aiMeshMorphKey(211,6352
+    ~aiMeshMorphKey(218,6524
+enum aiAnimBehaviour 231,6931
+    aiAnimBehaviour_DEFAULT 233,7020
+    aiAnimBehaviour_CONSTANT 236,7119
+    aiAnimBehaviour_LINEAR 240,7261
+    aiAnimBehaviour_REPEAT 246,7453
+    _aiAnimBehaviour_Force32Bit 251,7620
+struct aiNodeAnim 270,8578
+    C_STRUCT aiString mNodeName;273,8708
+    unsigned int mNumPositionKeys;276,8781
+    C_STRUCT aiVectorKey *mPositionKeys;mPositionKeys283,9067
+    unsigned int mNumRotationKeys;286,9148
+    C_STRUCT aiQuatKey *mRotationKeys;mRotationKeys294,9465
+    unsigned int mNumScalingKeys;297,9543
+    C_STRUCT aiVectorKey *mScalingKeys;mScalingKeys304,9826
+    C_ENUM aiAnimBehaviour mPreState;311,10091
+    C_ENUM aiAnimBehaviour mPostState;318,10352
+    aiNodeAnim(321,10411
+    ~aiNodeAnim(333,10784
+struct aiMeshAnim 347,11299
+    C_STRUCT aiString mName;352,11578
+    unsigned int mNumKeys;355,11666
+    C_STRUCT aiMeshKey *mKeys;mKeys358,11754
+    aiMeshAnim(362,11806
+    ~aiMeshAnim(366,11888
+struct aiMeshMorphAnim 375,12084
+    C_STRUCT aiString mName;380,12367
+    unsigned int mNumKeys;383,12455
+    C_STRUCT aiMeshMorphKey *mKeys;mKeys386,12543
+    aiMeshMorphAnim(390,12600
+    ~aiMeshMorphAnim(394,12687
+struct aiAnimation 404,12982
+    C_STRUCT aiString mName;408,13200
+    double mDuration;411,13278
+    double mTicksPerSecond;414,13370
+    unsigned int mNumChannels;418,13493
+    C_STRUCT aiNodeAnim **mChannels;mChannels422,13644
+    unsigned int mNumMeshChannels;426,13811
+    C_STRUCT aiMeshAnim **mMeshChannels;mMeshChannels430,13970
+    unsigned int mNumMorphMeshChannels;434,14137
+    C_STRUCT aiMeshMorphAnim **mMorphMeshChannels;mMorphMeshChannels438,14312
+    aiAnimation(441,14383
+    ~aiAnimation(453,14725
+struct Interpolator 494,15882
+    void operator(501,16224
+struct Interpolator<Interpolator509,16397
+    void operator()(operator()510,16433
+struct Interpolator<Interpolator517,16653
+    void operator()(operator()518,16689
+struct Interpolator<Interpolator525,16878
+    void operator()(operator()526,16913
+struct Interpolator<Interpolator534,17158
+    void operator()(operator()535,17191
+struct Interpolator<Interpolator543,17434
+    void operator()(operator()544,17467
+
+include/assimp/importerdesc.h,753
+#define AI_IMPORTER_DESC_H_INC47,1936
+enum aiImporterFlags 61,2189
+    aiImporterFlags_SupportTextFlavour 64,2319
+    aiImporterFlags_SupportBinaryFlavour 68,2472
+    aiImporterFlags_SupportCompressedFlavour 72,2631
+    aiImporterFlags_LimitedSupport 78,2905
+    aiImporterFlags_Experimental 84,3160
+struct aiImporterDesc 95,3701
+    const char *mName;mName97,3787
+    const char *mAuthor;mAuthor100,3883
+    const char *mMaintainer;mMaintainer103,3975
+    const char *mComments;mComments106,4068
+    unsigned int mFlags;110,4183
+    unsigned int mMinMajor;115,4387
+    unsigned int mMinMinor;116,4415
+    unsigned int mMaxMajor;124,4808
+    unsigned int mMaxMinor;125,4836
+    const char *mFileExtensions;mFileExtensions139,5597
+
+include/assimp/LogStream.hpp,66
+#define INCLUDED_AI_LOGSTREAM_H47,1870
+namespace Assimp 55,1973
+
+include/assimp/matrix3x3.h,700
+#define AI_MATRIX3X3_H_INC47,1950
+class aiMatrix3x3t 71,2658
+    aiMatrix3x3t(73,2687
+    aiMatrix3x3t 78,2874
+    TReal a1,161,6216
+    TReal a1, a2,161,6216
+    TReal a1, a2, a3;161,6216
+    TReal b1,162,6238
+    TReal b1, b2,162,6238
+    TReal b1, b2, b3;162,6238
+    TReal c1,163,6260
+    TReal c1, c2,163,6260
+    TReal c1, c2, c3;163,6260
+typedef aiMatrix3x3t<ai_real> aiMatrix3x3;166,6286
+struct aiMatrix3x3 170,6337
+    ai_real a1,171,6358
+    ai_real a1, a2,171,6358
+    ai_real a1, a2, a3;171,6358
+    ai_real b1,172,6382
+    ai_real b1, b2,172,6382
+    ai_real b1, b2, b3;172,6382
+    ai_real c1,173,6406
+    ai_real c1, c2,173,6406
+    ai_real c1, c2, c3;173,6406
+
+include/assimp/SmoothingGroups.h,360
+#define AI_SMOOTHINGGROUPS_H_INC48,1916
+struct FaceWithSmoothingGroup 61,2225
+    FaceWithSmoothingGroup(62,2257
+    uint32_t mIndices[mIndices77,2721
+    uint32_t iSmoothGroup;80,2811
+struct MeshWithSmoothingGroups92,3333
+    std::vector<aiVector3D> mPositions;95,3391
+    std::vector<T> mFaces;98,3451
+    std::vector<aiVector3D> mNormals;101,3510
+
+include/assimp/aabb.h,169
+#define AI_AABB_H_INC44,1822
+struct aiAABB 56,2045
+    C_STRUCT aiVector3D mMin;57,2061
+    C_STRUCT aiVector3D mMax;58,2091
+    aiAABB(62,2187
+    aiAABB(70,2408
+
+include/assimp/GltfMaterial.h,785
+#define AI_GLTFMATERIAL_H_INC48,1955
+#define AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE 56,2069
+#define AI_MATKEY_GLTF_ALPHAMODE 57,2164
+#define AI_MATKEY_GLTF_ALPHACUTOFF 58,2225
+#define _AI_MATKEY_GLTF_MAPPINGNAME_BASE 60,2291
+#define _AI_MATKEY_GLTF_MAPPINGID_BASE 61,2351
+#define _AI_MATKEY_GLTF_MAPPINGFILTER_MAG_BASE 62,2407
+#define _AI_MATKEY_GLTF_MAPPINGFILTER_MIN_BASE 63,2478
+#define _AI_MATKEY_GLTF_SCALE_BASE 64,2549
+#define _AI_MATKEY_GLTF_STRENGTH_BASE 65,2597
+#define AI_MATKEY_GLTF_MAPPINGNAME(67,2652
+#define AI_MATKEY_GLTF_MAPPINGID(68,2738
+#define AI_MATKEY_GLTF_MAPPINGFILTER_MAG(69,2820
+#define AI_MATKEY_GLTF_MAPPINGFILTER_MIN(70,2918
+#define AI_MATKEY_GLTF_TEXTURE_SCALE(71,3016
+#define AI_MATKEY_GLTF_TEXTURE_STRENGTH(72,3098
+
+include/assimp/ZipArchiveIOSystem.h,183
+#define AI_ZIPARCHIVEIOSYSTEM_H_INC48,1966
+class ZipArchiveIOSystem 60,2157
+    ZipArchiveIOSystem(63,2258
+    ZipArchiveIOSystem(64,2352
+    virtual ~ZipArchiveIOSystem(65,2453
+
+include/assimp/ProgressHandler.hpp,67
+#define AI_PROGRESSHANDLER_H_INC48,1849
+namespace Assimp 56,1963
+
+include/assimp/Profiler.h,310
+#define AI_INCLUDED_PROFILER_H48,1861
+class Profiler 69,2341
+    void BeginRegion(75,2425
+    void EndRegion(82,2663
+    typedef std::map<std::string,std::string93,3044
+    typedef std::map<std::string,std::chrono::time_point<std::chrono::system_clock>> RegionMap;93,3044
+    RegionMap regions;94,3140
+
+include/assimp/SpatialSort.h,258
+#define AI_SPATIALSORT_H_INC46,1844
+    struct Entry 161,7775
+        unsigned int mIndex;162,7794
+        aiVector3D mPosition;163,7862
+        ai_real mDistance;165,7989
+        Entry(167,8017
+        Entry(173,8243
+        bool operator<(178,8444
+
+include/assimp/XmlParser.h,2606
+#define INCLUDED_AI_IRRXML_WRAPPER43,1737
+struct find_node_by_name_predicate 58,2014
+    std::string mName;63,2138
+    find_node_by_name_predicate(64,2184
+    bool operator()(operator()69,2293
+struct NodeConverter 77,2514
+    static int to_int(79,2545
+using XmlNode 85,2714
+using XmlAttribute 86,2746
+class TXmlParser 104,3214
+    pugi::xml_document *mDoc;mDoc232,9470
+    TNodeType mCurrent;233,9500
+    std::vector<char> mData;234,9524
+inline TXmlParser<TNodeType>::TXmlParser(TXmlParser238,9584
+inline TXmlParser<TNodeType>::~TXmlParser(~TXmlParser245,9713
+inline void TXmlParser<TNodeType>::clear(clear250,9802
+inline TNodeType *TXmlParser<TNodeType>::findNode(findNode265,10060
+bool TXmlParser<TNodeType>::hasNode(hasNode284,10464
+bool TXmlParser<TNodeType>::parse(parse289,10595
+bool TXmlParser<TNodeType>::hasRoot(hasRoot318,11504
+pugi::xml_document *TXmlParser<TNodeType>::getDocument(getDocument323,11608
+const TNodeType TXmlParser<TNodeType>::getRootNode(getRootNode328,11720
+TNodeType TXmlParser<TNodeType>::getRootNode(getRootNode337,11922
+inline bool TXmlParser<TNodeType>::hasNode(hasNode347,12113
+inline bool TXmlParser<TNodeType>::hasAttribute(hasAttribute353,12327
+inline bool TXmlParser<TNodeType>::getUIntAttribute(getUIntAttribute359,12525
+inline bool TXmlParser<TNodeType>::getIntAttribute(getIntAttribute370,12816
+inline bool TXmlParser<TNodeType>::getRealAttribute(getRealAttribute381,13096
+inline bool TXmlParser<TNodeType>::getFloatAttribute(getFloatAttribute395,13454
+inline bool TXmlParser<TNodeType>::getDoubleAttribute(getDoubleAttribute407,13741
+inline bool TXmlParser<TNodeType>::getStdStrAttribute(getStdStrAttribute419,14031
+inline bool TXmlParser<TNodeType>::getBoolAttribute(getBoolAttribute431,14326
+inline bool TXmlParser<TNodeType>::getValueAsString(getValueAsString443,14610
+inline bool TXmlParser<TNodeType>::getValueAsFloat(getValueAsFloat455,14861
+inline bool TXmlParser<TNodeType>::getValueAsInt(getValueAsInt466,15074
+inline bool TXmlParser<TNodeType>::getValueAsBool(getValueAsBool477,15279
+using XmlParser 487,15460
+class XmlNodeIterator 490,15598
+    enum IterationMode 493,15665
+        PreOrderMode,494,15690
+        PostOrderMode 495,15771
+    explicit XmlNodeIterator(500,16022
+    void collectChildrenPreOrder(516,16554
+    void collectChildrenPostOrder(527,16971
+    bool getNext(539,17440
+    size_t size(552,17734
+    bool isEmpty(558,17907
+    void clear(563,18020
+    XmlNode &mParent;mParent573,18160
+    std::vector<XmlNode> mNodes;574,18182
+    size_t mIndex;575,18215
+
+include/assimp/Exceptional.h,667
+#define AI_INCLUDED_EXCEPTIONAL_H43,1764
+using std::runtime_error;53,1941
+class ASSIMP_API DeadlyImportError : public DeadlyErrorBase 84,3106
+struct ExceptionSwallower 121,4464
+    T operator()(operator()122,4492
+struct ExceptionSwallower<ExceptionSwallower129,4650
+    T *operator()(operator()130,4683
+struct ExceptionSwallower<ExceptionSwallower137,4836
+    aiReturn operator()(operator()138,4874
+struct ExceptionSwallower<ExceptionSwallower151,5191
+    void operator()(operator()152,5225
+#define ASSIMP_BEGIN_EXCEPTION_REGION(157,5281
+#define ASSIMP_END_EXCEPTION_REGION_WITH_ERROR_STRING(161,5380
+#define ASSIMP_END_EXCEPTION_REGION(175,7135
+
+include/assimp/SkeletonMeshBuilder.h,143
+#define AI_SKELETONMESHBUILDER_H_INC51,1981
+    struct Face 109,3938
+        unsigned int mIndices[mIndices110,3956
+        Face(112,4006
+
+include/assimp/StringComparison.h,266
+#define INCLUDED_AI_STRING_WORKERS_H54,2016
+namespace Assimp 68,2254
+inline unsigned int ASSIMP_itoa10(124,4075
+inline int ASSIMP_stricmp(139,4648
+inline int ASSIMP_stricmp(163,5237
+inline int ASSIMP_strincmp(180,5922
+inline unsigned int integer_pow(213,6650
+
+include/assimp/Logger.hpp,722
+#define INCLUDED_AI_LOGGER_H47,1854
+namespace Assimp 52,1945
+#define MAX_LOG_MESSAGE_LENGTH 57,2049
+    enum LogSeverity 75,2757
+        NORMAL,76,2780
+        DEBUGGING,77,2835
+        VERBOSE 78,2923
+    enum ErrorSeverity 89,3368
+        Debugging 90,3393
+        Info 91,3444
+        Warn 92,3494
+        Err 93,3544
+inline Logger::Logger(260,10028
+inline Logger::Logger(269,10321
+inline void Logger::setLogSeverity(setLogSeverity275,10500
+inline Logger::LogSeverity Logger::getLogSeverity(getLogSeverity281,10705
+#define ASSIMP_LOG_WARN(288,10914
+#define ASSIMP_LOG_ERROR(291,10995
+#define ASSIMP_LOG_DEBUG(294,11078
+#define ASSIMP_LOG_VERBOSE_DEBUG(297,11161
+#define ASSIMP_LOG_INFO(300,11259
+
+include/assimp/light.h,943
+#define AI_LIGHT_H_INC48,1908
+enum aiLightSourceType 63,2188
+    aiLightSource_UNDEFINED 64,2213
+    aiLightSource_DIRECTIONAL 69,2410
+    aiLightSource_POINT 74,2617
+    aiLightSource_SPOT 80,2860
+    aiLightSource_AMBIENT 87,3178
+    aiLightSource_AREA 92,3418
+    _aiLightSource_Force32Bit 98,3596
+struct aiLight 115,4393
+    C_STRUCT aiString mName;122,4637
+    C_ENUM aiLightSourceType mType;128,4789
+    C_STRUCT aiVector3D mPosition;135,5025
+    C_STRUCT aiVector3D mDirection;143,5310
+    C_STRUCT aiVector3D mUp;151,5599
+    float mAttenuationConstant;163,5993
+    float mAttenuationLinear;175,6388
+    float mAttenuationQuadratic;187,6784
+    C_STRUCT aiColor3D mColorDiffuse;195,7041
+    C_STRUCT aiColor3D mColorSpecular;203,7307
+    C_STRUCT aiColor3D mColorAmbient;213,7731
+    float mAngleInnerCone;221,8022
+    float mAngleOuterCone;233,8511
+    C_STRUCT aiVector2D mSize;236,8577
+    aiLight(240,8629
+
+include/assimp/material.h,12502
+#define AI_MATERIAL_H_INC47,1921
+#define AI_DEFAULT_MATERIAL_NAME 60,2134
+enum aiTextureOp 81,2906
+    aiTextureOp_Multiply 83,2948
+    aiTextureOp_Add 86,3004
+    aiTextureOp_Subtract 89,3055
+    aiTextureOp_Divide 92,3111
+    aiTextureOp_SmoothAdd 95,3179
+    aiTextureOp_SignedAdd 98,3242
+    _aiTextureOp_Force32Bit 101,3289
+enum aiTextureMapMode 110,3546
+    aiTextureMapMode_Wrap 113,3636
+    aiTextureMapMode_Clamp 118,3770
+    aiTextureMapMode_Decal 123,3929
+    aiTextureMapMode_Mirror 128,4082
+    _aiTextureMapMode_Force32Bit 131,4131
+enum aiTextureMapping 144,4699
+    aiTextureMapping_UV 151,4981
+    aiTextureMapping_SPHERE 154,5042
+    aiTextureMapping_CYLINDER 157,5109
+    aiTextureMapping_BOX 160,5172
+    aiTextureMapping_PLANE 163,5231
+    aiTextureMapping_OTHER 166,5306
+    _aiTextureMapping_Force32Bit 169,5354
+enum aiTextureType 188,6226
+    aiTextureType_NONE 195,6454
+    aiTextureType_DIFFUSE 208,6838
+    aiTextureType_SPECULAR 215,7012
+    aiTextureType_AMBIENT 220,7143
+    aiTextureType_EMISSIVE 225,7302
+    aiTextureType_HEIGHT 232,7493
+    aiTextureType_NORMALS 240,7734
+    aiTextureType_SHININESS 249,8081
+    aiTextureType_OPACITY 256,8288
+    aiTextureType_DISPLACEMENT 263,8493
+    aiTextureType_LIGHTMAP 272,8844
+    aiTextureType_REFLECTION 279,9038
+    aiTextureType_BASE_COLOR 288,9377
+    aiTextureType_NORMAL_CAMERA 289,9412
+    aiTextureType_EMISSION_COLOR 290,9450
+    aiTextureType_METALNESS 291,9489
+    aiTextureType_DIFFUSE_ROUGHNESS 292,9523
+    aiTextureType_AMBIENT_OCCLUSION 293,9565
+    aiTextureType_SHEEN 306,10089
+    aiTextureType_CLEARCOAT 313,10398
+    aiTextureType_TRANSMISSION 319,10571
+    aiTextureType_UNKNOWN 327,10843
+    _aiTextureType_Force32Bit 330,10889
+#define AI_TEXTURE_TYPE_MAX 334,10940
+enum aiShadingMode 355,11895
+    aiShadingMode_Flat 359,12035
+    aiShadingMode_Gouraud 363,12106
+    aiShadingMode_Phong 367,12172
+    aiShadingMode_Blinn 371,12240
+    aiShadingMode_Toon 377,12356
+    aiShadingMode_OrenNayar 384,12546
+    aiShadingMode_Minnaert 391,12741
+    aiShadingMode_CookTorrance 397,12876
+    aiShadingMode_NoShading 402,13010
+    aiShadingMode_Unlit 403,13045
+    aiShadingMode_Fresnel 407,13138
+    aiShadingMode_PBR_BRDF 420,13834
+    _aiShadingMode_Force32Bit 423,13882
+enum aiTextureFlags 438,14469
+    aiTextureFlags_Invert 441,14575
+    aiTextureFlags_UseAlpha 452,15058
+    aiTextureFlags_IgnoreAlpha 459,15263
+    _aiTextureFlags_Force32Bit 462,15315
+enum aiBlendMode 482,16057
+    aiBlendMode_Default 489,16200
+    aiBlendMode_Additive 498,16357
+    _aiBlendMode_Force32Bit 504,16491
+struct aiUVTransform 520,17041
+    C_STRUCT aiVector2D mTranslation;525,17156
+    C_STRUCT aiVector2D mScaling;531,17283
+    ai_real mRotation;539,17509
+    aiUVTransform(542,17552
+enum aiPropertyTypeInfo 558,17980
+    aiPTI_Float 565,18298
+    aiPTI_Double 573,18614
+    aiPTI_String 580,18850
+    aiPTI_Integer 588,19143
+    aiPTI_Buffer 592,19254
+    _aiPTI_Force32Bit 598,19413
+struct aiMaterialProperty 622,20284
+    C_STRUCT aiString mKey;626,20414
+    unsigned int mSemantic;632,20613
+    unsigned int mIndex;637,20765
+    unsigned int mDataLength;642,20891
+    C_ENUM aiPropertyTypeInfo mType;651,21207
+    char *mData;mData656,21358
+    aiMaterialProperty(660,21396
+    ~aiMaterialProperty(669,21606
+struct aiMaterial694,22355
+    aiMaterial(701,22411
+    ~aiMaterial(702,22429
+    aiString GetName(710,22708
+#define AI_MATKEY_NAME 944,32142
+#define AI_MATKEY_TWOSIDED 945,32183
+#define AI_MATKEY_SHADING_MODEL 946,32232
+#define AI_MATKEY_ENABLE_WIREFRAME 947,32286
+#define AI_MATKEY_BLEND_FUNC 948,32344
+#define AI_MATKEY_OPACITY 949,32392
+#define AI_MATKEY_TRANSPARENCYFACTOR 950,32439
+#define AI_MATKEY_BUMPSCALING 951,32508
+#define AI_MATKEY_SHININESS 952,32563
+#define AI_MATKEY_REFLECTIVITY 953,32614
+#define AI_MATKEY_SHININESS_STRENGTH 954,32671
+#define AI_MATKEY_REFRACTI 955,32733
+#define AI_MATKEY_COLOR_DIFFUSE 956,32782
+#define AI_MATKEY_COLOR_AMBIENT 957,32835
+#define AI_MATKEY_COLOR_SPECULAR 958,32888
+#define AI_MATKEY_COLOR_EMISSIVE 959,32943
+#define AI_MATKEY_COLOR_TRANSPARENT 960,32998
+#define AI_MATKEY_COLOR_REFLECTIVE 961,33059
+#define AI_MATKEY_GLOBAL_BACKGROUND_IMAGE 962,33118
+#define AI_MATKEY_GLOBAL_SHADERLANG 963,33179
+#define AI_MATKEY_SHADER_VERTEX 964,33232
+#define AI_MATKEY_SHADER_FRAGMENT 965,33279
+#define AI_MATKEY_SHADER_GEO 966,33328
+#define AI_MATKEY_SHADER_TESSELATION 967,33372
+#define AI_MATKEY_SHADER_PRIMITIVE 968,33424
+#define AI_MATKEY_SHADER_COMPUTE 969,33474
+#define AI_MATKEY_USE_COLOR_MAP 975,33698
+#define AI_MATKEY_BASE_COLOR 982,34072
+#define AI_MATKEY_BASE_COLOR_TEXTURE 983,34119
+#define AI_MATKEY_USE_METALLIC_MAP 984,34184
+#define AI_MATKEY_METALLIC_FACTOR 986,34307
+#define AI_MATKEY_METALLIC_TEXTURE 987,34369
+#define AI_MATKEY_USE_ROUGHNESS_MAP 988,34431
+#define AI_MATKEY_ROUGHNESS_FACTOR 990,34564
+#define AI_MATKEY_ROUGHNESS_TEXTURE 991,34628
+#define AI_MATKEY_ANISOTROPY_FACTOR 994,34827
+#define AI_MATKEY_SPECULAR_FACTOR 1003,35159
+#define AI_MATKEY_GLOSSINESS_FACTOR 1005,35290
+#define AI_MATKEY_SHEEN_COLOR_FACTOR 1010,35416
+#define AI_MATKEY_SHEEN_ROUGHNESS_FACTOR 1012,35506
+#define AI_MATKEY_SHEEN_COLOR_TEXTURE 1013,35582
+#define AI_MATKEY_SHEEN_ROUGHNESS_TEXTURE 1014,35643
+#define AI_MATKEY_CLEARCOAT_FACTOR 1019,35787
+#define AI_MATKEY_CLEARCOAT_ROUGHNESS_FACTOR 1020,35852
+#define AI_MATKEY_CLEARCOAT_TEXTURE 1021,35936
+#define AI_MATKEY_CLEARCOAT_ROUGHNESS_TEXTURE 1022,35999
+#define AI_MATKEY_CLEARCOAT_NORMAL_TEXTURE 1023,36072
+#define AI_MATKEY_TRANSMISSION_FACTOR 1029,36376
+#define AI_MATKEY_TRANSMISSION_TEXTURE 1032,36567
+#define AI_MATKEY_VOLUME_THICKNESS_FACTOR 1038,36901
+#define AI_MATKEY_VOLUME_THICKNESS_TEXTURE 1041,37062
+#define AI_MATKEY_VOLUME_ATTENUATION_DISTANCE 1043,37259
+#define AI_MATKEY_VOLUME_ATTENUATION_COLOR 1045,37444
+#define AI_MATKEY_USE_EMISSIVE_MAP 1049,37549
+#define AI_MATKEY_EMISSIVE_INTENSITY 1050,37612
+#define AI_MATKEY_USE_AO_MAP 1051,37680
+#define _AI_MATKEY_TEXTURE_BASE 1056,37888
+#define _AI_MATKEY_UVWSRC_BASE 1057,37932
+#define _AI_MATKEY_TEXOP_BASE 1058,37977
+#define _AI_MATKEY_MAPPING_BASE 1059,38017
+#define _AI_MATKEY_TEXBLEND_BASE 1060,38064
+#define _AI_MATKEY_MAPPINGMODE_U_BASE 1061,38110
+#define _AI_MATKEY_MAPPINGMODE_V_BASE 1062,38164
+#define _AI_MATKEY_TEXMAP_AXIS_BASE 1063,38218
+#define _AI_MATKEY_UVTRANSFORM_BASE 1064,38269
+#define _AI_MATKEY_TEXFLAGS_BASE 1065,38320
+#define AI_MATKEY_TEXTURE(1069,38459
+#define AI_MATKEY_TEXTURE_DIFFUSE(1073,38597
+#define AI_MATKEY_TEXTURE_SPECULAR(1076,38685
+#define AI_MATKEY_TEXTURE_AMBIENT(1079,38775
+#define AI_MATKEY_TEXTURE_EMISSIVE(1082,38863
+#define AI_MATKEY_TEXTURE_NORMALS(1085,38953
+#define AI_MATKEY_TEXTURE_HEIGHT(1088,39041
+#define AI_MATKEY_TEXTURE_SHININESS(1091,39127
+#define AI_MATKEY_TEXTURE_OPACITY(1094,39219
+#define AI_MATKEY_TEXTURE_DISPLACEMENT(1097,39307
+#define AI_MATKEY_TEXTURE_LIGHTMAP(1100,39405
+#define AI_MATKEY_TEXTURE_REFLECTION(1103,39495
+#define AI_MATKEY_UVWSRC(1109,39682
+#define AI_MATKEY_UVWSRC_DIFFUSE(1113,39818
+#define AI_MATKEY_UVWSRC_SPECULAR(1116,39904
+#define AI_MATKEY_UVWSRC_AMBIENT(1119,39992
+#define AI_MATKEY_UVWSRC_EMISSIVE(1122,40078
+#define AI_MATKEY_UVWSRC_NORMALS(1125,40166
+#define AI_MATKEY_UVWSRC_HEIGHT(1128,40252
+#define AI_MATKEY_UVWSRC_SHININESS(1131,40336
+#define AI_MATKEY_UVWSRC_OPACITY(1134,40426
+#define AI_MATKEY_UVWSRC_DISPLACEMENT(1137,40512
+#define AI_MATKEY_UVWSRC_LIGHTMAP(1140,40608
+#define AI_MATKEY_UVWSRC_REFLECTION(1143,40696
+#define AI_MATKEY_TEXOP(1148,40880
+#define AI_MATKEY_TEXOP_DIFFUSE(1152,41014
+#define AI_MATKEY_TEXOP_SPECULAR(1155,41098
+#define AI_MATKEY_TEXOP_AMBIENT(1158,41184
+#define AI_MATKEY_TEXOP_EMISSIVE(1161,41268
+#define AI_MATKEY_TEXOP_NORMALS(1164,41354
+#define AI_MATKEY_TEXOP_HEIGHT(1167,41438
+#define AI_MATKEY_TEXOP_SHININESS(1170,41520
+#define AI_MATKEY_TEXOP_OPACITY(1173,41608
+#define AI_MATKEY_TEXOP_DISPLACEMENT(1176,41692
+#define AI_MATKEY_TEXOP_LIGHTMAP(1179,41786
+#define AI_MATKEY_TEXOP_REFLECTION(1182,41872
+#define AI_MATKEY_MAPPING(1187,42054
+#define AI_MATKEY_MAPPING_DIFFUSE(1191,42192
+#define AI_MATKEY_MAPPING_SPECULAR(1194,42280
+#define AI_MATKEY_MAPPING_AMBIENT(1197,42370
+#define AI_MATKEY_MAPPING_EMISSIVE(1200,42458
+#define AI_MATKEY_MAPPING_NORMALS(1203,42548
+#define AI_MATKEY_MAPPING_HEIGHT(1206,42636
+#define AI_MATKEY_MAPPING_SHININESS(1209,42722
+#define AI_MATKEY_MAPPING_OPACITY(1212,42814
+#define AI_MATKEY_MAPPING_DISPLACEMENT(1215,42902
+#define AI_MATKEY_MAPPING_LIGHTMAP(1218,43000
+#define AI_MATKEY_MAPPING_REFLECTION(1221,43090
+#define AI_MATKEY_TEXBLEND(1226,43276
+#define AI_MATKEY_TEXBLEND_DIFFUSE(1230,43416
+#define AI_MATKEY_TEXBLEND_SPECULAR(1233,43506
+#define AI_MATKEY_TEXBLEND_AMBIENT(1236,43598
+#define AI_MATKEY_TEXBLEND_EMISSIVE(1239,43688
+#define AI_MATKEY_TEXBLEND_NORMALS(1242,43780
+#define AI_MATKEY_TEXBLEND_HEIGHT(1245,43870
+#define AI_MATKEY_TEXBLEND_SHININESS(1248,43958
+#define AI_MATKEY_TEXBLEND_OPACITY(1251,44052
+#define AI_MATKEY_TEXBLEND_DISPLACEMENT(1254,44142
+#define AI_MATKEY_TEXBLEND_LIGHTMAP(1257,44242
+#define AI_MATKEY_TEXBLEND_REFLECTION(1260,44334
+#define AI_MATKEY_MAPPINGMODE_U(1265,44522
+#define AI_MATKEY_MAPPINGMODE_U_DIFFUSE(1269,44672
+#define AI_MATKEY_MAPPINGMODE_U_SPECULAR(1272,44772
+#define AI_MATKEY_MAPPINGMODE_U_AMBIENT(1275,44874
+#define AI_MATKEY_MAPPINGMODE_U_EMISSIVE(1278,44974
+#define AI_MATKEY_MAPPINGMODE_U_NORMALS(1281,45076
+#define AI_MATKEY_MAPPINGMODE_U_HEIGHT(1284,45176
+#define AI_MATKEY_MAPPINGMODE_U_SHININESS(1287,45274
+#define AI_MATKEY_MAPPINGMODE_U_OPACITY(1290,45378
+#define AI_MATKEY_MAPPINGMODE_U_DISPLACEMENT(1293,45478
+#define AI_MATKEY_MAPPINGMODE_U_LIGHTMAP(1296,45588
+#define AI_MATKEY_MAPPINGMODE_U_REFLECTION(1299,45690
+#define AI_MATKEY_MAPPINGMODE_V(1304,45888
+#define AI_MATKEY_MAPPINGMODE_V_DIFFUSE(1308,46038
+#define AI_MATKEY_MAPPINGMODE_V_SPECULAR(1311,46138
+#define AI_MATKEY_MAPPINGMODE_V_AMBIENT(1314,46240
+#define AI_MATKEY_MAPPINGMODE_V_EMISSIVE(1317,46340
+#define AI_MATKEY_MAPPINGMODE_V_NORMALS(1320,46442
+#define AI_MATKEY_MAPPINGMODE_V_HEIGHT(1323,46542
+#define AI_MATKEY_MAPPINGMODE_V_SHININESS(1326,46640
+#define AI_MATKEY_MAPPINGMODE_V_OPACITY(1329,46744
+#define AI_MATKEY_MAPPINGMODE_V_DISPLACEMENT(1332,46844
+#define AI_MATKEY_MAPPINGMODE_V_LIGHTMAP(1335,46954
+#define AI_MATKEY_MAPPINGMODE_V_REFLECTION(1338,47056
+#define AI_MATKEY_TEXMAP_AXIS(1343,47254
+#define AI_MATKEY_TEXMAP_AXIS_DIFFUSE(1347,47400
+#define AI_MATKEY_TEXMAP_AXIS_SPECULAR(1350,47496
+#define AI_MATKEY_TEXMAP_AXIS_AMBIENT(1353,47594
+#define AI_MATKEY_TEXMAP_AXIS_EMISSIVE(1356,47690
+#define AI_MATKEY_TEXMAP_AXIS_NORMALS(1359,47788
+#define AI_MATKEY_TEXMAP_AXIS_HEIGHT(1362,47884
+#define AI_MATKEY_TEXMAP_AXIS_SHININESS(1365,47978
+#define AI_MATKEY_TEXMAP_AXIS_OPACITY(1368,48078
+#define AI_MATKEY_TEXMAP_AXIS_DISPLACEMENT(1371,48174
+#define AI_MATKEY_TEXMAP_AXIS_LIGHTMAP(1374,48280
+#define AI_MATKEY_TEXMAP_AXIS_REFLECTION(1377,48378
+#define AI_MATKEY_UVTRANSFORM(1382,48572
+#define AI_MATKEY_UVTRANSFORM_DIFFUSE(1386,48718
+#define AI_MATKEY_UVTRANSFORM_SPECULAR(1389,48814
+#define AI_MATKEY_UVTRANSFORM_AMBIENT(1392,48912
+#define AI_MATKEY_UVTRANSFORM_EMISSIVE(1395,49008
+#define AI_MATKEY_UVTRANSFORM_NORMALS(1398,49106
+#define AI_MATKEY_UVTRANSFORM_HEIGHT(1401,49202
+#define AI_MATKEY_UVTRANSFORM_SHININESS(1404,49296
+#define AI_MATKEY_UVTRANSFORM_OPACITY(1407,49396
+#define AI_MATKEY_UVTRANSFORM_DISPLACEMENT(1410,49492
+#define AI_MATKEY_UVTRANSFORM_LIGHTMAP(1413,49598
+#define AI_MATKEY_UVTRANSFORM_REFLECTION(1416,49696
+#define AI_MATKEY_UVTRANSFORM_UNKNOWN(1419,49798
+#define AI_MATKEY_TEXFLAGS(1424,49986
+#define AI_MATKEY_TEXFLAGS_DIFFUSE(1428,50126
+#define AI_MATKEY_TEXFLAGS_SPECULAR(1431,50216
+#define AI_MATKEY_TEXFLAGS_AMBIENT(1434,50308
+#define AI_MATKEY_TEXFLAGS_EMISSIVE(1437,50398
+#define AI_MATKEY_TEXFLAGS_NORMALS(1440,50490
+#define AI_MATKEY_TEXFLAGS_HEIGHT(1443,50580
+#define AI_MATKEY_TEXFLAGS_SHININESS(1446,50668
+#define AI_MATKEY_TEXFLAGS_OPACITY(1449,50762
+#define AI_MATKEY_TEXFLAGS_DISPLACEMENT(1452,50852
+#define AI_MATKEY_TEXFLAGS_LIGHTMAP(1455,50952
+#define AI_MATKEY_TEXFLAGS_REFLECTION(1458,51044
+#define AI_MATKEY_TEXFLAGS_UNKNOWN(1461,51140
+inline aiReturn aiGetMaterialInteger(1562,55577
+
+include/assimp/MemoryIOWrapper.h,1123
+#define AI_MEMORYIOSTREAM_H_INC46,1875
+#define AI_MEMORYIO_MAGIC_FILENAME 60,2098
+#define AI_MEMORYIO_MAGIC_FILENAME_LENGTH 61,2153
+class MemoryIOStream 66,2443
+    MemoryIOStream 68,2492
+    ~MemoryIOStream(76,2705
+    size_t Read(82,2803
+    size_t Write(95,3147
+    aiReturn Seek(100,3275
+    size_t Tell(120,3832
+    size_t FileSize(124,3894
+    void Flush(128,3963
+    const uint8_t* buffer;133,4051
+    size_t length,134,4078
+    size_t length,pos;134,4078
+    bool own;135,4101
+class MemoryIOSystem 140,4255
+    MemoryIOSystem(143,4332
+    bool Exists(152,4682
+    char getOsSeparator(161,5065
+    IOStream* Open(168,5362
+    void Close(178,5908
+    bool ComparePaths(190,6342
+    bool PushDirectory(195,6542
+    const std::string &CurrentDirectory(CurrentDirectory200,6750
+    size_t StackSize(206,6959
+    bool PopDirectory(211,7110
+    bool CreateDirectory(216,7260
+    bool ChangeDirectory(221,7445
+    bool DeleteFile(226,7625
+    const uint8_t* buffer;231,7767
+    size_t length;232,7794
+    IOSystem* existing_io;233,7813
+    std::vector<IOStream*> created_streams;234,7840
+
+include/assimp/ParsingUtils.h,851
+#define AI_PARSING_UTILS_H_INC47,1844
+namespace Assimp 60,2061
+AI_FORCE_INLINE bool IsLower(81,2880
+AI_FORCE_INLINE bool IsSpace(87,3087
+AI_FORCE_INLINE bool IsLineEnd(93,3295
+AI_FORCE_INLINE bool IsSpaceOrNewLine(99,3550
+AI_FORCE_INLINE bool SkipSpaces(105,3770
+AI_FORCE_INLINE bool SkipSpaces(115,4115
+AI_FORCE_INLINE bool SkipLine(121,4353
+AI_FORCE_INLINE bool SkipLine(136,4879
+AI_FORCE_INLINE bool SkipSpacesAndLineEnd(142,5113
+AI_FORCE_INLINE bool SkipSpacesAndLineEnd(152,5503
+AI_FORCE_INLINE bool GetNextLine(158,5761
+AI_FORCE_INLINE bool IsNumeric(179,6286
+AI_FORCE_INLINE bool TokenMatch(185,6505
+AI_FORCE_INLINE bool TokenMatchI(204,7128
+AI_FORCE_INLINE void SkipToken(213,7446
+AI_FORCE_INLINE std::string GetNextToken(221,7684
+AI_FORCE_INLINE unsigned int tokenize(238,8301
+inline std::string ai_stdStrToLower(261,9197
+
+include/assimp/commonMetaData.h,226
+#define AI_COMMONMETADATA_H_INC47,1935
+#define AI_METADATA_SOURCE_FORMAT 55,2177
+#define AI_METADATA_SOURCE_FORMAT_VERSION 59,2358
+#define AI_METADATA_SOURCE_GENERATOR 63,2568
+#define AI_METADATA_SOURCE_COPYRIGHT 67,2748
+
+include/assimp/SmallVector.h,476
+#define AI_SMALLVECTOR_H_INC47,1908
+class SmallVector 63,2493
+    SmallVector(66,2568
+    ~SmallVector(74,2745
+    void push_back(82,3024
+    void resize(93,3290
+    size_t size(102,3518
+    T* begin(108,3671
+    T* end(114,3804
+    T* begin(120,3969
+    T* end(126,4120
+    void grow(136,4395
+    void push_back_and_grow(150,4737
+    T* mStorage;156,4860
+    size_t mSize;157,4877
+    size_t mCapacity;158,4895
+    T mInplaceStorage[mInplaceStorage159,4917
+
+include/assimp/defs.h,2229
+#define AI_DEFINES_H_INC49,1998
+#define ASSIMP_BUILD_NEED_Z_INFLATE79,3094
+#define ASSIMP_BUILD_NEED_Z_INFLATE83,3179
+#define ASSIMP_BUILD_NEED_Z_INFLATE87,3262
+#define ASSIMP_BUILD_NEED_UNZIP88,3298
+#define ASSIMP_BUILD_NEED_Z_INFLATE92,3377
+#define ASSIMP_BUILD_NEED_UNZIP93,3413
+#define SIZE_MAX 98,3564
+#undef ASSIMP_API141,4534
+#define ASSIMP_API 146,4802
+#define ASSIMP_API_WINONLY 147,4843
+#define ASSIMP_API 154,5206
+#define ASSIMP_API_WINONLY 155,5247
+#define ASSIMP_API157,5302
+#define ASSIMP_API_WINONLY158,5321
+#define ASSIMP_API 163,5448
+#define ASSIMP_API_WINONLY164,5506
+    #define AI_FORCE_INLINE 173,5777
+    #define AI_WONT_RETURN 177,5966
+    #define AI_WONT_RETURN181,6109
+    #define AI_FORCE_INLINE 182,6136
+#   define AI_WONT_RETURN_SUFFIX 186,6217
+#   define AI_WONT_RETURN_SUFFIX 189,6314
+#   define AI_WONT_RETURN_SUFFIX191,6379
+#   define AI_WONT_RETURN_SUFFIX194,6425
+#define C_STRUCT201,6599
+#define C_ENUM202,6616
+    ENABLE_PREPROCESSING 210,6957
+#define C_STRUCT227,7707
+#define C_ENUM228,7724
+#define C_STRUCT 230,7745
+#define C_ENUM 231,7769
+#define ASSIMP_BUILD_SINGLETHREADED245,8292
+#define ASSIMP_BUILD_DEBUG249,8376
+typedef double ai_real;258,8695
+typedef signed long long int ai_int;259,8719
+typedef unsigned long long int ai_uint;260,8756
+#define ASSIMP_AI_REAL_TEXT_PRECISION 262,8834
+typedef float ai_real;265,8948
+typedef signed int ai_int;266,8971
+typedef unsigned int ai_uint;267,8998
+#define ASSIMP_AI_REAL_TEXT_PRECISION 269,9066
+#define AI_MATH_PI 278,9380
+#define AI_MATH_TWO_PI 279,9434
+#define AI_MATH_HALF_PI 280,9476
+#define AI_MATH_PI_F 283,9570
+#define AI_MATH_TWO_PI_F 284,9607
+#define AI_MATH_HALF_PI_F 285,9654
+#define AI_DEG_TO_RAD(288,9764
+#define AI_RAD_TO_DEG(289,9820
+constexpr ai_real ai_epsilon 293,9917
+#define ai_epsilon 295,9970
+#define __BIG_ENDIAN__302,10151
+#undef __BIG_ENDIAN__306,10235
+#define AI_BUILD_BIG_ENDIAN311,10306
+#define AI_MAX_ALLOC(319,10501
+#define AI_NO_EXCEPT 323,10620
+#define AI_NO_EXCEPT325,10656
+#define AI_NO_EXCEPT 329,10713
+#define AI_NO_EXCEPT331,10749
+#define AI_DEBUG_INVALIDATE_PTR(339,10896
+#define AI_DEBUG_INVALIDATE_PTR(341,10947
+#define AI_COUNT_OF(344,10990
+
+include/assimp/XMLTools.h,70
+#define INCLUDED_ASSIMP_XML_TOOLS_H45,1768
+namespace Assimp 53,1877
+
+include/assimp/TinyFormatter.h,738
+#define INCLUDED_TINY_FORMATTER_H50,1970
+    typedef class std::basic_string<T,CharTraits,Allocator> string;76,2633
+    typedef class std::basic_ostringstream<T,CharTraits,Allocator> stringstream;77,2701
+    operator string operator string114,4173
+    const basic_formatter &operator<<(operator<<123,4647
+    const basic_formatter &operator<<(operator<<129,4886
+    basic_formatter &operator<<(operator<<135,5133
+    basic_formatter &operator<<(operator<<141,5360
+    const basic_formatter& operator, operator,149,5573
+    basic_formatter& operator, operator,155,5716
+    basic_formatter& operator, operator,163,5953
+typedef basic_formatter< char > format;174,6099
+typedef basic_formatter< wchar_t > wformat;175,6139
+
+include/assimp/config.h,6471
+#define AI_CONFIG_H_INC60,2430
+#define AI_CONFIG_GLOB_MEASURE_TIME 77,3097
+#define AI_CONFIG_IMPORT_NO_SKELETON_MESHES 88,3591
+#define AI_CONFIG_PP_SBBC_MAX_BONES 105,4361
+#   define AI_SBBC_DEFAULT_MAX_BONES 110,4497
+#define AI_CONFIG_PP_CT_MAX_SMOOTHING_ANGLE 121,4940
+#define AI_CONFIG_PP_CT_TEXTURE_CHANNEL_INDEX 131,5352
+#define AI_CONFIG_PP_GSN_MAX_SMOOTHING_ANGLE 146,6128
+#define AI_CONFIG_IMPORT_MDL_COLORMAP 159,6693
+#define AI_CONFIG_PP_RRM_EXCLUDE_LIST 181,7833
+#define AI_CONFIG_PP_PTV_KEEP_HIERARCHY 196,8525
+#define AI_CONFIG_PP_PTV_NORMALIZE 206,9053
+#define AI_CONFIG_PP_PTV_ADD_ROOT_TRANSFORMATION 215,9414
+#define AI_CONFIG_PP_PTV_ROOT_TRANSFORMATION 225,9871
+#define AI_CONFIG_CHECK_IDENTITY_MATRIX_EPSILON 235,10283
+#   define AI_CONFIG_CHECK_IDENTITY_MATRIX_EPSILON_DEFAULT 240,10494
+#define AI_CONFIG_PP_FD_REMOVE 253,11098
+#define AI_CONFIG_PP_FD_CHECKAREA 262,11452
+#define AI_CONFIG_PP_OG_EXCLUDE_LIST 283,12484
+#define AI_CONFIG_PP_SLM_TRIANGLE_LIMIT 294,12895
+#   define AI_SLM_DEFAULT_MAX_TRIANGLES 299,13063
+#define AI_CONFIG_PP_SLM_VERTEX_LIMIT 310,13464
+#   define AI_SLM_DEFAULT_MAX_VERTICES 315,13625
+#define AI_CONFIG_PP_LBW_MAX_WEIGHTS 324,13983
+#   define AI_LMW_MAX_WEIGHTS 329,14135
+#define AI_CONFIG_PP_DB_THRESHOLD 338,14493
+#   define AI_DEBONE_THRESHOLD 343,14637
+#define AI_CONFIG_PP_DB_ALL_OR_NONE 352,14977
+#   define PP_ICL_PTCACHE_SIZE 358,15145
+#define AI_CONFIG_PP_ICL_PTCACHE_SIZE 372,15791
+enum aiComponent380,16173
+    aiComponent_NORMALS 384,16230
+    aiComponent_NORMALS 386,16267
+    aiComponent_TANGENTS_AND_BITANGENTS 391,16377
+    aiComponent_TANGENTS_AND_BITANGENTS 393,16430
+    aiComponent_COLORS 398,16569
+    aiComponent_TEXCOORDS 402,16688
+    aiComponent_BONEWEIGHTS 407,16904
+    aiComponent_ANIMATIONS 412,17119
+    aiComponent_TEXTURES 415,17217
+    aiComponent_LIGHTS 420,17423
+    aiComponent_CAMERAS 425,17623
+    aiComponent_MESHES 428,17707
+    aiComponent_MATERIALS 432,17858
+    _aiComponent_Force32Bit 438,18028
+#define aiComponent_COLORSn(443,18119
+#define aiComponent_TEXCOORDSn(446,18203
+#define AI_CONFIG_PP_RVC_FLAGS 460,18910
+#define AI_CONFIG_PP_SBP_REMOVE 472,19438
+#define AI_CONFIG_PP_FID_ANIM_ACCURACY 484,20090
+#define AI_CONFIG_PP_FID_IGNORE_TEXTURECOORDS 492,20488
+#define AI_UVTRAFO_SCALING 496,20621
+#define AI_UVTRAFO_ROTATION 499,20697
+#define AI_UVTRAFO_TRANSLATION 502,20776
+#define AI_UVTRAFO_ALL 505,20858
+#define AI_CONFIG_PP_TUV_EVALUATE 515,21320
+#define AI_CONFIG_FAVOUR_SPEED 527,21821
+#define AI_CONFIG_IMPORT_SCHEMA_DOCUMENT_PROVIDER 542,22401
+#define AI_CONFIG_IMPORT_FBX_READ_ALL_GEOMETRY_LAYERS 552,22762
+#define AI_CONFIG_IMPORT_FBX_READ_ALL_MATERIALS 564,23195
+#define AI_CONFIG_IMPORT_FBX_READ_MATERIALS 573,23485
+#define AI_CONFIG_IMPORT_FBX_READ_TEXTURES 582,23775
+#define AI_CONFIG_IMPORT_FBX_READ_CAMERAS 591,24053
+#define AI_CONFIG_IMPORT_FBX_READ_LIGHTS 600,24335
+#define AI_CONFIG_IMPORT_FBX_READ_ANIMATIONS 609,24612
+#define AI_CONFIG_IMPORT_FBX_READ_WEIGHTS 618,24894
+#define AI_CONFIG_IMPORT_FBX_STRICT_MODE 630,25369
+#define AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS 641,25774
+#define AI_CONFIG_IMPORT_FBX_OPTIMIZE_EMPTY_ANIMATION_CURVES 652,26178
+#define AI_CONFIG_IMPORT_FBX_EMBEDDED_TEXTURES_LEGACY_NAMING 661,26519
+#define AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES 669,26861
+#define AI_CONFIG_FBX_CONVERT_TO_M 676,27111
+#define AI_CONFIG_FBX_USE_SKELETON_BONE_CONTAINER 685,27420
+#define AI_CONFIG_IMPORT_GLOBAL_KEYFRAME 701,28212
+#define AI_CONFIG_IMPORT_MD3_KEYFRAME 703,28282
+#define AI_CONFIG_IMPORT_MD2_KEYFRAME 704,28348
+#define AI_CONFIG_IMPORT_MDL_KEYFRAME 705,28414
+#define AI_CONFIG_IMPORT_MDC_KEYFRAME 706,28480
+#define AI_CONFIG_IMPORT_SMD_KEYFRAME 707,28546
+#define AI_CONFIG_IMPORT_UNREAL_KEYFRAME 708,28612
+#define AI_CONFIG_IMPORT_MDL_HL1_READ_ANIMATIONS 716,28892
+#define AI_CONFIG_IMPORT_MDL_HL1_READ_ANIMATION_EVENTS 725,29283
+#define AI_CONFIG_IMPORT_MDL_HL1_READ_BLEND_CONTROLLERS 734,29687
+#define AI_CONFIG_IMPORT_MDL_HL1_READ_SEQUENCE_TRANSITIONS 743,30101
+#define AI_CONFIG_IMPORT_MDL_HL1_READ_ATTACHMENTS 751,30420
+#define AI_CONFIG_IMPORT_MDL_HL1_READ_BONE_CONTROLLERS 759,30726
+#define AI_CONFIG_IMPORT_MDL_HL1_READ_HITBOXES 767,31034
+#define AI_CONFIG_IMPORT_MDL_HL1_READ_MISC_GLOBAL_INFO 775,31344
+#define AI_CONFIG_IMPORT_SMD_LOAD_ANIMATION_LIST 782,31604
+#define AI_CONFIG_IMPORT_AC_SEPARATE_BFCULL 790,31946
+#define AI_CONFIG_IMPORT_AC_EVAL_SUBDIVISION 801,32401
+#define AI_CONFIG_IMPORT_UNREAL_HANDLE_FLAGS 810,32750
+#define AI_CONFIG_IMPORT_TER_MAKE_UVS 823,33340
+#define AI_CONFIG_IMPORT_ASE_RECONSTRUCT_NORMALS 833,33731
+#define AI_CONFIG_IMPORT_MD3_HANDLE_MULTIPART 845,34248
+#define AI_CONFIG_IMPORT_MD3_SKIN_NAME 857,34795
+#define AI_CONFIG_IMPORT_MD3_LOAD_SHADERS 866,35148
+#define AI_CONFIG_IMPORT_MD3_SHADER_SRC 884,36177
+#define AI_CONFIG_IMPORT_LWO_ONE_LAYER_ONLY 898,36888
+#define AI_CONFIG_IMPORT_MD5_NO_ANIM_AUTOLOAD 912,37470
+#define AI_CONFIG_IMPORT_LWS_ANIM_START 931,38469
+#define AI_CONFIG_IMPORT_LWS_ANIM_END 933,38547
+#define AI_CONFIG_IMPORT_IRR_ANIM_FPS 944,39001
+#define AI_CONFIG_IMPORT_OGRE_MATERIAL_FILE 957,39608
+#define AI_CONFIG_IMPORT_OGRE_TEXTURETYPE_FROM_FILENAME 977,40699
+ #define AI_CONFIG_ANDROID_JNI_ASSIMP_MANAGER_SUPPORT 986,41052
+#define AI_CONFIG_IMPORT_IFC_SKIP_SPACE_REPRESENTATIONS 995,41487
+#define AI_CONFIG_IMPORT_IFC_CUSTOM_TRIANGULATION 1010,42323
+#define AI_CONFIG_IMPORT_IFC_SMOOTHING_ANGLE 1021,42813
+#   define AI_IMPORT_IFC_DEFAULT_SMOOTHING_ANGLE 1025,42999
+#define AI_CONFIG_IMPORT_IFC_CYLINDRICAL_TESSELLATION 1037,43524
+#   define AI_IMPORT_IFC_DEFAULT_CYLINDRICAL_TESSELLATION 1041,43746
+#define AI_CONFIG_IMPORT_COLLADA_IGNORE_UP_DIRECTION 1051,44169
+#define AI_CONFIG_IMPORT_COLLADA_IGNORE_UNIT_SIZE 1060,44629
+#define AI_CONFIG_IMPORT_COLLADA_USE_COLLADA_NAMES 1070,45104
+#define AI_CONFIG_EXPORT_XFILE_64BIT 1079,45363
+#define AI_CONFIG_EXPORT_POINT_CLOUDS 1090,45895
+#define AI_CONFIG_USE_GLTF_PBR_SPECULAR_GLOSSINESS 1101,46457
+#define AI_CONFIG_EXPORT_GLTF_UNLIMITED_SKINNING_BONES_PER_VERTEX 1113,47142
+#define AI_CONFIG_EXPORT_FBX_TRANSPARENCY_FACTOR_REFER_TO_OPACITY 1123,47559
+#define AI_CONFIG_EXPORT_BLOB_NAME 1141,48429
+#define AI_CONFIG_GLOBAL_SCALE_FACTOR_KEY 1146,48557
+#   define AI_CONFIG_GLOBAL_SCALE_FACTOR_DEFAULT 1149,48675
+#define AI_CONFIG_APP_SCALE_KEY 1152,48764
+#   define AI_CONFIG_APP_SCALE_KEY 1155,48855
+
+include/assimp/MathFunctions.h,85
+inline IntegerType lcm(83,2618
+inline T getEpsilon(93,2922
+inline T aiPi(100,3092
+
+include/assimp/StreamWriter.h,424
+#define AI_STREAMWRITER_H_INCLUDED46,1968
+    StreamWriter& operator << operator <<244,8310
+    typedef StreamWriter<true>  StreamWriterLE;291,9719
+    typedef StreamWriter<false> StreamWriterBE;292,9767
+    typedef StreamWriter<true>  StreamWriterBE;294,9821
+    typedef StreamWriter<false> StreamWriterLE;295,9869
+typedef StreamWriter<true,true300,10081
+typedef StreamWriter<true,true> StreamWriterAny;300,10081
+
+include/assimp/metadata.h,1662
+#define AI_METADATA_H_INC47,1941
+typedef enum aiMetadataType 66,2373
+    AI_BOOL 67,2403
+    AI_INT32 68,2420
+    AI_UINT64 69,2438
+    AI_FLOAT 70,2457
+    AI_DOUBLE 71,2475
+    AI_AISTRING 72,2494
+    AI_AIVECTOR3D 73,2515
+    AI_AIMETADATA 74,2538
+    AI_INT64 75,2561
+    AI_UINT32 76,2579
+    AI_META_MAX 77,2598
+    FORCE_32BIT 80,2634
+} aiMetadataType;82,2667
+struct aiMetadataEntry 91,2961
+    aiMetadataType mType;92,2986
+    void *mData;mData93,3012
+    aiMetadataEntry(96,3049
+inline aiMetadataType GetAiType(116,3466
+inline aiMetadataType GetAiType(119,3528
+inline aiMetadataType GetAiType(122,3594
+inline aiMetadataType GetAiType(125,3662
+inline aiMetadataType GetAiType(128,3726
+inline aiMetadataType GetAiType(131,3792
+inline aiMetadataType GetAiType(134,3870
+inline aiMetadataType GetAiType(137,3952
+inline aiMetadataType GetAiType(140,4034
+inline aiMetadataType GetAiType(143,4100
+struct aiMetadata 156,4471
+    unsigned int mNumProperties;158,4555
+    C_STRUCT aiString *mKeys;mKeys161,4680
+    C_STRUCT aiMetadataEntry *mValues;mValues165,4856
+    aiMetadata(172,5009
+    aiMetadata(179,5159
+    aiMetadata &operator=operator247,7777
+    ~aiMetadata(258,8040
+    static inline aiMetadata *Alloc(Alloc314,9880
+    static inline void Dealloc(330,10333
+    inline void Add(335,10446
+    inline bool Set(356,11011
+    inline bool Set(390,12108
+    inline bool Get(408,12537
+    inline bool Get(428,13076
+    inline bool Get(439,13383
+    inline bool Get(448,13785
+    inline bool HasKey(461,14174
+    friend bool operator==(operator==560,17658
+    friend bool operator!=(operator!=564,17805
+
+include/assimp/qnan.h,624
+#define AI_QNAN_H_INCLUDED55,2253
+union _IEEESingle 69,2584
+    float Float;70,2604
+        uint32_t Frac 73,2638
+        uint32_t Exp 74,2666
+        uint32_t Sign 75,2693
+    } IEEE;76,2720
+union _IEEEDouble 82,2921
+    double Double;83,2941
+        uint64_t Frac 86,2977
+        uint64_t Exp 87,3005
+        uint64_t Sign 88,3033
+    } IEEE;89,3060
+AI_FORCE_INLINE bool is_qnan(95,3225
+AI_FORCE_INLINE bool is_qnan(112,3856
+AI_FORCE_INLINE bool is_special_float(131,4570
+AI_FORCE_INLINE bool is_special_float(142,4962
+AI_FORCE_INLINE bool is_not_qnan(152,5289
+AI_FORCE_INLINE ai_real get_qnan(158,5474
+
+include/assimp/port/AndroidJNI/AndroidJNIIOSystem.h,44
+#define AI_ANDROIDJNIIOSYSTEM_H_INC46,1983
+
+include/assimp/port/AndroidJNI/BundledAssetIOSystem.h,529
+#define AI_BUNDLEDASSETIOSYSTEM_H_INC46,1985
+class BundledAssetIOSystem 55,2159
+    AAssetManager* mApkAssetManager;58,2230
+    BundledAssetIOSystem(60,2268
+    ~BundledAssetIOSystem(61,2394
+    bool Exists(63,2427
+    class AssetIOStream 71,2599
+        AAsset * asset;72,2651
+        AssetIOStream(75,2688
+        ~AssetIOStream(76,2751
+        size_t Read(78,2802
+        size_t Write(79,2923
+        aiReturn Seek(80,3010
+        size_t Tell(81,3160
+        size_t FileSize(82,3261
+        void Flush(83,3331
+
+include/assimp/mesh.h,5278
+#define AI_MESH_H_INC48,2000
+#define AI_MAX_FACE_INDICES 77,2724
+#define AI_MAX_BONE_WEIGHTS 84,2878
+#define AI_MAX_VERTICES 91,3020
+#define AI_MAX_FACES 98,3148
+#define AI_MAX_NUMBER_OF_COLOR_SETS 105,3317
+#define AI_MAX_NUMBER_OF_TEXTURECOORDS 112,3551
+struct aiFace 138,4837
+    unsigned int mNumIndices;141,4966
+    unsigned int *mIndices;mIndices144,5077
+    aiFace(149,5162
+    ~aiFace(156,5334
+    aiFace(161,5438
+    aiFace &operator=operator167,5599
+    bool operator=185,6111
+struct aiVertexWeight 218,6973
+    unsigned int mVertexId;220,7058
+    ai_real mWeight;224,7212
+    aiVertexWeight(229,7289
+    aiVertexWeight(238,7545
+    bool operator=243,7670
+struct aiBone 265,8382
+    C_STRUCT aiString mName;269,8443
+    unsigned int mNumWeights;275,8608
+    C_STRUCT aiNode *mArmature;mArmature282,8836
+    C_STRUCT aiNode *mNode;mNode288,9021
+    C_STRUCT aiVertexWeight *mWeights;mWeights294,9133
+    C_STRUCT aiMatrix4x4 mOffsetMatrix;308,9684
+    aiBone(313,9781
+    aiBone(326,10102
+    void copyVertexWeights(338,10453
+    aiBone &operator operator355,10947
+    bool operator=369,11273
+    ~aiBone(383,11673
+enum aiPrimitiveType 397,12135
+    aiPrimitiveType_POINT 404,12333
+    aiPrimitiveType_LINE 412,12555
+    aiPrimitiveType_TRIANGLE 419,12694
+    aiPrimitiveType_POLYGON 429,13069
+    aiPrimitiveType_NGONEncodingFlag 447,13867
+    _aiPrimitiveType_Force32Bit 454,14056
+#define AI_PRIMITIVE_TYPE_FOR_N_INDICES(459,14205
+struct aiAnimMesh 473,14929
+    C_STRUCT aiString mName;475,14974
+    C_STRUCT aiVector3D *mVertices;mVertices483,15407
+    C_STRUCT aiVector3D *mNormals;mNormals486,15490
+    C_STRUCT aiVector3D *mTangents;mTangents489,15572
+    C_STRUCT aiVector3D *mBitangents;mBitangents492,15657
+    C_STRUCT aiColor4D *mColors[mColors495,15739
+    C_STRUCT aiVector3D *mTextureCoords[mTextureCoords498,15852
+    unsigned int mNumVertices;508,16303
+    float mWeight;513,16382
+    aiAnimMesh(517,16460
+            mTextureCoords{mTextureCoords523,16652
+            mNumVertices(524,16689
+    ~aiAnimMesh(530,16807
+    bool HasPositions(548,17372
+    bool HasNormals(557,17626
+    bool HasTangentsAndBitangents(567,17985
+    bool HasVertexColors(578,18332
+    bool HasTextureCoords(588,18756
+enum aiMorphingMethod 598,19085
+    aiMorphingMethod_UNKNOWN 600,19153
+    aiMorphingMethod_VERTEX_BLEND 603,19237
+    aiMorphingMethod_MORPH_NORMALIZED 606,19333
+    aiMorphingMethod_MORPH_RELATIVE 609,19431
+    _aiMorphingMethod_Force32Bit 615,19608
+struct aiMesh 638,20702
+    unsigned int mPrimitiveTypes;645,21003
+    unsigned int mNumVertices;652,21227
+    unsigned int mNumFaces;659,21460
+    C_STRUCT aiVector3D *mVertices;mVertices667,21634
+    C_STRUCT aiVector3D *mNormals;mNormals691,22746
+    C_STRUCT aiVector3D *mTangents;mTangents707,23491
+    C_STRUCT aiVector3D *mBitangents;mBitangents718,23880
+    C_STRUCT aiColor4D *mColors[mColors727,24147
+    C_STRUCT aiVector3D *mTextureCoords[mTextureCoords735,24443
+    unsigned int mNumUVComponents[mNumUVComponents746,24928
+    C_STRUCT aiFace *mFaces;mFaces756,25335
+    unsigned int mNumBones;761,25479
+    C_STRUCT aiBone **mBones;mBones769,25687
+    unsigned int mMaterialIndex;778,25978
+    C_STRUCT aiString mName;792,26596
+    unsigned int mNumAnimMeshes;800,26758
+    C_STRUCT aiAnimMesh **mAnimMeshes;mAnimMeshes810,27079
+    enum aiMorphingMethod mMethod;816,27275
+    C_STRUCT aiAABB mAABB;821,27353
+    C_STRUCT aiString **mTextureCoordsNames;mTextureCoordsNames826,27484
+    aiMesh(831,27589
+              mTextureCoords{nullptr}nullptr840,27877
+              mNumUVComponents{mNumUVComponents841,27916
+              mFaces(842,27951
+              mNumBones(843,27982
+              mBones(844,28010
+              mMaterialIndex(845,28041
+              mNumAnimMeshes(846,28074
+              mAnimMeshes(847,28107
+              mMethod(848,28143
+              mAABB(849,28192
+              mTextureCoordsNames(850,28215
+    ~aiMesh(855,28321
+    bool HasPositions(902,29796
+    bool HasFaces(909,30083
+    bool HasNormals(915,30290
+    bool HasTangentsAndBitangents(925,30727
+    bool HasVertexColors(932,31046
+    bool HasTextureCoords(942,31468
+    unsigned int GetNumUVChannels(951,31805
+    unsigned int GetNumColorChannels(962,32130
+    bool HasBones(972,32417
+    bool HasTextureCoordsName(979,32707
+    void SetTextureCoordsName(989,33127
+    const aiString *GetTextureCoordsName(GetTextureCoordsName1019,34159
+struct aiSkeletonBone 1045,35214
+    int mParent;1047,35318
+    C_STRUCT aiNode *mArmature;mArmature1053,35527
+    C_STRUCT aiNode *mNode;mNode1057,35705
+    unsigned int mNumnWeights;1061,35778
+    C_STRUCT aiMesh *mMeshId;mMeshId1064,35875
+    C_STRUCT aiVertexWeight *mWeights;mWeights1067,35967
+    C_STRUCT aiMatrix4x4 mOffsetMatrix;1080,36511
+    C_STRUCT aiMatrix4x4 mLocalMatrix;1083,36613
+    aiSkeletonBone(1087,36710
+    aiSkeletonBone(1103,37150
+    ~aiSkeletonBone(1117,37545
+struct aiSkeleton 1137,38151
+    C_STRUCT aiString mName;1141,38237
+    unsigned int mNumBones;1146,38336
+    C_STRUCT aiSkeletonBone **mBones;mBones1151,38431
+    aiSkeleton(1157,38543
+    ~aiSkeleton(1164,38694
+
+include/assimp/SceneCombiner.h,1218
+#define AI_SCENE_COMBINER_H_INC48,1868
+struct AttachmentInfo 84,2544
+    AttachmentInfo(85,2568
+    AttachmentInfo(89,2657
+    aiScene *scene;scene92,2777
+    aiNode *attachToNode;attachToNode93,2797
+struct NodeAttachmentInfo 97,2906
+    NodeAttachmentInfo(98,2934
+    NodeAttachmentInfo(104,3086
+    aiNode *node;node107,3251
+    aiNode *attachToNode;attachToNode108,3269
+    bool resolved;109,3295
+    size_t src_idx;110,3314
+#define AI_INT_MERGE_SCENE_GEN_UNIQUE_NAMES 117,3518
+#define AI_INT_MERGE_SCENE_GEN_UNIQUE_MATNAMES 123,3725
+#define AI_INT_MERGE_SCENE_DUPLICATES_DEEP_CPY 128,3868
+#define AI_INT_MERGE_SCENE_RESOLVE_CROSS_ATTACHMENTS 134,4104
+#define AI_INT_MERGE_SCENE_GEN_UNIQUE_NAMES_IF_NECESSARY 141,4384
+typedef std::pair<aiBone aiBone143,4447
+typedef std::pair<aiBone *, unsigned int> BoneSrcIndex;143,4447
+struct BoneWithHash 148,4651
+    std::vector<BoneSrcIndex> pSrcBones;149,4714
+struct SceneHelper 155,4879
+    SceneHelper(156,4900
+    explicit SceneHelper(162,4997
+    AI_FORCE_INLINE aiScene *operator->(operator->167,5105
+    aiScene *scene;scene172,5214
+    char id[id175,5297
+    unsigned int idlen;178,5339
+    std::set<unsigned int> hashes;181,5440
+
+include/assimp/LineSplitter.h,1465
+#define INCLUDED_LINE_SPLITTER_H48,1912
+class LineSplitter 79,2700
+    typedef size_t line_idx;81,2729
+    LineSplitter(87,2927
+    ~LineSplitter(89,3018
+    LineSplitter& operator++(int)96,3208
+    const char* operator[operator100,3357
+    line_idx mIdx;142,4679
+    std::string mCur;143,4698
+    const char *mEnd;mEnd144,4720
+    StreamReaderLE& mStream;145,4742
+    bool mSwallow,146,4771
+    bool mSwallow, mSkip_empty_lines,146,4771
+    bool mSwallow, mSkip_empty_lines, mTrim;146,4771
+AI_FORCE_INLINE LineSplitter::LineSplitter(149,4820
+AI_FORCE_INLINE LineSplitter& LineSplitter::operator++(operator++165,5241
+AI_FORCE_INLINE LineSplitter &LineSplitter::operator++(operator++205,6503
+AI_FORCE_INLINE void LineSplitter::get_tokens(get_tokens225,7020
+AI_FORCE_INLINE const std::string* LineSplitter::operator -> operator ->240,7427
+AI_FORCE_INLINE std::string LineSplitter::operator* operator*244,7520
+AI_FORCE_INLINE const char* LineSplitter::getEnd(getEnd248,7603
+AI_FORCE_INLINE LineSplitter::operator bool(operator bool252,7682
+AI_FORCE_INLINE LineSplitter::operator line_idx(operator line_idx256,7782
+AI_FORCE_INLINE LineSplitter::line_idx LineSplitter::get_index(get_index260,7860
+AI_FORCE_INLINE StreamReaderLE &LineSplitter::get_stream(get_stream264,7953
+AI_FORCE_INLINE bool LineSplitter::match_start(match_start268,8037
+AI_FORCE_INLINE void LineSplitter::swallow_next_increment(swallow_next_increment274,8230
+
+include/assimp/GenericProperty.h,234
+#define AI_GENERIC_PROPERTY_H_INCLUDED44,1770
+inline bool SetGenericProperty(58,2086
+inline const T &GetGenericProperty(GetGenericProperty75,2635
+inline void SetGenericPropertyPtr(92,3271
+inline bool HasGenericProperty(120,4083
+
 include/Camera.hpp,670
 enum class CameraMovementOptions 10,157
     FORWARD,11,192
@@ -2495,24 +4727,25 @@ class Camera 24,540
     void processMouseScroll(122,3651
     void updateCameraVectors(133,3859
 
-include/Mesh.hpp,521
-enum class TextureType 5,37
-    DIFFUSE,6,62
-    SPECULAR7,75
-struct Vertex 10,92
-    glm::vec3 position;11,108
-    glm::vec3 normal;12,132
-    glm::vec2 textureCoordinates;13,154
-struct Texture 16,192
-    unsigned int id;17,209
-    TextureType textureType;18,230
-class Mesh 21,263
-    std::vector<Vertex> vertices;23,284
-    std::vector<Texture> textures;24,318
-    std::vector<unsigned int> indices;25,353
-    unsigned int VAO{VAO33,592
-    unsigned int VBO{VBO34,619
-    unsigned int EBO{EBO35,646
+include/Mesh.hpp,552
+enum class TextureType 7,73
+    DIFFUSE,8,98
+    SPECULAR9,111
+struct Vertex 12,128
+    glm::vec3 position;13,144
+    glm::vec3 normal;14,168
+    glm::vec2 textureCoordinates;15,190
+struct Texture 18,228
+    unsigned int id;19,245
+    TextureType textureType;20,266
+    std::string path;21,295
+class Mesh 24,321
+    std::vector<Vertex> vertices;26,342
+    std::vector<Texture> textures;27,376
+    std::vector<unsigned int> indices;28,411
+    unsigned int VAO{VAO36,656
+    unsigned int VBO{VBO37,683
+    unsigned int EBO{EBO38,710
 
 include/stb_image.h,24493
 #define STBI_INCLUDE_STB_IMAGE_H129,6373
@@ -13266,6 +15499,12 @@ include/Shader.hpp,46
 struct Shader 7,60
     unsigned int id;8,76
 
+include/Model.hpp,139
+class Model 13,184
+    std::vector<Texture> texturesLoaded;20,299
+    std::vector<Mesh> meshes;21,340
+    std::string directory;22,370
+
 src/glad.c,23741
 #undef APIENTRY31,681
 static HMODULE libGL;34,725
@@ -13695,25 +15934,25 @@ static int find_extensionsGL(1057,57652
 static void find_coreGL(1064,57762
 int gladLoadGLLoader(1118,59593
 
-src/main.cpp,374
-#define STB_IMAGE_IMPLEMENTATION11,166
-constexpr int windowWidth 19,414
-constexpr int windowHeight 20,448
-float deltaTime 22,484
-float lastFrame 23,508
-bool firstMouse 24,532
-float lastX 25,556
-float lastY 26,589
-int main(48,1209
-void framebuffer_size_callback(320,13848
-void process_input(324,13980
-void mouse_callback(350,15317
-void scroll_callback(365,15838
+src/main.cpp,369
+#define STB_IMAGE_IMPLEMENTATION12,187
+constexpr int windowWidth 20,435
+constexpr int windowHeight 21,469
+float deltaTime 23,505
+float lastFrame 24,529
+bool firstMouse 25,553
+float lastX 26,577
+float lastY 27,610
+int main(31,690
+void framebuffer_size_callback(127,4307
+void process_input(131,4439
+void mouse_callback(145,5141
+void scroll_callback(160,5662
 
 src/Mesh.cpp,86
-Mesh::Mesh(6,69
-void Mesh::draw(draw13,298
-void Mesh::setupMesh(setupMesh40,1208
+Mesh::Mesh(8,90
+void Mesh::draw(draw15,319
+void Mesh::setupMesh(setupMesh41,1241
 
 src/Shader.cpp,329
 Shader::Shader(Shader8,121
@@ -13724,6 +15963,15 @@ void Shader::setUniformFloat(setUniformFloat81,2640
 void Shader::setMat4(setMat485,2778
 void Shader::setVec3(setVec389,2946
 void Shader::setVec3(setVec393,3114
+
+src/Model.cpp,314
+static unsigned int textureFromFile(12,180
+Model::Model(Model50,1485
+void Model::draw(draw54,1549
+void Model::loadModel(loadModel60,1663
+void Model::processNode(processNode75,2140
+Mesh Model::processMesh(processMesh86,2497
+std::vector<Texture> Model::loadMaterialTextures(loadMaterialTextures131,4276
 
 include/glm/mat4x4.hpp,0
 

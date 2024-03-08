@@ -1092,20 +1092,10 @@ that starts at the same point as the two vectors.
 
 *** Read, TODO
 In order:
-
-- https://www.khanacademy.org/math/geometry-home/right-triangles-topic/intro-to-the-trig-ratios-geo/v/basic-trigonometry
-Done
-
-- https://www.khanacademy.org/math/algebra-home/alg-vectors
-Done
-
-- https://www.khanacademy.org/math/algebra-home/alg-matrices
-Lesson 5: Adding & subtracting matrices
-
-- https://www.khanacademy.org/math/linear-algebra/matrix-transformations
 - https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab
 - http://www.songho.ca/opengl/gl_projectionmatrix.html
 - https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process
+- https://www.youtube.com/watch?v=4DQquG_o-Ac
 
 We need to understand the explanation and REALLY how the two exercises of the "Transformations" chapter work. If we
 don't, we'll never get good at this.
