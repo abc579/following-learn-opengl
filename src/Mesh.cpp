@@ -15,20 +15,23 @@ Mesh::Mesh(const std::vector<Vertex>& aVertices, const std::vector<Texture>& aTe
 void Mesh::draw(Shader& shader) const {
     unsigned int diffuseNumber{ 0 };
     unsigned int specularNumber{ 0 };
+    unsigned int shininessNumber{ 0 };
 
     for(unsigned int i = 0; i < textures.size(); ++i) {
         glActiveTexture(GL_TEXTURE0 + i);
         std::string texTypeStr;
 
-        if(textures[i].textureType == TextureType::DIFFUSE) {
+        switch(textures[i].textureType) {
+        case TextureType::DIFFUSE:
             texTypeStr = "texture_diffuse" + std::to_string(diffuseNumber);
             ++diffuseNumber;
-        } else if(textures[i].textureType == TextureType::SPECULAR) {
+            break;
+        case TextureType::SPECULAR:
             texTypeStr = "texture_specular" + std::to_string(specularNumber);
             ++specularNumber;
+            break;
         }
 
-        // std::cout << "texTypeStr = " << texTypeStr << std::endl;
         shader.setUniformInt(texTypeStr, i);
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
     }

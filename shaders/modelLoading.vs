@@ -9,8 +9,13 @@ uniform mat4 view;
 uniform mat4 projection;
 
 out vec2 TexCoords;
+out vec3 FragmentWorldSpaceCoordinates;
+out vec3 Normal;
 
 void main() {
+    FragmentWorldSpaceCoordinates = vec3(model * vec4(position, 1.0));
     TexCoords = aTexCoords;
-    gl_Position = projection * view * model * vec4(position, 1.0);
+    Normal = mat3(transpose(inverse(model))) * normal;
+
+    gl_Position = projection * view * vec4(position, 1.0);
 }

@@ -6,7 +6,8 @@
 
 enum class TextureType {
     DIFFUSE,
-    SPECULAR
+    SPECULAR,
+    SHININESS
 };
 
 struct Vertex {

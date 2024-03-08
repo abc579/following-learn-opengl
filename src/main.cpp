@@ -66,19 +66,19 @@ int main() {
     glEnable(GL_DEPTH_TEST);
 
     constexpr glm::vec3 sunPosition(0.f, 10.f, 0.f);
-    constexpr glm::vec3 lightColour(1.f, 0.f, 0.f);
+    constexpr glm::vec3 lightColour(1.f, 1.f, 1.f);
     constexpr glm::vec3 lightColour2(0.f, 0.f, 1.f);
 
     constexpr glm::vec3 directionalLightAmbientValues(.1f, .1f, .1f);
-    constexpr glm::vec3 directionalLightDiffuseValues(.1f, .1f, .1f);
+    constexpr glm::vec3 directionalLightDiffuseValues(.5f, .5f, .5f);
     constexpr glm::vec3 directionalLightSpecularValues(1.f, 1.f, 1.f);
 
-    constexpr glm::vec3 pointLightAmbientValues(.1f, .1f, .1f);
-    constexpr glm::vec3 pointLightDiffuseValues(.4f, .4f, .4f);
-    constexpr glm::vec3 pointLightSpecularValues(1.f, 1.f, 1.f);
+    // constexpr glm::vec3 pointLightAmbientValues(.1f, .1f, .1f);
+    // constexpr glm::vec3 pointLightDiffuseValues(.4f, .4f, .4f);
+    // constexpr glm::vec3 pointLightSpecularValues(1.f, 1.f, 1.f);
 
     constexpr glm::vec3 spotlightLightAmbientValues(.1f, .1f, .1f);
-    constexpr glm::vec3 spotlightLightDiffuseValues(.7f, .7f, .7f);
+    constexpr glm::vec3 spotlightLightDiffuseValues(.5f, .5f, .5f);
     constexpr glm::vec3 spotlightLightSpecularValues(1.f, 1.f, 1.f);
 
     constexpr float lightCutOffAngle{ glm::cos(glm::radians(12.f)) };
@@ -97,8 +97,24 @@ int main() {
         glClearColor(.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
         modelLoadingShader.use();
+        modelLoadingShader.setVec3("directionalLight.position", sunPosition);
+        modelLoadingShader.setVec3("directionalLight.colour", lightColour);
+        modelLoadingShader.setVec3("directionalLight.ambient", directionalLightAmbientValues);
+        modelLoadingShader.setVec3("directionalLight.specular", directionalLightSpecularValues);
+        modelLoadingShader.setVec3("directionalLight.diffuse", directionalLightDiffuseValues);
+
+        modelLoadingShader.setVec3("spotlightLight.position", camera.position);
+        modelLoadingShader.setVec3("spotlightLight.direction", camera.front);
+        modelLoadingShader.setVec3("spotlightLight.colour", lightColour2);
+        modelLoadingShader.setVec3("spotlightLight.ambient", spotlightLightAmbientValues);
+        modelLoadingShader.setVec3("spotlightLight.specular", spotlightLightSpecularValues);
+        modelLoadingShader.setVec3("spotlightLight.diffuse", spotlightLightDiffuseValues);
+        modelLoadingShader.setUniformFloat("spotlightLight.constant", attenuationConstantFactor);
+        modelLoadingShader.setUniformFloat("spotlightLight.linear", attenuationLinearFactor);
+        modelLoadingShader.setUniformFloat("spotlightLight.quadratic", attenuationQuadraticFactor);
+        modelLoadingShader.setUniformFloat("spotlightLight.cutOff", lightCutOffAngle);
+        modelLoadingShader.setUniformFloat("spotlightLight.outerCutOff", lightOuterCutOffAngle);
 
         // render the loaded model
         const glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 100.f);

@@ -4727,25 +4727,26 @@ class Camera 24,540
     void processMouseScroll(122,3651
     void updateCameraVectors(133,3859
 
-include/Mesh.hpp,552
+include/Mesh.hpp,574
 enum class TextureType 7,73
     DIFFUSE,8,98
-    SPECULAR9,111
-struct Vertex 12,128
-    glm::vec3 position;13,144
-    glm::vec3 normal;14,168
-    glm::vec2 textureCoordinates;15,190
-struct Texture 18,228
-    unsigned int id;19,245
-    TextureType textureType;20,266
-    std::string path;21,295
-class Mesh 24,321
-    std::vector<Vertex> vertices;26,342
-    std::vector<Texture> textures;27,376
-    std::vector<unsigned int> indices;28,411
-    unsigned int VAO{VAO36,656
-    unsigned int VBO{VBO37,683
-    unsigned int EBO{EBO38,710
+    SPECULAR,9,111
+    SHININESS10,125
+struct Vertex 13,143
+    glm::vec3 position;14,159
+    glm::vec3 normal;15,183
+    glm::vec2 textureCoordinates;16,205
+struct Texture 19,243
+    unsigned int id;20,260
+    TextureType textureType;21,281
+    std::string path;22,310
+class Mesh 25,336
+    std::vector<Vertex> vertices;27,357
+    std::vector<Texture> textures;28,391
+    std::vector<unsigned int> indices;29,426
+    unsigned int VAO{VAO37,671
+    unsigned int VBO{VBO38,698
+    unsigned int EBO{EBO39,725
 
 include/stb_image.h,24493
 #define STBI_INCLUDE_STB_IMAGE_H129,6373
@@ -15944,15 +15945,15 @@ bool firstMouse 25,553
 float lastX 26,577
 float lastY 27,610
 int main(31,690
-void framebuffer_size_callback(127,4307
-void process_input(131,4439
-void mouse_callback(145,5141
-void scroll_callback(160,5662
+void framebuffer_size_callback(143,5741
+void process_input(147,5873
+void mouse_callback(161,6575
+void scroll_callback(176,7096
 
 src/Mesh.cpp,86
 Mesh::Mesh(8,90
 void Mesh::draw(draw15,319
-void Mesh::setupMesh(setupMesh41,1241
+void Mesh::setupMesh(setupMesh44,1231
 
 src/Shader.cpp,329
 Shader::Shader(Shader8,121
@@ -15969,9 +15970,9 @@ static unsigned int textureFromFile(12,180
 Model::Model(Model50,1485
 void Model::draw(draw54,1549
 void Model::loadModel(loadModel60,1663
-void Model::processNode(processNode75,2140
-Mesh Model::processMesh(processMesh86,2497
-std::vector<Texture> Model::loadMaterialTextures(loadMaterialTextures131,4276
+void Model::processNode(processNode75,2198
+Mesh Model::processMesh(processMesh86,2555
+std::vector<Texture> Model::loadMaterialTextures(loadMaterialTextures131,4321
 
 include/glm/mat4x4.hpp,0
 

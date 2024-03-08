@@ -60,7 +60,7 @@ void Model::draw(Shader& shader) const {
 void Model::loadModel(const std::string& path) {
     Assimp::Importer importer;
 
-    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         std::cerr << "ERROR reading file in ASSIMP! " << importer.GetErrorString() << '\n';
@@ -95,9 +95,11 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* const scene) {
                                     mesh->mVertices[i].y,
                                     mesh->mVertices[i].z);
 
-        vertex.normal = glm::vec3(mesh->mNormals[i].x,
-                                  mesh->mNormals[i].y,
-                                  mesh->mNormals[i].z);
+        if(mesh->HasNormals()) {
+            vertex.normal = glm::vec3(mesh->mNormals[i].x,
+                                      mesh->mNormals[i].y,
+                                      mesh->mNormals[i].z);
+        }
 
         // There are 8 possible texture coordinates, but we only care about the first two.
         if(mesh->mTextureCoords[0]) {
@@ -117,13 +119,11 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* const scene) {
         }
     }
 
-    if(mesh->mMaterialIndex > 0) { // ???
-        aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-        std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE);
-        textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-        std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR);
-        textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-    }
+    aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+    std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE);
+    textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+    std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR);
+    textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
     return Mesh(vertices, textures, indices);
 }
@@ -146,9 +146,21 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
         }
 
         if(!skip) {
+            TextureType myType = TextureType::DIFFUSE;
+            switch(type) {
+            case aiTextureType_DIFFUSE:
+                myType = TextureType::DIFFUSE;
+                break;
+            case aiTextureType_SPECULAR:
+                myType = TextureType::SPECULAR;
+                break;
+            default:
+                break;
+            }
+
             Texture t {
                 .id = textureFromFile(str.C_Str(), directory),
-                .textureType = (type == aiTextureType_DIFFUSE) ? TextureType::DIFFUSE : TextureType::SPECULAR,
+                .textureType = myType,
                 .path = std::string(str.C_Str())
             };
 
