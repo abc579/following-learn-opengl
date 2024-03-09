@@ -621,35 +621,116 @@ reflection on objects and much more stuff. They're expensive to compute, though,
 for our scenes.
 
 *** Materials
-TODO
+Real world objects have different light reflection properties. For example, a wooden container doesn't reflect light in
+the same way a steel container does.
 
-*** Diffuse Maps
-TODO
+In order to simulate that behavior, we define materials for each surface and lighting type, that is, one material for
+ambient lighting, one for diffuse lighting and another one for specular lighting.
 
-*** Specular Maps
-TODO
+*** Lighting Maps
+They're [[Materials][material]] textures that we use to give a more realistic effect/look when light hits our objects. There are
+different types of lighting maps:
 
-*** Normal Maps
-TODO
+**** Diffuse Maps
+They're textures that are used to give [[Diffuse Lighting][diffuse lighting]] properties per [[Texel][texel]]. These maps are applied to the object's
+surface during rendering to simulate the interaction with light with the material.
 
-*** Bump Maps
-TODO
-
-*** Reflection Maps
-TODO
+**** Specular Maps
+They're textures that are used to give [[Specular Lighting][specular lighting]] properties per [[Texel][texel]]. These maps are applied to the object's
+surface during rendering to simulate the interaction with light with the material. Specular maps give that shiny
+behavior on objects.
 
 *** Light Casters
-TODO
-**** Directional Light
-TODO
-**** Point Light
-TODO
-**** Spotlight
-TODO
-**** Smooth/Soft Edges
-TODO
+They're light sources in our scene.
 
-*** Multiple Lights
+There are different types of light casters:
+
+**** Directional Light
+This light caster tries to simulate very powerful light sources that no matter how far they are from objects, they're
+still illuminating them almost completely. For example, the sun or a powerful bulb in a small room.
+
+What we care about when doing directional light is:
+
+- Light colour & position.
+- Object position and its normals.
+
+With this information, then we proceed to compute [[Phong Lighting Model][The Phong Lighting Model]] and that's it.
+
+**** Point Light
+Tries to simulate light that comes from sources but that isn't too powerful. For example, a desktop lamp or a
+streetlight. When we say "not too powerful" we mean that the light attenuates as it travels through space.
+
+So, we care about:
+
+- Light colour & position.
+- Object position and its normals.
+- Attenuation factor, given by the formula: 1 / Kc * Kl * d * Kq * d^2.
+
+Where:
+
+- Kc: generally it's value is 1 to make sure that the denominator never gets smaller than 1, because that would increase
+  the intensity a lot for certain distances. It's called the _constant term_.
+- Kl: it's called the _linear term_.
+- Kq: it's called the _quadratic term_.
+
+To choose the right values we more or less follow the next table:
+
+#+CAPTION: Point Light Table Values
+#+NAME: PointLightTableValues.png
+[[./PointLightTableValues.png]]
+
+Using this formula with [[Phong Lighting Model][The Phong Lighting Model]] we get a good representation of these type of light casters.
+
+**** Spotlight
+Tries to simulate spotlight lights, for example, a flashlight, but also behaving as a [[Point Light][point light]]. That's why it's a
+little bit more complicated than the others.
+
+In this case, we want to simulate the circle of light over objects when the light source is pointing at them.
+
+To do this, we need the following information:
+
+#+CAPTION: Spotlight Light
+#+NAME: SpotlightLight.png
+[[./SpotlightLight.png]]
+
+- LightDir: the vector pointing from the fragment to the light source.
+- SpotDir: the direction the spotlight is pointing at.
+- Phi: represents the radius of the spotlight. It's called the _cutoff angle_. Everything outside this angle is not illuminated.
+- Theta: the angle between LightDir and SpotDir. The value of theta has to be less than Phi's to be inside the spotlight.
+
+How do we compute theta? First, we normalize LightDir and SpotDir. Then, we apply the dot product, which returns the
+cosine of the angle, and there we have it. _Remember that SpotDir needs to be negated because we want vectors to point
+towards the light source._
+
+Now, we'd have to compare theta and phi. If Theta is inside Phi, then we're in the spotlight.
+
+***** Smooth/Soft Edges
+The previous section allows us to compute the spotlight light but the circumference of the light circle may look
+unrealistic. For that reason, we generally add a smooth/soft edge effect, which is given by this formula:
+
+#+CAPTION: Smooth Edges
+#+NAME: SmoothEdges.png
+[[./SmoothEdges.png]]
+
+Where:
+
+- I: intensity.
+- E: epsilon, the cosine difference between the inner (phi) and outer cone (gamma).
+- Y: gamma, the outer cutoff value.
+
+#+NAME: Smooth Soft Edges Computation
+#+BEGIN_SRC glsl
+  void main() {
+      float theta     = dot(lightDir, normalize(-light.direction));
+      float epsilon   = light.cutOff - light.outerCutOff;
+      float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
+      ...
+      // we'll leave ambient unaffected so we always have a little light.
+      diffuse  *= intensity;
+      specular *= intensity;
+      ...
+  }
+#+END_SRC
 
 ** Model Loading
 For complicated figures, we don't define every vertex manually. We use tools like blender to import these figures/models
