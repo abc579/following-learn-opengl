@@ -769,23 +769,52 @@ It's a combination of [[Mesh][meshes]] that end up forming the final object that
 a house, etc.
 
 ** Depth Testing
-TODO
+It's a process that consists in determining whether a fragment should be visible or not by considering its depth value
+(z component).
+
+When we tell OpenGL to enable depth testing, what OpenGL does is, for every frame, it stores the current fragment's
+depth value in the _depth buffer_ if the test succeeds.
+
+We can control the way OpenGL performs this testing using the function glDepthFunc, and we have these options:
+
+- GL_ALWAYS: The depth test always passes.
+- GL_NEVER: The depth test never passes.
+- GL_LESS: Passes if the fragment's depth value is less than the stored depth value.
+- GL_EQUAL: Passes if the fragment's depth value is equal to the stored depth value.
+- GL_LEQUAL: Passes if the fragment's depth value is less than or equal to the stored depth value.
+- GL_GREATER: Passes if the fragment's depth value is greater than the stored depth value.
+- GL_NOTEQUAL: Passes if the fragment's depth value is not equal to the stored depth value.
+- GL_GEQUAL: Passes if the fragment's depth value is greater than or equal to the stored depth value.
+
+_NOTE_: it's important to clear the depth buffer every frame.
+
+_NOTE_: Fragments closer to the viewer will typically have lower depth values, while fragments that are farther away will
+have higher depth values. Each fragment generated during rendering is associated with a depth value, typically
+_representing the distance from the viewer's eye to the fragment's position in the scene_.
 
 **** Early Depth Testing
-TODO
-
-_NOTE_: Fragments that are closer to the viewer will typically have lower depth values, while fragments that are farther
-away will have higher depth values. Each fragment generated during rendering is associated with a depth value, typically
-representing the distance from the viewer's eye to the fragment's position in the scene.
-
-**** Depth Test Function
-TODO
+It's a process that OpenGL can do to improve performance that consists in doing depth testing before the fragment shader
+runs. Because the nature of fragment shader's is expensive to do, this saves computational resources. To achieve this we
+shouldn't as a general rule modify the Z component in the fragment shader.
 
 **** Depth Value Precision
-TODO
+The thing to keep in mind is that values in the depth buffer are not linear in clip space, however, they're linear in
+view space, before the projection matrix is used.
+
+_NOTE_: For more details, go to LearnOpenGL.
 
 **** Z-Fighting
-TODO
+It's the phenomenom that happens when OpenGL cannot tell which object is in front of the other one, causing visual
+glitches.
+
+There are 3 ways of avoiding Z-fighting:
+
+- Don't put objects very close to each other. Instead, have a little offset between them that is barely noticeable, so
+  OpenGL can evaluate the difference between depths values without problems.
+- Increase the near plane distance from the viewer's position, but not too far away because near objects won't get
+  rendered because they'll get clipped.
+- Increase the depth buffer precision to 32 bits. This has performance implications. Generally, the default buffer
+  precision is 24 bits.
 
 ** Stencil Testing
 TODO
