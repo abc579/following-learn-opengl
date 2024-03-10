@@ -817,7 +817,74 @@ There are 3 ways of avoiding Z-fighting:
   precision is 24 bits.
 
 ** Stencil Testing
-TODO
+It's another process that has the ability to discard fragments when rendering. The stencil test is executed before the [[Depth
+Testing][depth test]].
+
+This operation has a buffer attached to it, called the _stencil buffer_, where we can store values from 0-256 (8 bits).
+
+We can update this buffer at will.
+
+This is an example of a stencil buffer:
+
+#+CAPTION: StencilBuffer.png
+#+NAME: StencilBuffer.png
+[[./StencilBuffer.png]]
+
+In this example, a stencil buffer is cleared with zeroes and then an open rectangle of ones is stored in the stencil
+buffer. The fragments on the scene are only rendered (the rest discarded) wherever the stencil value of these fragments
+is one.
+
+In general, we use the stencil buffer as follows:
+
+1. Enable writing to the stencil buffer.
+2. Render objects, which updates the content of the stencil buffer.
+3. Disable writing to the stencil buffer.
+4. Render other objects, this time discarding certain fragments depending on the contents of the stencil buffer.
+
+By using the stencil buffer we can thus discard certain fragments based on the fragments of other drawn objects in the
+scene.
+
+To use the stencil buffer, we need to activate it first calling: glEnable(GL_STENCIL_TEST).
+
+We also need to clear it every frame: glClear(GL_STENCIL_BUFFER_BIT).
+
+To enable or disabling writing: glStencilMask(0xFF) and glStencilMask(0x00); We can use more masks if we'd like.
+
+To determine how a stencil test should pass or succeed in order to discard a fragment (or not) we have these functions:
+
+- glStencilFunc(func, ref, mask): _func_ sets the test function that determines whether a fragment passes or is
+  discarded. This is applied to the stored stencil test value and the _glStencilFunc_'s ref value. Options:
+  - GL_NEVER
+  - GL_LESS
+  - GL_LEQUAL
+  - GL_GREATER
+  - GL_GEQUAL
+  - GL_EQUAL
+  - GL_NOTEQUAL
+  - GL_ALWAYS
+  _ref_: the stencil buffer's content is compared to this value.
+  _mask_: mask that is ANDed with the reference value and the stored stencil value before the test compares
+  them. Initially set to all ones.
+
+- glStencilOp(sfail, dpfail, dppass): _sfail_ action to take if the stencil test fails.
+  _dpfail_: action to take if the stencil test passes, but the depth test fails.
+  _dppass_: action to take if both tests pass.
+
+  For each argument, we got the following options:
+
+  - GL_KEEP: The currently stored stencil value is kept.
+  - GL_ZERO: The stencil value is set to 0.
+  - GL_REPLACE: The stencil value is replaced with the reference value set with glStencilFunc.
+  - GL_INCR: The stencil value is increased by 1 if it is lower than the maximum value.
+  - GL_INCR_WRAP: Same as GL_INCR, but wraps it back to 0 as soon as the maximum value is exceeded.
+  - GL_DECR: The stencil value is decreased by 1 if it is higher than the minimum value.
+  - GL_DECR_WRAP: Same as GL_DECR, but wraps it to the maximum value if it ends up lower than 0.
+  - GL_INVERT: Bitwise inverts the current stencil buffer value.
+
+By default, glStencilOp is set to (GL_KEEP, GL_KEEP, GL_KEEP), so whatever the outcome of any of the tests, the stencil
+buffer will keep its values.
+
+Usage examples: drawing borders (outlining) around models or objects.
 
 ** Mathematics
 *** Basics of Trigonometry
