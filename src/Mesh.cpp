@@ -15,7 +15,6 @@ Mesh::Mesh(const std::vector<Vertex>& aVertices, const std::vector<Texture>& aTe
 void Mesh::draw(Shader& shader) const {
     unsigned int diffuseNumber{ 0 };
     unsigned int specularNumber{ 0 };
-    unsigned int shininessNumber{ 0 };
 
     for(unsigned int i = 0; i < textures.size(); ++i) {
         glActiveTexture(GL_TEXTURE0 + i);

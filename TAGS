@@ -15935,25 +15935,26 @@ static int find_extensionsGL(1057,57652
 static void find_coreGL(1064,57762
 int gladLoadGLLoader(1118,59593
 
-src/main.cpp,369
+src/main.cpp,404
 #define STB_IMAGE_IMPLEMENTATION12,187
-constexpr int windowWidth 20,435
-constexpr int windowHeight 21,469
-float deltaTime 23,505
-float lastFrame 24,529
-bool firstMouse 25,553
-float lastX 26,577
-float lastY 27,610
-int main(31,690
-void framebuffer_size_callback(178,7108
-void process_input(182,7240
-void mouse_callback(196,7942
-void scroll_callback(211,8463
+constexpr int windowWidth 21,485
+constexpr int windowHeight 22,519
+float deltaTime 24,555
+float lastFrame 25,579
+bool firstMouse 26,603
+float lastX 27,627
+float lastY 28,660
+int main(32,740
+void framebuffer_size_callback(202,6947
+void process_input(206,7079
+void mouse_callback(220,7781
+void scroll_callback(235,8302
+unsigned int loadTexture(240,8472
 
 src/Mesh.cpp,86
 Mesh::Mesh(8,90
 void Mesh::draw(draw15,319
-void Mesh::setupMesh(setupMesh44,1231
+void Mesh::setupMesh(setupMesh43,1192
 
 src/Shader.cpp,329
 Shader::Shader(Shader8,121

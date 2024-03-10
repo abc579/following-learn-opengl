@@ -405,6 +405,12 @@ It's the real life effect of seeing farthest objects as smaller and nearest obje
 #+NAME: PerspectiveMatrix.png
 [[./PerspectiveMatrix.png]]
 
+**** Near Plane
+It's a component of the view frustrum that defines the closest distance from the viewer at which objects are rendered.
+
+**** Far Plane
+It's a component of the view frustrum that defines the largest distance from the viewer at which objects are rendered.
+
 *** Getting the Colour of an Object
 We just need to multiply the vector that represents the light source and the object's colour vector.
 
@@ -736,16 +742,49 @@ Where:
 For complicated figures, we don't define every vertex manually. We use tools like blender to import these figures/models
 to our application.
 
+Models are usually exported using two formats:
+
+- [[Wavefront Format][Wavefront]] .obj.
+- [[Collada][Collada]] file format.
+
 *** Assimp
-It's a library that we use to load models from files.
+It's a library that we use to load models from files. This is the internal structure when loading a model:
+
+#+CAPTION: AssimpModelStructure.png
+#+NAME: AssimpModelStructure.png
+[[./AssimpModelStructure.png]]
 
 *** Mesh
-TODO
+It's a combination of primitives that form a shape. When we create models, we don't create a single shape, what we do
+instead is create sub-models or shapes that together end up forming the model. Each of these _single shapes_ is called a
+mesh.
+
+For example: a human model. To model this, a general approach is to create the different parts (arms, legs, head, etc)
+as sub-models or shapes. Each of these shapes is a mesh.
+
+_NOTE_: the term "mesh" can also refer to the combination of all of these shapes.
 
 *** Model
-TODO
+It's a combination of [[Mesh][meshes]] that end up forming the final object that we want to render. For example, a car, a person,
+a house, etc.
 
 ** Depth Testing
+TODO
+
+**** Early Depth Testing
+TODO
+
+_NOTE_: Fragments that are closer to the viewer will typically have lower depth values, while fragments that are farther
+away will have higher depth values. Each fragment generated during rendering is associated with a depth value, typically
+representing the distance from the viewer's eye to the fragment's position in the scene.
+
+**** Depth Test Function
+TODO
+
+**** Depth Value Precision
+TODO
+
+**** Z-Fighting
 TODO
 
 ** Stencil Testing
@@ -1190,8 +1229,33 @@ don't, we'll never get good at this.
 - http://www.lighthouse3d.com/tutorials/glsl-12-tutorial/the-normal-matrix/
 
 * Normal Vector
-
 It's a unit vector that is perpendicular to the surface of a vertex. Because a vertex doesn't have a surface (it's just
 a point), we compute the normal vector by using its surrounding vertices.
 
 TODO: process. not explained yet.
+
+* Wavefront Format
+It's a format that tools like Blender, 3DMax or Maya use to export models. The extension is .obj.
+
+Files stored in this format contain:
+
+- Vertices.
+- Normals.
+- Texture coordinates.
+
+* Collada
+It's also a file format that tools like Blender, 3DMax or Maya use to export models. This is way more flexible than the
+[[Wavefront
+Format][wavefront format]], but this one is harder to parse.
+
+Files stored in this format can contain:
+
+- Vertices.
+- Normals.
+- Texture coordinates.
+- Models.
+- Lights.
+- Materials.
+- Animation data.
+- Cameras.
+- Scene information.

@@ -16,6 +16,7 @@ void framebuffer_size_callback(GLFWwindow*, int, int);
 void process_input(GLFWwindow*);
 void mouse_callback(GLFWwindow*, double, double);
 void scroll_callback(GLFWwindow* , double, double);
+unsigned int loadTexture(const char* const path);
 
 constexpr int windowWidth = 1920;
 constexpr int windowHeight = 1080;
@@ -60,41 +61,96 @@ int main() {
 
     glViewport(0, 0, windowWidth, windowHeight);
 
-    Shader modelLoadingShader("./shaders/modelLoading.vs", "./shaders/modelLoading.fs");
-    Shader modelLoadingShaderBorder("./shaders/modelLoadingBorder.vs", "./shaders/modelLoadingBorder.fs");
-    Model ourModel("./assets/backpack/backpack.obj");
-
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-    glEnable(GL_STENCIL_TEST);
-    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    Shader shader("./shaders/depthTesting.vs", "./shaders/depthTesting.fs");
 
-    constexpr glm::vec3 sunPosition(0.f, 10.f, 0.f);
-    constexpr glm::vec3 lightColour(1.f, 1.f, 1.f);
-    constexpr glm::vec3 lightColour2(0.f, 0.f, 1.f);
+    constexpr std::array<float, 200> cubeVertices{
+        // positions          // texture Coords
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
-    constexpr glm::vec3 directionalLightAmbientValues(.1f, .1f, .1f);
-    constexpr glm::vec3 directionalLightDiffuseValues(.5f, .5f, .5f);
-    constexpr glm::vec3 directionalLightSpecularValues(1.f, 1.f, 1.f);
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
-    // constexpr glm::vec3 pointLightAmbientValues(.1f, .1f, .1f);
-    // constexpr glm::vec3 pointLightDiffuseValues(.4f, .4f, .4f);
-    // constexpr glm::vec3 pointLightSpecularValues(1.f, 1.f, 1.f);
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-    constexpr glm::vec3 spotlightLightAmbientValues(.1f, .1f, .1f);
-    constexpr glm::vec3 spotlightLightDiffuseValues(.5f, .5f, .5f);
-    constexpr glm::vec3 spotlightLightSpecularValues(1.f, 1.f, 1.f);
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-    constexpr float lightCutOffAngle{ glm::cos(glm::radians(12.f)) };
-    constexpr float lightOuterCutOffAngle{ glm::cos(glm::radians(17.5f)) };
-    constexpr float attenuationConstantFactor{ 1.f };
-    constexpr float attenuationLinearFactor{ .027f };
-    constexpr float attenuationQuadraticFactor{ .0028f };
-    constexpr float scaleFactor{ 1.1f };
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+    };
+
+    constexpr std::array<float, 30> planeVertices{
+        // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
+         5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
+        -5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
+        -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
+
+         5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
+        -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
+         5.0f, -0.5f, -5.0f,  2.0f, 2.0f
+    };
+
+    unsigned int cubeVAO{ 0 }, cubeVBO{ 0 };
+    glGenVertexArrays(1, &cubeVAO);
+    glGenBuffers(1, &cubeVBO);
+    glBindVertexArray(cubeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
+    glBindVertexArray(0);
+
+    unsigned int planeVAO{ 0 }, planeVBO{ 0 };
+    glGenVertexArrays(1, &planeVAO);
+    glGenBuffers(1, &planeVBO);
+    glBindVertexArray(planeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), &planeVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
+    glBindVertexArray(0);
+
+    unsigned int cubeTexture = loadTexture("./assets/marble.jpg");
+    unsigned int floorTexture = loadTexture("./assets/metal.png");
+
+    shader.use();
+    shader.setUniformInt("texture1", 0);
 
     while(!glfwWindowShouldClose(window)) {
         const float currentFrame = static_cast<float>(glfwGetTime());
@@ -103,70 +159,35 @@ int main() {
 
         process_input(window);
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        glClearColor(.2f, 0.2f, 0.2f, 1.0f);
-
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        glStencilMask(0xFF);
-
-        modelLoadingShader.use();
-        modelLoadingShader.setVec3("directionalLight.position", sunPosition);
-        modelLoadingShader.setVec3("directionalLight.colour", lightColour);
-        modelLoadingShader.setVec3("directionalLight.ambient", directionalLightAmbientValues);
-        modelLoadingShader.setVec3("directionalLight.specular", directionalLightSpecularValues);
-        modelLoadingShader.setVec3("directionalLight.diffuse", directionalLightDiffuseValues);
-
-        modelLoadingShader.setVec3("spotlightLight.position", camera.position);
-        modelLoadingShader.setVec3("spotlightLight.direction", camera.front);
-        modelLoadingShader.setVec3("spotlightLight.colour", lightColour2);
-        modelLoadingShader.setVec3("spotlightLight.ambient", spotlightLightAmbientValues);
-        modelLoadingShader.setVec3("spotlightLight.specular", spotlightLightSpecularValues);
-        modelLoadingShader.setVec3("spotlightLight.diffuse", spotlightLightDiffuseValues);
-        modelLoadingShader.setUniformFloat("spotlightLight.constant", attenuationConstantFactor);
-        modelLoadingShader.setUniformFloat("spotlightLight.linear", attenuationLinearFactor);
-        modelLoadingShader.setUniformFloat("spotlightLight.quadratic", attenuationQuadraticFactor);
-        modelLoadingShader.setUniformFloat("spotlightLight.cutOff", lightCutOffAngle);
-        modelLoadingShader.setUniformFloat("spotlightLight.outerCutOff", lightOuterCutOffAngle);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(.1f, .1f, .1f, 1.0f);
 
         // render the loaded model
-        glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 100.f);
+        glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), static_cast<float>(windowWidth) / static_cast<float>(windowHeight), .1f, 100.f);
         glm::mat4 view = camera.getViewMatrix();
         glm::mat4 model = glm::mat4(1.0f);
-        // model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-        // model = glm::scale(model, glm::vec3(.2f, .2f, .2f));
 
-        modelLoadingShader.setMat4("projection", projection);
-        modelLoadingShader.setMat4("view", view);
-        modelLoadingShader.setMat4("model", model);
+        shader.setMat4("view", view);
+        shader.setMat4("projection", projection);
 
-        ourModel.draw(modelLoadingShader);
-
-        // ----------- STENCIL SHIT --------------------
-
-        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-        glStencilMask(0x00); // disable writing to the stencil buffer
-        glDisable(GL_DEPTH_TEST);
-
-        modelLoadingShaderBorder.use();
-        modelLoadingShaderBorder.setMat4("projection", projection);
-        modelLoadingShaderBorder.setMat4("view", view);
-
-        // render the loaded model
+        // cubes
+        glBindVertexArray(cubeVAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, cubeTexture);
+        model = glm::translate(model, glm::vec3(-1.f, .02f, -1.f));
+        shader.setMat4("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
         model = glm::mat4(1.f);
-        model = glm::translate(model, glm::vec3(-.1f, .0f, -.1f));
-        model = glm::scale(model, glm::vec3(scaleFactor, scaleFactor, scaleFactor));
-        modelLoadingShaderBorder.setMat4("model", model);
-        ourModel.draw(modelLoadingShaderBorder);
+        model = glm::translate(model, glm::vec3(2.f, .02f, 0.f));
+        shader.setMat4("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        model = glm::mat4(1.f);
-        model = glm::translate(model, glm::vec3(.02f, .0f, .0f));
-        model = glm::scale(model, glm::vec3(scaleFactor, scaleFactor, scaleFactor));
-        modelLoadingShaderBorder.setMat4("model", model);
-        ourModel.draw(modelLoadingShaderBorder);
-
-        glStencilMask(0xFF);
-        glStencilFunc(GL_ALWAYS, 0, 0xFF);
-        glEnable(GL_DEPTH_TEST);
+        // floor
+        glBindVertexArray(planeVAO);
+        glBindTexture(GL_TEXTURE_2D, floorTexture);
+        shader.setMat4("model", glm::mat4(1.f));
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(0);
 
         // Render everything we computed.
         glfwSwapBuffers(window);
@@ -214,4 +235,39 @@ void mouse_callback([[maybe_unused]]GLFWwindow* window, double mouseXPos, double
 void scroll_callback([[maybe_unused]]GLFWwindow* window, [[maybe_unused]]double xoffset, double yoffset)
 {
     camera.processMouseScroll(static_cast<float>(yoffset));
+}
+
+unsigned int loadTexture(const char* const path) {
+    unsigned int textureID{ 0 };
+    glGenTextures(1, &textureID);
+
+    int width{ 0 }, height{ 0 }, nrComponents{ 0 };
+    unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0);
+    if(!data) {
+        std::cerr << "::" << __func__ << "::ERROR: Couldn't load texture: " << path << '\n';
+        stbi_image_free(data);
+        return textureID;
+    }
+
+    GLenum format = GL_RED;
+    if(nrComponents == 1) {
+        format = GL_RED;
+    } else if(nrComponents == 3) {
+        format = GL_RGB;
+    } else if(nrComponents == 4) {
+        format = GL_RGBA;
+    }
+
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    stbi_image_free(data);
+
+    return textureID;
 }
