@@ -63,8 +63,12 @@ int main() {
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+    glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     Shader shader("./shaders/depthTesting.vs", "./shaders/depthTesting.fs");
+    Shader shaderSingleColour("./shaders/shaderSingleColour.vs", "./shaders/shaderSingleColour.fs");
 
     constexpr std::array<float, 200> cubeVertices{
         // positions          // texture Coords
@@ -149,7 +153,6 @@ int main() {
     unsigned int cubeTexture = loadTexture("./assets/marble.jpg");
     unsigned int floorTexture = loadTexture("./assets/metal.png");
 
-    shader.use();
     shader.setUniformInt("texture1", 0);
 
     while(!glfwWindowShouldClose(window)) {
@@ -159,35 +162,70 @@ int main() {
 
         process_input(window);
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(.1f, .1f, .1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         // render the loaded model
         glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), static_cast<float>(windowWidth) / static_cast<float>(windowHeight), .1f, 100.f);
         glm::mat4 view = camera.getViewMatrix();
         glm::mat4 model = glm::mat4(1.0f);
 
+        shader.use();
+
+        // floor
+        glStencilMask(0x00);
+        glBindVertexArray(planeVAO);
+        glBindTexture(GL_TEXTURE_2D, floorTexture);
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
+        shader.setMat4("model", glm::mat4(1.f));
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(0);
 
         // cubes
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
+
         glBindVertexArray(cubeVAO);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, cubeTexture);
         model = glm::translate(model, glm::vec3(-1.f, .02f, -1.f));
         shader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
+
         model = glm::mat4(1.f);
         model = glm::translate(model, glm::vec3(2.f, .02f, 0.f));
         shader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
-
-        // floor
-        glBindVertexArray(planeVAO);
-        glBindTexture(GL_TEXTURE_2D, floorTexture);
-        shader.setMat4("model", glm::mat4(1.f));
-        glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
+
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glStencilMask(0x00);
+        glDisable(GL_DEPTH_TEST);
+
+        shaderSingleColour.use();
+        shaderSingleColour.setMat4("view", view);
+        shaderSingleColour.setMat4("projection", projection);
+
+        // cubes border
+        glBindVertexArray(cubeVAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, cubeTexture);
+        model = glm::mat4(1.f);
+        model = glm::translate(model, glm::vec3(-1.f, .02f, -1.f));
+        model = glm::scale(model, glm::vec3(1.1f, 1.1f, 1.1f));
+        shaderSingleColour.setMat4("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        model = glm::mat4(1.f);
+        model = glm::translate(model, glm::vec3(2.f, .02f, 0.f));
+        model = glm::scale(model, glm::vec3(1.1f, 1.1f, 1.1f));
+        shaderSingleColour.setMat4("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
+
+        glStencilMask(0xFF);
+        glStencilFunc(GL_ALWAYS, 0, 0xFF);
+        glEnable(GL_DEPTH_TEST);
 
         // Render everything we computed.
         glfwSwapBuffers(window);
