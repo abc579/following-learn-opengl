@@ -887,10 +887,122 @@ buffer will keep its values.
 Usage examples: drawing borders (outlining) around models or objects.
 
 ** Blending
-TODO
+It's the process of implementing transparency within objects in the scene.
+
+_This process is computed after the fragment shader and after all tests have passed._
+
+To use blending, we need to tell OpenGL to activate it for us: glEnable(GL_BLEND);
+
+The formula that OpenGL uses to compute the final colour of objects when transparency is involved is this one:
+
+#+CAPTION: BlendingFormula.png
+#+NAME: BlendingFormula.png
+[[./BlendingFormula.png]]
+
+Where:
+
+- _Csource_: it's the source colour vector. This is the output colour of the fragment shader.
+- _Fsource_: the source factor value. Sets the impact of the alpha value on the source colour vector.
+- _Cdestination_: it's the destination colour vector. This has the contents of the colour buffer.
+- _Fdestination_: it's the destination factor value. Sets the impact of the alpha value on the destination vector.
+
+OpenGL allows us to control several things regarding this equation. First, it allows us to define the factor value for
+both the source and destination, using the function glBlendFunc(sfactor, dfactor). Possibles values are:
+
+- GL_ZERO: Factor is equal to 0.
+- GL_ONE: Factor is equal to 1.
+- GL_SRC_COLOR: Factor is equal to the source color vector Csource.
+- GL_ONE_MINUS_SRC_COLOR: Factor is equal to 1 minus the source color vector: 1−Csource.
+- GL_DST_COLOR: Factor is equal to the destination color vector Cdestination.
+- GL_ONE_MINUS_DST_COLOR: Factor is equal to 1 minus the destination color vector: 1−Cdestination.
+- GL_SRC_ALPHA: Factor is equal to the alpha component of the source color vector Csource.
+- GL_ONE_MINUS_SRC_ALPHA: Factor is equal to 1−alpha of the source color vector Csource.
+- GL_DST_ALPHA: Factor is equal to the alpha component of the destination color vector Cdestination.
+- GL_ONE_MINUS_DST_ALPHA: Factor is equal to 1−alpha of the destination color vector Cdestination.
+- GL_CONSTANT_COLOR: Factor is equal to the constant color vector Cconstant
+- GL_ONE_MINUS_CONSTANT_COLOR: Factor is equal to 1 - the constant color vector Cconstant.
+- GL_CONSTANT_ALPHA: Factor is equal to the alpha component of the constant color vector Cconstant.
+- GL_ONE_MINUS_CONSTANT_ALPHA: Factor is equal to 1−alpha of the constant color vector Cconstant.
+
+We can even set different options for each RGB component using the function glBlendFuncSeparate.
+
+Second, it allows us to define the operation of the equation, using glBlendEquation(mode):
+
+- GL_FUNC_ADD: the default, adds both colors to each other: Cresult = Src + Dst.
+- GL_FUNC_SUBTRACT: subtracts both colors from each other: Cresult = Src − Dst.
+- GL_FUNC_REVERSE_SUBTRACT: subtracts both colors, but reverses order: Cresult = Dst − Src.
+- GL_MIN: takes the component-wise minimum of both colors: Cresult = min(Dst,Src).
+- GL_MAX: takes the component-wise maximum of both colors: Cresult = max(Dst,Src).
+
+Generally, things stay at GL_FUNC_ADD.
+
+_NOTE_: when drawing transparent objects in a scene, if we're not careful we can create visual bugs because blending and
+depth testing can create conflicts betweem them. For example, if we were to draw multiple transparent windows in a scene
+without a particular order, windows that are closer to the viewer but were drawn first will not allow us to see through
+them, because the process of depth doesn't take alpha values in consideration, so the transparent window will end up
+looking as a opaque object.
+
+To avoid such problems, a common technique is to _sort windows based on their distance between their position and the
+camera's_.
+
+Taking into account other objects, the process should look something like this:
+
+1. Draw all opaque objects first.
+2. Sort all transparent objects.
+3. Draw all transparent objects in sorted (desc, by their distance, i.e farthest ones first, near ones last) order.
+
+Another approach is using _order independent transparency_.
+
+*** Fully Transparent or Not
+For some specific cases, for example, putting grass in a scene, it's convinient to just use a .png file image and load
+them in a batch-fashion. Because .png files allow for transparency, what OpenGL does (if we tell it so in the fragment
+shader, evaluating the alpha channel and _discard_ ing the right fragments) is to ignore fragments whose alpha value is
+insignificant.
+
+_NOTE_: When doing this, we might run into the problem of seeing solid fragments in places they shouldn't be in. For
+example, in the case of a grass texture, we could see a tiny white border on top of the texture. That's something that
+can get fixed by using the option GL_CLAMP_TO_EDGE for textures with GL_RGBA.
 
 ** Face Culling
-TODO
+It's an optimization process that OpenGL can do where it doesn't render faces of objects that are not facing the
+viewer. For example, if we were facing a cube, we could see at maximum three faces at once. The other three faces (50%)
+don't need to be processed and passed to the fragment shader, because we will not see them anyways.
+
+Likewise, if we were seeing only one face of the cube, we wouldn't need to process the other five faces.
+
+The purpose of face culling is to optimize rendering by skipping the rendering of faces that are not visible to the
+viewer, thereby reducing unnecessary fragment shader computations.
+
+_How does OpenGL do this?_
+
+The way it does that is by checking if triangles are _front facing_ the viewer. If they are, they will get passed to the
+fragment shader. If they're not, they won't.
+
+This front facing and back facing is determined by analyzing the _winding order_ of the vertex data.
+
+When we define the vertices of a triangle, we're definining them in a certain order. That order is what is known as
+_winding order_, and it can be _clockwise_ or _counter-clockwise_:
+
+#+CAPTION: WindingOrder.png
+#+NAME: WindingOrder.png
+[[./WindingOrder.png]]
+
+OpenGL uses the _winding order_ to determine if a triangle is _front facing_ or _back facing_. By default, _triangles defined
+with counter-clockwise vertices_ are processed as front-facing triangles.
+
+We need to tell OpenGL to activate face culling with: glEnable(GL_CULL_FACE);
+
+We can also tell OpenGL if we want to cull front, back or front & back faces with: glCullFace(GL_FRONT || GL_BACK ||
+GL_FRONT_AND_BACK);
+
+We can also tell OpenGL the way to decide if a triangle is front facing or back facing with: glFrontFace(GL_CCW ||
+GL_CW); CCW stands for Counter-Clockwise and CW for Clockwise.
+
+This is the visual effect:
+
+#+CAPTION: WindingOrderFrontAndBack.png
+#+NAME: WindingOrderFrontAndBack.png
+[[./WindingOrderFrontAndBack.png]]
 
 ** Mathematics
 *** Basics of Trigonometry
