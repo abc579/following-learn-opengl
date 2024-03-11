@@ -15936,20 +15936,20 @@ static void find_coreGL(1064,57762
 int gladLoadGLLoader(1118,59593
 
 src/main.cpp,409
-#define STB_IMAGE_IMPLEMENTATION12,187
-constexpr int windowWidth 21,485
-constexpr int windowHeight 22,519
-float deltaTime 24,555
-float lastFrame 25,579
-bool firstMouse 26,603
-float lastX 27,627
-float lastY 28,660
-int main(32,740
-void framebuffer_size_callback(288,10347
-void process_input(292,10479
-void mouse_callback(306,11181
-void scroll_callback(321,11702
-unsigned int loadTexture(326,11872
+#define STB_IMAGE_IMPLEMENTATION13,202
+constexpr int windowWidth 22,500
+constexpr int windowHeight 23,534
+float deltaTime 25,570
+float lastFrame 26,594
+bool firstMouse 27,618
+float lastX 28,642
+float lastY 29,675
+int main(33,755
+void framebuffer_size_callback(337,12408
+void process_input(341,12540
+void mouse_callback(355,13242
+void scroll_callback(370,13763
+unsigned int loadTexture(375,13933
 
 src/Mesh.cpp,86
 Mesh::Mesh(8,90

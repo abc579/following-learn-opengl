@@ -2,6 +2,7 @@
 #include <cmath>
 #include <iostream>
 #include <array>
+#include <map>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -66,10 +67,14 @@ int main() {
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
 
     Shader shader("./shaders/depthTesting.vs", "./shaders/depthTesting.fs");
     Shader shaderSingleColour("./shaders/shaderSingleColour.vs", "./shaders/shaderSingleColour.fs");
     Shader shaderGrass("./shaders/shaderGrass.vs", "./shaders/shaderGrass.fs");
+    Shader shaderWindow("./shaders/shaderWindow.vs", "./shaders/shaderWindow.fs");
 
     constexpr std::array<float, 200> cubeVertices{
         // positions          // texture Coords
@@ -122,6 +127,14 @@ int main() {
         glm::vec3( 0.0f, 0.f,  0.7f),
         glm::vec3(-0.3f, 0.f, -2.3f),
         glm::vec3( 0.5f, 0.f, -0.6f)
+    };
+
+    constexpr std::array<glm::vec3, 5> windows{
+        glm::vec3( 0.0f, 0.0f, 0.74f),
+        glm::vec3(-1.5f, 0.0f, -0.45f),
+        glm::vec3( 1.5f, 0.0f, 0.54f),
+        glm::vec3(-0.3f, 0.0f, -2.2f),
+        glm::vec3( 0.5f, 0.0f, -0.4f),
     };
 
     constexpr std::array<float, 30> planeVertices{
@@ -182,9 +195,22 @@ int main() {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
     glBindVertexArray(0);
 
+    unsigned int windowVAO{ 0 }, windowVBO{ 0 };
+    glGenVertexArrays(1, &windowVAO);
+    glGenBuffers(1, &windowVBO);
+    glBindVertexArray(windowVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, windowVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(transparentVertices), &transparentVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
+    glBindVertexArray(0);
+
     unsigned int cubeTexture = loadTexture("./assets/marble.jpg");
     unsigned int floorTexture = loadTexture("./assets/metal.png");
     unsigned int grassTexture = loadTexture("./assets/grass.png");
+    unsigned int windowTexture = loadTexture("./assets/blending_transparent_window.png");
 
     shader.setUniformInt("texture1", 0);
 
@@ -270,6 +296,29 @@ int main() {
         for(unsigned int i = 0; i < vegetation.size(); ++i) {
             model = glm::mat4(1.f);
             model = glm::translate(model, vegetation[i]);
+            shaderGrass.setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+        }
+        glBindVertexArray(0);
+
+        // blending windows
+        shaderWindow.use();
+        shaderWindow.setMat4("projection", projection);
+        shaderWindow.setMat4("view", view);
+        glBindVertexArray(windowVAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, windowTexture);
+
+        // Sorting windows on the fly to define order of drawing.
+        std::map<float, glm::vec3> sorted;
+        for(unsigned int i = 0; i < windows.size(); ++i) {
+            const float distance = glm::length(camera.position - windows[i]);
+            sorted[distance] = windows[i];
+        }
+
+        for(auto it = sorted.rbegin(); it != sorted.rend(); ++it) {
+            model = glm::mat4(1.f);
+            model = glm::translate(model, it->second);
             shaderGrass.setMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 6);
         }
