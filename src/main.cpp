@@ -32,7 +32,7 @@ Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 int main() {
     std::ios::sync_with_stdio(false);
 
-    stbi_set_flip_vertically_on_load(true);
+    stbi_set_flip_vertically_on_load(false);
 
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -69,6 +69,7 @@ int main() {
 
     Shader shader("./shaders/depthTesting.vs", "./shaders/depthTesting.fs");
     Shader shaderSingleColour("./shaders/shaderSingleColour.vs", "./shaders/shaderSingleColour.fs");
+    Shader shaderGrass("./shaders/shaderGrass.vs", "./shaders/shaderGrass.fs");
 
     constexpr std::array<float, 200> cubeVertices{
         // positions          // texture Coords
@@ -115,6 +116,14 @@ int main() {
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
+    constexpr std::array<glm::vec3, 5> vegetation{
+        glm::vec3(-1.5f, 0.f, -0.48f),
+        glm::vec3( 1.5f, 0.f,  0.51f),
+        glm::vec3( 0.0f, 0.f,  0.7f),
+        glm::vec3(-0.3f, 0.f, -2.3f),
+        glm::vec3( 0.5f, 0.f, -0.6f)
+    };
+
     constexpr std::array<float, 30> planeVertices{
         // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
          5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
@@ -124,6 +133,17 @@ int main() {
          5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
         -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
          5.0f, -0.5f, -5.0f,  2.0f, 2.0f
+    };
+
+    constexpr std::array<float, 30> transparentVertices{
+        // positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
+        0.0f,  0.5f,  0.0f,  0.0f,  0.0f,
+        0.0f, -0.5f,  0.0f,  0.0f,  1.0f,
+        1.0f, -0.5f,  0.0f,  1.0f,  1.0f,
+
+        0.0f,  0.5f,  0.0f,  0.0f,  0.0f,
+        1.0f, -0.5f,  0.0f,  1.0f,  1.0f,
+        1.0f,  0.5f,  0.0f,  1.0f,  0.0f
     };
 
     unsigned int cubeVAO{ 0 }, cubeVBO{ 0 };
@@ -150,8 +170,21 @@ int main() {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
     glBindVertexArray(0);
 
+    unsigned int grassVAO{ 0 }, grassVBO{ 0 };
+    glGenVertexArrays(1, &grassVAO);
+    glGenBuffers(1, &grassVBO);
+    glBindVertexArray(grassVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, grassVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(transparentVertices), &transparentVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
+    glBindVertexArray(0);
+
     unsigned int cubeTexture = loadTexture("./assets/marble.jpg");
     unsigned int floorTexture = loadTexture("./assets/metal.png");
+    unsigned int grassTexture = loadTexture("./assets/grass.png");
 
     shader.setUniformInt("texture1", 0);
 
@@ -227,6 +260,21 @@ int main() {
         glStencilFunc(GL_ALWAYS, 0, 0xFF);
         glEnable(GL_DEPTH_TEST);
 
+        // grass
+        shaderGrass.use();
+        shaderGrass.setMat4("projection", projection);
+        shaderGrass.setMat4("view", view);
+        glBindVertexArray(grassVAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, grassTexture);
+        for(unsigned int i = 0; i < vegetation.size(); ++i) {
+            model = glm::mat4(1.f);
+            model = glm::translate(model, vegetation[i]);
+            shaderGrass.setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+        }
+        glBindVertexArray(0);
+
         // Render everything we computed.
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -300,8 +348,14 @@ unsigned int loadTexture(const char* const path) {
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    if(nrComponents == 4) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    } else {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    }
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 

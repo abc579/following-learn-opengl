@@ -886,6 +886,12 @@ buffer will keep its values.
 
 Usage examples: drawing borders (outlining) around models or objects.
 
+** Blending
+TODO
+
+** Face Culling
+TODO
+
 ** Mathematics
 *** Basics of Trigonometry
 Trigonometry means the study of triangles.
