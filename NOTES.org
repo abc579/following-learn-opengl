@@ -493,6 +493,7 @@ What if we go outside this range? See [[Texture Wrapping][texture wrapping]].
 
 ** Sampling
 It refers to the process of obtaining the texture color from the texture's coordinates.
+
 ** Magnifying
 Scaling up a texture.
 
@@ -1003,6 +1004,23 @@ This is the visual effect:
 #+CAPTION: WindingOrderFrontAndBack.png
 #+NAME: WindingOrderFrontAndBack.png
 [[./WindingOrderFrontAndBack.png]]
+
+** Framebuffers
+TODO
+
+*** Kernel Matrix
+
+**** Sharpen
+TODO
+
+**** Blur
+TODO
+
+**** Edge detection
+TODO
+
+** Cubemaps
+TODO
 
 ** Mathematics
 *** Basics of Trigonometry
