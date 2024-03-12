@@ -18,6 +18,7 @@ void process_input(GLFWwindow*);
 void mouse_callback(GLFWwindow*, double, double);
 void scroll_callback(GLFWwindow* , double, double);
 unsigned int loadTexture(const char* const path);
+unsigned int loadCubeMap(const std::array<std::string, 6>& faces);
 
 constexpr int windowWidth = 1920;
 constexpr int windowHeight = 1080;
@@ -33,7 +34,7 @@ Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 int main() {
     std::ios::sync_with_stdio(false);
 
-    stbi_set_flip_vertically_on_load(true);
+    stbi_set_flip_vertically_on_load(false);
 
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -76,6 +77,7 @@ int main() {
     // Shader shaderGrass("./shaders/shaderGrass.vs", "./shaders/shaderGrass.fs");
     // Shader shaderWindow("./shaders/shaderWindow.vs", "./shaders/shaderWindow.fs");
     Shader shaderContainer("./shaders/containerShader.vs", "./shaders/containerShader.fs");
+    Shader shaderSkybox("./shaders/skyboxShader.vs", "./shaders/skyboxShader.fs");
 
     constexpr std::array<float, 200> cubeVertices{
         // Back face
@@ -232,6 +234,51 @@ int main() {
          0.4f,  1.0f,  1.0f, 1.0f, // top-right
     };
 
+    constexpr std::array<float, 120> skyboxVertices{
+        // positions
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+        1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f,  1.0f,
+        1.0f,  1.0f,  1.0f,
+        1.0f,  1.0f,  1.0f,
+        1.0f,  1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        1.0f,  1.0f,  1.0f,
+        1.0f,  1.0f,  1.0f,
+        1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+        -1.0f,  1.0f, -1.0f,
+        1.0f,  1.0f, -1.0f,
+        1.0f,  1.0f,  1.0f,
+        1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+        1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+        1.0f, -1.0f,  1.0f
+    };
+
     unsigned int containerVAO{ 0 }, containerVBO{ 0 };
     glGenVertexArrays(1, &containerVAO);
     glGenBuffers(1, &containerVBO);
@@ -242,6 +289,16 @@ int main() {
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)(2 * sizeof(float)));
+    glBindVertexArray(0);
+
+    unsigned int skyboxVAO{ 0 }, skyboxVBO{ 0 };
+    glGenVertexArrays(1, &skyboxVAO);
+    glGenBuffers(1, &skyboxVBO);
+    glBindVertexArray(skyboxVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
     glBindVertexArray(0);
 
     unsigned int framebuffer{ 0 };
@@ -270,23 +327,27 @@ int main() {
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    unsigned int cubeTexture = loadTexture("./assets/marble.jpg");
+    const std::array<std::string, 6> faces{
+        "./assets/skybox/right.jpg",
+        "./assets/skybox/left.jpg",
+        "./assets/skybox/top.jpg",
+        "./assets/skybox/bottom.jpg",
+        "./assets/skybox/front.jpg",
+        "./assets/skybox/back.jpg"
+    };
+
+    // unsigned int cubeTexture = loadTexture("./assets/marble.jpg");
     unsigned int floorTexture = loadTexture("./assets/metal.png");
     // unsigned int grassTexture = loadTexture("./assets/grass.png");
     // unsigned int windowTexture = loadTexture("./assets/blending_transparent_window.png");
     unsigned int containerTexture = loadTexture("./assets/haruhi.jpg");
+    unsigned int cubemapTexture = loadCubeMap(faces);
 
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     shader.use();
     shader.setUniformInt("texture1", 0);
 
     shaderContainer.use();
     shaderContainer.setUniformInt("texture1", 0);
-
-    GLenum err;
-    while ((err = glGetError()) != GL_NO_ERROR) {
-        std::cerr << "OpenGL error: " << err << std::endl;
-    }
 
     while(!glfwWindowShouldClose(window)) {
         const float currentFrame = static_cast<float>(glfwGetTime());
@@ -295,65 +356,86 @@ int main() {
 
         process_input(window);
 
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-        glEnable(GL_DEPTH_TEST);
+        // glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        // glEnable(GL_DEPTH_TEST);
 
         // Mirrored world.
-        glClearColor(.1f, .1f, .1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        shader.use();
+        // glClearColor(.1f, .1f, .1f, 1.0f);
+        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), static_cast<float>(windowWidth) / static_cast<float>(windowHeight), .1f, 100.f);
-        glm::mat4 model = glm::mat4(1.0f);
+        // shader.use();
 
-        // Mirrored-effect by rotating the camera's view 180º degrees.
-        camera.pitch = -camera.pitch;
-        camera.yaw += 180.0f;
-        camera.processMouseMovement(0, 0, false);
-        glm::mat4 view = camera.getViewMatrix();
-        camera.yaw -= 180.0f;
-        camera.pitch = -camera.pitch;
-        camera.processMouseMovement(0, 0, true);
+        // glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), static_cast<float>(windowWidth) / static_cast<float>(windowHeight), .1f, 100.f);
+        // glm::mat4 model = glm::mat4(1.0f);
 
-        // floor
-        glBindVertexArray(planeVAO);
-        glBindTexture(GL_TEXTURE_2D, floorTexture);
-        shader.setMat4("view", view);
-        shader.setMat4("projection", projection);
-        shader.setMat4("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        glBindVertexArray(0);
+        // // Mirrored-effect
+        // camera.pitch = -camera.pitch;
+        // camera.yaw += 180.0f;
+        // camera.processMouseMovement(0, 0, false);
+        // glm::mat4 view = glm::mat4(glm::mat3(camera.getViewMatrix())); //camera.getViewMatrix();
+        // camera.yaw -= 180.0f;
+        // camera.pitch = -camera.pitch;
+        // camera.processMouseMovement(0, 0, true);
 
-        // cubes
-        glBindVertexArray(cubeVAO);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, containerTexture);
-        model = glm::translate(model, glm::vec3(-1.f, .02f, -1.f));
-        shader.setMat4("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        model = glm::mat4(1.f);
-        model = glm::translate(model, glm::vec3(2.f, .02f, 0.f));
-        shader.setMat4("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
+        // // skybox
+        // glDepthMask(GL_FALSE); // Disable writing to the depth buffer.
+        // shaderSkybox.use();
+        // glBindVertexArray(skyboxVAO);
+        // glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        // shaderSkybox.setMat4("projection", projection);
+        // shaderSkybox.setMat4("view", view);
+        // glDrawArrays(GL_TRIANGLES, 0, 36);
+        // glBindVertexArray(0);
+        // glDepthMask(GL_TRUE); // Leave it as it was.
+
+        // // floor
+        // glBindVertexArray(planeVAO);
+        // glBindTexture(GL_TEXTURE_2D, floorTexture);
+        // shader.setMat4("view", view);
+        // shader.setMat4("projection", projection);
+        // shader.setMat4("model", model);
+        // glDrawArrays(GL_TRIANGLES, 0, 6);
+        // glBindVertexArray(0);
+
+        // // cubes
+        // glBindVertexArray(cubeVAO);
+        // glActiveTexture(GL_TEXTURE0);
+        // glBindTexture(GL_TEXTURE_2D, containerTexture);
+        // model = glm::translate(model, glm::vec3(-1.f, .02f, -1.f));
+        // shader.setMat4("model", model);
+        // glDrawArrays(GL_TRIANGLES, 0, 36);
+        // model = glm::mat4(1.f);
+        // model = glm::translate(model, glm::vec3(2.f, .02f, 0.f));
+        // shader.setMat4("model", model);
+        // glDrawArrays(GL_TRIANGLES, 0, 36);
+        // glBindVertexArray(0);
 
         // Once we get here, we have the mirrored world stored in the texture.
         // rear-view mirror.
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        // glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
         glEnable(GL_DEPTH_TEST);
-        glClearColor(.1f, .1f, .1f, 1.0f);
+        glDepthFunc(GL_LEQUAL);
+        glClearColor(1.f, 1.f, 1.f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        model = glm::mat4(1.0f);
-        view = camera.getViewMatrix();
 
-        glBindVertexArray(planeVAO);
-        glBindTexture(GL_TEXTURE_2D, floorTexture);
-        shader.setMat4("view", view);
-        shader.setMat4("projection", projection);
-        shader.setMat4("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        glBindVertexArray(0);
+        glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), static_cast<float>(windowWidth) / static_cast<float>(windowHeight), .1f, 100.f);
+        glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 view = camera.getViewMatrix();
 
+        // model = glm::mat4(1.0f);
+        // // view = camera.getViewMatrix();
+        // view = glm::mat4(glm::mat3(camera.getViewMatrix())); //camera.getViewMatrix();
+
+        // glBindVertexArray(planeVAO);
+        // glBindTexture(GL_TEXTURE_2D, floorTexture);
+        // shader.setMat4("view", view);
+        // shader.setMat4("projection", projection);
+        // shader.setMat4("model", model);
+        // glDrawArrays(GL_TRIANGLES, 0, 6);
+        // glBindVertexArray(0);
+
+        shader.use();
         glBindVertexArray(cubeVAO);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, containerTexture);
@@ -363,13 +445,27 @@ int main() {
         model = glm::mat4(1.f);
         model = glm::translate(model, glm::vec3(2.f, .02f, 0.f));
         shader.setMat4("model", model);
+        shader.setMat4("projection", projection);
+        shader.setMat4("view", view);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
 
-        shaderContainer.use();
-        glBindVertexArray(containerVAO);
-        glBindTexture(GL_TEXTURE_2D, textureColourBuffer);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        view = glm::mat4(glm::mat3(camera.getViewMatrix()));
+        // skybox
+        glDepthMask(GL_FALSE); // Disable writing to the depth buffer.
+        shaderSkybox.use();
+        glBindVertexArray(skyboxVAO);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        shaderSkybox.setMat4("projection", projection);
+        shaderSkybox.setMat4("view", view);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
+        glDepthMask(GL_TRUE); // Leave it as it was.
+
+        // shaderContainer.use();
+        // glBindVertexArray(containerVAO);
+        // glBindTexture(GL_TEXTURE_2D, textureColourBuffer);
+        // glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // Render everything we computed.
         glfwSwapBuffers(window);
@@ -456,6 +552,32 @@ unsigned int loadTexture(const char* const path) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     stbi_image_free(data);
+
+    return textureID;
+}
+
+unsigned int loadCubeMap(const std::array<std::string, 6>& faces) {
+    unsigned int textureID{ 0 };
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    int width{ 0 }, height{ 0 }, nrComponents{ 0 };
+    for(unsigned int i{ 0 }; i < faces.size(); ++i) {
+        unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrComponents, 0);
+        if(!data) {
+            std::cerr << "Failed to load cubeMap, bro.\n";
+            stbi_image_free(data);
+            return 0;
+        }
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        stbi_image_free(data);
+    }
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
     return textureID;
 }
