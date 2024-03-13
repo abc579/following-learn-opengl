@@ -1006,18 +1006,109 @@ This is the visual effect:
 [[./WindingOrderFrontAndBack.png]]
 
 ** Framebuffers
-TODO
+It's a buffer that is stored in the GPU and contains a collection of other buffers, like the _colour buffer_, _stencil
+buffer_, _depth buffer_, etc.
 
-*** Kernel Matrix
+OpenGL has two types of framebuffers:
 
-**** Sharpen
-TODO
+- The default one, provided by OpenGL's context.
+- User-created framebuffers, which are called framebuffer objects (FBOs).
 
-**** Blur
-TODO
+User-created framebuffers (FBOs) are used to create off-screen buffers for rendering later. For example, it's a common
+approach to use FBOs to render a mirrored world.
 
-**** Edge detection
-TODO
+_FBOs are not directly visible_, namely, we cannot see them in the window. _Only the default framebuffer_ has a visual
+output in our window.
+
+#+NAME: Create a framebuffer example
+#+BEGIN_SRC c
+  unsigned int fbo;
+  glGenFramebuffers(1, &fbo);
+  glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+#+END_SRC
+
+Generally, we always bind to GL_FRAMEBUFFER, but we have two more options:
+
+- GL_READ_FRAMEBUFFER: we bind to the framebuffer in read-only mode.
+- GL_DRAW_FRAMEBUFFER: we bind to the framebuffer in write mode.
+
+It's a good idea to always check if the framebuffer is _completed_ before using it. For it to be complete, we need to:
+
+- Attach at least one buffer (colour, stencil and/or depth).
+- There should be at least one colour attachment.
+- All [[Attachment][attachments]] should be complete as well (reserved memory), i.e correctly initialized and sized.
+- Each buffer should have the same number of [[Samples][samples]] when using [[Multisampling][multisampling]].
+
+#+NAME: Checking if the framebuffer is complete
+#+BEGIN_SRC c
+  if(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
+#+END_SRC
+
+**** Attachment
+It's a buffer (memory location) that's used in a framebuffer. We can think of them as _images_. We have two types of
+attachments:
+
+- *Textures attachments*: all rendering commands will write to the texture, as if it was a regular colour/depth
+  buffer. _A great point_ of using using textures as attachments is that _the render output_ is then stored in a texture
+  that we _can later query in our shaders_, like any other texture.
+
+  When creating a texture for a framebuffer attachment, we have to keep in mind some minor details:
+
+  - In the function glTexImage2D, for width and height, we generally put the window's width and height, although this is
+    not necessary.
+  - _We pass nullptr as the data parameter_.
+
+  _If we want to render the whole screen_ to a texture of a smaller or larger size, we'd need to use glViewport before
+  rendering to our framebuffer passing the texture's dimensions. Otherwise, our render commands will only fit one part
+  of the texture.
+
+  After we created the texture, we just need to attach it to the framebuffer:
+
+  #+NAME: Attaching created texture to a framebuffer
+  #+BEGIN_SRC c
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+  #+END_SRC
+
+  _NOTE_: we can also attach a depth and/or stencil buffer. We can combine both using GL_DEPTH_STENCIL_ATTACHMENT.
+
+- *Renderbuffer objects attachments*: it's also a regular buffer, just like texture attachments, but way faster for write
+  operations, although very slow for reading. This is because this type of attachment doesn't work with texture formats
+  or anything, it's manipulated at memory level (bytes), which allows OpenGL to perform optimizations. We can read from
+  it if we want using the glReadPixels function, but it's a _slow_ operation.
+
+  Renderbuffer objects can be moved around very fast. Swapping and copying buffers of this kind is cheap.
+
+  #+NAME: Binding to a renderbuffer object and misc
+  #+BEGIN_SRC c
+    unsigned int rbo;
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+  #+END_SRC
+
+Renderbuffer objects are generally used with depth and stencil buffers when we don't need to sample them. There are
+situations where these two buffers need to get sampled, e.g for [[Shadow Mapping][shadow mapping]] or depth-based post-processing effects.
+
+_NOTE_: Renderbuffer objects can be more efficient for use in your off-screen render projects, but it is important to
+realize when to use renderbuffer objects and when to use textures. The general rule is that if you never need to sample
+data from a specific buffer, it is wise to use a renderbuffer object for that specific buffer. If you need to sample
+data from a specific buffer like colors or depth values, you should use a texture attachment instead.
+
+**** Post-processing
+If we use [[Attachment][texture attachments]], we can do some really cool effects while using the texture attachment in our fragment
+shader.
+
+Some of these effects are:
+
+- Inversion: inverts colours.
+
+- Gray-scale: all colours are black, white and gray.
+
+- Kernel effects: these ones are the most interesting ones. _Another great point of using a texture as an attachment is
+  that we can query other parts of the scene that are not the fragment itself_, allowing us to grab, for example, a small
+  area around the current fragment to tweak its colours a little bit, creating fuzzy visual effects. Popular kernel
+  effects are: sharpen, blur and edge detection.
 
 ** Cubemaps
 TODO
@@ -1503,3 +1594,9 @@ Files stored in this format can contain:
 - Animation data.
 - Cameras.
 - Scene information.
+
+* Samples
+TODO
+
+* Multisampling
+TODO
