@@ -4744,7 +4744,7 @@ class Mesh 25,336
     std::vector<Vertex> vertices;27,357
     std::vector<Texture> textures;28,391
     std::vector<unsigned int> indices;29,426
-    unsigned int VAO{VAO37,671
+    unsigned int VAO{VAO36,662
     unsigned int VBO{VBO38,698
     unsigned int EBO{EBO39,725
 
@@ -15502,8 +15502,8 @@ struct Shader 7,60
 
 include/Model.hpp,139
 class Model 13,184
-    std::vector<Texture> texturesLoaded;20,299
-    std::vector<Mesh> meshes;21,340
+    std::vector<Mesh> meshes;19,290
+    std::vector<Texture> texturesLoaded;20,320
     std::string directory;22,370
 
 src/glad.c,23741
@@ -15945,19 +15945,19 @@ bool firstMouse 28,685
 float lastX 29,709
 float lastY 30,742
 int main(34,822
-void framebuffer_size_callback(133,4634
-void process_input(137,4766
-void mouse_callback(151,5468
-void scroll_callback(166,5989
-unsigned int loadTexture(171,6159
-unsigned int loadCubeMap(212,7517
+void framebuffer_size_callback(182,6685
+void process_input(186,6817
+void mouse_callback(200,7519
+void scroll_callback(215,8040
+unsigned int loadTexture(220,8210
+unsigned int loadCubeMap(261,9568
 
 src/Mesh.cpp,86
 Mesh::Mesh(8,90
 void Mesh::draw(draw15,319
 void Mesh::setupMesh(setupMesh43,1192
 
-src/Shader.cpp,367
+src/Shader.cpp,406
 Shader::Shader(Shader8,121
 Shader::Shader(Shader69,2319
 void Shader::use(use153,5447
@@ -15967,6 +15967,7 @@ void Shader::setUniformFloat(setUniformFloat165,5768
 void Shader::setMat4(setMat4169,5906
 void Shader::setVec3(setVec3173,6074
 void Shader::setVec3(setVec3177,6242
+void Shader::setVec2(setVec2181,6391
 
 src/Model.cpp,314
 static unsigned int textureFromFile(12,180

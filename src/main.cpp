@@ -62,29 +62,70 @@ int main() {
 
     glViewport(0, 0, windowWidth, windowHeight);
 
-    Model backpackModel("./assets/backpack/backpack.obj");
+    Shader planetShader("./shaders/planetShader.vs", "./shaders/planetShader.fs");
+    Shader asteroidShader("./shaders/asteroidShader.vs", "./shaders/asteroidShader.fs");
 
-    Shader geometryShader("./shaders/geometryTest.vs", "./shaders/geometryTest.gs", "./shaders/geometryTest.fs");
-    Shader normalShader("./shaders/modelLoading.vs", "./shaders/modelLoading.fs");
+    constexpr unsigned int totalAsteroids{ 1000 };
+    std::array <glm::mat4, totalAsteroids> modelMatrices;
+    std::srand(static_cast<unsigned int>(glfwGetTime()));
+    constexpr float radius{ 150.f };
+    constexpr float offset{ 2.5f };
 
-    constexpr std::array<float, 20> points{
-        -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, // top-left
-         0.5f,  0.5f, 0.0f, 1.0f, 0.0f, // top-right
-         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // bottom-right
-        -0.5f, -0.5f, 1.0f, 1.0f, 0.0f  // bottom-left
-    };
+   for(unsigned int i = 0; i < modelMatrices.size(); ++i) {
+        glm::mat4 model = glm::mat4(1.f);
+        // 1. translation
+        const float angle{ static_cast<float>(i) / static_cast<float>(totalAsteroids) * 360.f };
+        float displacement{ (std::rand() % (int)(2 * offset * 100)) / 100.0f - offset };
+        const float x{ std::sin(angle) * radius + displacement };
+        displacement = (std::rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+        const float y{ displacement * 0.4f }; // keep height of field smaller compared to width of x and z
+        displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+        const float z{ std::cos(angle) * radius + displacement };
+        model = glm::translate(model, glm::vec3(x, y, z));
 
-    unsigned int pointsVAO{ 0 }, pointsVBO{ 0 };
-    glGenVertexArrays(1, &pointsVAO);
-    glGenBuffers(1, &pointsVBO);
-    glBindVertexArray(pointsVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, pointsVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(points), &points, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(5 * sizeof(float)));
-    glBindVertexArray(0);
+        // 2. scale
+        const float scale{ (std::rand() % 20) / 100.f + 0.05f };
+        model = glm::scale(model, glm::vec3(scale));
+
+        // 3. rotation
+        const float rotationAngle{ static_cast<float>(std::rand() % 360) };
+        model = glm::rotate(model, rotationAngle, glm::vec3(.4f, .6f, .8f));
+
+        // 4. add to the array
+        modelMatrices[i] = model;
+    }
+
+    unsigned int buffer{ 0 };
+    glGenBuffers(1, &buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer);
+    glBufferData(GL_ARRAY_BUFFER, totalAsteroids * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
+
+    Model planetModel("./assets/planet/planet.obj");
+    Model asteroidModel("./assets/rock/rock.obj");
+
+    constexpr auto vec4Size{ sizeof(glm::vec4) };
+
+    for(unsigned int i = 0; i < asteroidModel.meshes.size(); ++i) {
+        const auto VAO = asteroidModel.meshes[i].VAO;
+        glBindVertexArray(VAO);
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(1 * vec4Size));
+        glEnableVertexAttribArray(5);
+        glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * vec4Size));
+        glEnableVertexAttribArray(6);
+        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * vec4Size));
+
+        glVertexAttribDivisor(3, 1);
+        glVertexAttribDivisor(4, 1);
+        glVertexAttribDivisor(5, 1);
+        glVertexAttribDivisor(6, 1);
+
+        glBindVertexArray(0);
+    }
+
+    glEnable(GL_DEPTH_TEST);
 
     while(!glfwWindowShouldClose(window)) {
         const float currentFrame = static_cast<float>(glfwGetTime());
@@ -96,29 +137,36 @@ int main() {
         glClearColor(.1f, .1f, .1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 projection = glm::perspective(glm::radians(45.f), static_cast<float>(windowWidth) / static_cast<float>(windowHeight), .1f, 100.f);
-        glm::mat4 view = camera.getViewMatrix();
-        glm::mat4 model = glm::mat4(1.f);
+        glm::mat4 projection{ glm::perspective(glm::radians(45.f), static_cast<float>(windowWidth) / windowHeight, .1f, 1000.f) };
+        glm::mat4 view{ camera.getViewMatrix() };
+        glm::mat4 model{ glm::mat4(1.f) };
 
-        normalShader.use();
-        normalShader.setMat4("projection", projection);
-        normalShader.setMat4("view", view);
-        normalShader.setMat4("model", model);
-        normalShader.setVec3("viewerPosition", camera.position);
-        normalShader.setVec3("directionalLight.position", glm::vec3(0.f, 1.f, 0.f));
-        normalShader.setVec3("directionalLight.colour", glm::vec3(1.f, 1.f, 1.f));
-        normalShader.setVec3("directionalLight.ambient", glm::vec3(1.f, 1.f, 1.f));
-        normalShader.setVec3("directionalLight.specular", glm::vec3(.3f, .3f, .3f));
-        normalShader.setVec3("directionalLight.diffuse", glm::vec3(1.f, 1.f, 1.f));
-        backpackModel.draw(normalShader);
+        planetShader.use();
+        planetShader.setMat4("projection", projection);
+        planetShader.setMat4("view", view);
+        model = glm::translate(model, glm::vec3(0.f, -3.f, 0.f));
+        model = glm::scale(model, glm::vec3(4.f, 4.f, 4.f));
+        planetShader.setMat4("model", model);
+        planetModel.draw(planetShader);
 
-        geometryShader.use();
-        geometryShader.setMat4("projection", projection);
-        geometryShader.setMat4("view", view);
-        geometryShader.setMat4("model", model);
+        asteroidShader.use();
+        asteroidShader.setMat4("projection", projection);
+        asteroidShader.setMat4("view", view);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, asteroidModel.texturesLoaded[0].id);
+        for(unsigned int i = 0; i < asteroidModel.meshes.size(); ++i) {
+            glBindVertexArray(asteroidModel.meshes[i].VAO);
+            glDrawElementsInstanced(GL_TRIANGLES, asteroidModel.meshes[i].indices.size(), GL_UNSIGNED_INT, 0, totalAsteroids);
+            glBindVertexArray(0);
+        }
 
-        geometryShader.setUniformFloat("time", static_cast<float>(glfwGetTime()));
-        backpackModel.draw(geometryShader);
+        // asteroidShader.use();
+        // for(unsigned int i = 0; i < totalAsteroids; ++i) {
+        //     asteroidShader.setMat4("model", modelMatrices[i]);
+        //     asteroidShader.setMat4("projection", projection);
+        //     asteroidShader.setMat4("view", view);
+        //     asteroidModel.draw(asteroidShader);
+        // }
 
         // Render everything we computed.
         glfwSwapBuffers(window);

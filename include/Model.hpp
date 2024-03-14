@@ -16,9 +16,9 @@ public:
 
     void draw(Shader& shader) const;
 
-private:
-    std::vector<Texture> texturesLoaded;
     std::vector<Mesh> meshes;
+    std::vector<Texture> texturesLoaded;
+private:
     std::string directory;
 
     void loadModel(const std::string& path);

@@ -33,8 +33,8 @@ public:
 
     void draw(Shader& shader) const;
 
-private:
     unsigned int VAO{ 0 };
+private:
     unsigned int VBO{ 0 };
     unsigned int EBO{ 0 };
 
