@@ -15935,7 +15935,7 @@ static int find_extensionsGL(1057,57652
 static void find_coreGL(1064,57762
 int gladLoadGLLoader(1118,59593
 
-src/main.cpp,445
+src/main.cpp,439
 #define STB_IMAGE_IMPLEMENTATION13,202
 constexpr int windowWidth 23,567
 constexpr int windowHeight 24,601
@@ -15945,27 +15945,28 @@ bool firstMouse 28,685
 float lastX 29,709
 float lastY 30,742
 int main(34,822
-void framebuffer_size_callback(487,18912
-void process_input(491,19044
-void mouse_callback(505,19746
-void scroll_callback(520,20267
-unsigned int loadTexture(525,20437
-unsigned int loadCubeMap(566,21795
+void framebuffer_size_callback(133,4634
+void process_input(137,4766
+void mouse_callback(151,5468
+void scroll_callback(166,5989
+unsigned int loadTexture(171,6159
+unsigned int loadCubeMap(212,7517
 
 src/Mesh.cpp,86
 Mesh::Mesh(8,90
 void Mesh::draw(draw15,319
 void Mesh::setupMesh(setupMesh43,1192
 
-src/Shader.cpp,329
+src/Shader.cpp,367
 Shader::Shader(Shader8,121
-void Shader::use(use69,2319
-void Shader::setUniformBool(setUniformBool73,2365
-void Shader::setUniformInt(setUniformInt77,2506
-void Shader::setUniformFloat(setUniformFloat81,2640
-void Shader::setMat4(setMat485,2778
-void Shader::setVec3(setVec389,2946
-void Shader::setVec3(setVec393,3114
+Shader::Shader(Shader69,2319
+void Shader::use(use153,5447
+void Shader::setUniformBool(setUniformBool157,5493
+void Shader::setUniformInt(setUniformInt161,5634
+void Shader::setUniformFloat(setUniformFloat165,5768
+void Shader::setMat4(setMat4169,5906
+void Shader::setVec3(setVec3173,6074
+void Shader::setVec3(setVec3177,6242
 
 src/Model.cpp,314
 static unsigned int textureFromFile(12,180

@@ -8,6 +8,7 @@ struct Shader {
     unsigned int id;
 
     explicit Shader(const std::string& vertexPath, const std::string& fragmentPath);
+    explicit Shader(const std::string& vertexPath, const std::string& geometryPath, const std::string& fragmentPath);
 
     void use();
     void setUniformBool(const std::string& name, bool val) const;

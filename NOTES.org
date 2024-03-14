@@ -231,6 +231,11 @@ The benefits of this approach is that we can be less verbose and save memory.
 *** Wireframe Mode
 It's a mode that draws only the edges of triangles.
 
+#+NAME: Activating wireframe mode
+#+BEGIN_SRC c
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+#+END_SRC
+
 *** Uniforms
 Are global variables that live within shaders. They're useful when we need to change something -like a color- every
 frame or to pass information between shaders, since they're shared among all shaders that are linked together.
@@ -1111,18 +1116,114 @@ Some of these effects are:
   effects are: sharpen, blur and edge detection.
 
 ** Cubemaps
-TODO
+It's a special kind of texture that is formed of six other textures.
+
+Each texture represents a side of a cube, and all of them together form a single cube.
+
+_These special textures have the property that can be indexed/sampled using a direction vector_. The magnitude of such
+direction vector doesn't matter, OpenGL only cares about its direction. As long as we supply the direction, OpenGL is
+able to retrieve the corresponding texel value.
+
+For cubes and as long as they're centered on the origin, we can use its coordinates to access the right face of the
+cubemap.
+
+The process of creating a cubemap is similar to any other texture:
+
+#+NAME Creating a cubemap
+#+BEGIN_SRC c
+  unsigned int textureID;
+  glGenTextures(1, &textureID);
+  glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+#+END_SRC
+
+Then, we need to specify the right image for each side (6) of the cubemap:
+
+#+NAME Creating a cubemap
+#+BEGIN_SRC c
+  int width, height, nrChannels;
+  unsigned char *data;
+  for(unsigned int i = 0; i < textures_faces.size(); i++) {
+      data = stbi_load(textures_faces[i].c_str(), &width, &height, &nrChannels, 0);
+      glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                   0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+   }
+#+END_SRC
+
+Don't forget to specify its wrapping and filtering methods:
+
+#+NAME Creating a cubemap
+#+BEGIN_SRC c
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+#+END_SRC
+
+The rest, that is, activating and binding the cubemap before rendering it, is the same as with any other texture.
+
+The only thing that changes is that in our shaders the texture is a samplerCube, not a sampler2D.
 
 *** Skybox
-TODO
+This is a perfect use-case for cubemaps. It's a large cubemap that encompasses the whole screen, giving the illusion of
+an endless world.
+
+It's a bit tricky to get it to work correctly, though.
+
+What we want to do is to center the skybox around the player's position every frame, giving them the sensation of this
+very large world. If we were to just render the skybox, it would get closer to the player when the player moves because
+of how the view matrix transforms all of the skybox's positions by rotating, scaling and translating them.
+
+_So, to accomplish this, what we need to do is to remove the translation section of the transformation matrices by
+taking the upper-left 3x3 matrix of the 4x4 matrix_. This is done like this:
+
+#+NAME Getting the upper-left 3x3 matrix of the 4x4 view matrix.
+#+BEGIN_SRC cpp
+  glm::mat4 view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
+#+END_SRC
+
+_This removes any translation and keeps the rotation factor within the matrix, so the user can look around_.
+
+Initially, the skybox was rendered first, which meant the computer had to calculate and draw every pixel on the screen,
+even though only a small part of the skybox would be visible. This was not very efficient because it used up a lot of
+processing power.
+
+To make it more efficient, the skybox is now rendered last. This means that by the time the skybox is rendered, the
+computer already knows where all the other objects in the scene are, so it can skip drawing parts of the skybox that are
+behind these objects. This is done by using a technique that makes the skybox appear to be very far away, so it only
+gets drawn in areas where there are no other objects.
+
+However, there's a problem: the skybox is a small cube, so it might still appear in front of other objects because it's
+very close to the camera. To solve this, the depth buffer (which keeps track of how far away objects are) is tricked
+into thinking the skybox is very far away. This is done by setting the depth value of the skybox to the maximum possible
+value, which is 1.0. This way, the skybox will only be drawn in areas where there are no other objects in front of it,
+making the rendering process more efficient
+
+This is done in the vertex shader:
+
+#+NAME Changing skybox's cube Z component to be its W.
+#+BEGIN_SRC glsl
+void main() {
+    TexCoords = aPos;
+    vec4 pos = projection * view * vec4(aPos, 1.0);
+    gl_Position = pos.xyww;
+}
+#+END_SRC
+
+We'd also have to change the depth function for it to be: GL_LEQUAL instead of the default GL_LESS.
 
 *** Environment Mapping
-TODO
 
 **** Reflection
 TODO
 
 **** Refraction
+TODO
+
+*** Geometry Shader
+TODO
+
+*** Instancing
 TODO
 
 ** Mathematics

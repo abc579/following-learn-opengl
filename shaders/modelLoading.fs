@@ -33,19 +33,19 @@ uniform sampler2D texture_specular0;
 uniform sampler2D texture_shininess0;
 
 uniform DirectionalLight directionalLight;
-uniform SpotlightLight spotlightLight;
+// uniform SpotlightLight spotlightLight;
 
 uniform vec3 viewerPosition;
 
 vec3 gNormal = normalize(Normal);
 
 vec3 computeDirectionalLight(DirectionalLight light);
-vec3 computeSpotlightLight(SpotlightLight light);
+// vec3 computeSpotlightLight(SpotlightLight light);
 
 void main() {
     vec3 result = computeDirectionalLight(directionalLight);
 
-    result += computeSpotlightLight(spotlightLight);
+    // result += computeSpotlightLight(spotlightLight);
 
     FragColor = vec4(result, 1.0);
 }
@@ -66,6 +66,7 @@ vec3 computeDirectionalLight(DirectionalLight light) {
     return ambient + diffuse + specular;
 }
 
+/*
 vec3 computeSpotlightLight(SpotlightLight light) {
     float dist = length(light.position - FragmentWorldSpaceCoordinates);
     float attenuation = 1.0 / (light.constant + light.linear * dist + light.quadratic * dist * dist);
@@ -93,7 +94,7 @@ vec3 computeSpotlightLight(SpotlightLight light) {
     return ambient + diffuse + specular;
 }
 
-/*
+
 struct Material {
     sampler2D diffuse;
     sampler2D specular;
