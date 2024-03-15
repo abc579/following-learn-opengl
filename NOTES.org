@@ -1226,6 +1226,9 @@ TODO
 *** Instancing
 TODO
 
+*** Anti Aliasing
+TODO
+
 ** Mathematics
 *** Basics of Trigonometry
 Trigonometry means the study of triangles.

@@ -15935,7 +15935,7 @@ static int find_extensionsGL(1057,57652
 static void find_coreGL(1064,57762
 int gladLoadGLLoader(1118,59593
 
-src/main.cpp,439
+src/main.cpp,441
 #define STB_IMAGE_IMPLEMENTATION13,202
 constexpr int windowWidth 23,567
 constexpr int windowHeight 24,601
@@ -15945,12 +15945,12 @@ bool firstMouse 28,685
 float lastX 29,709
 float lastY 30,742
 int main(34,822
-void framebuffer_size_callback(182,6685
-void process_input(186,6817
-void mouse_callback(200,7519
-void scroll_callback(215,8040
-unsigned int loadTexture(220,8210
-unsigned int loadCubeMap(261,9568
+void framebuffer_size_callback(252,8638
+void process_input(256,8770
+void mouse_callback(270,9472
+void scroll_callback(285,9993
+unsigned int loadTexture(290,10163
+unsigned int loadCubeMap(331,11521
 
 src/Mesh.cpp,86
 Mesh::Mesh(8,90
