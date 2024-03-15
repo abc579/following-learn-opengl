@@ -1213,15 +1213,237 @@ void main() {
 We'd also have to change the depth function for it to be: GL_LEQUAL instead of the default GL_LESS.
 
 *** Environment Mapping
+It's the technique of simulating reflective or refractive properties of an objects' surroundings on its surface using [[Cubemaps][cubemaps]].
 
 **** Reflection
-TODO
+It's a phenomenom that happens where light bounces off a surface of an object. To simulate reflection in OpenGL, we need
+four things:
+
+1. A cubemap, which is the object that represents the environment of that object. It has to have a texture attached to
+   it.
+2. A vector that represents the viewer's direction towards the object. This is computed as the difference of fragment's
+   position minus the camera's position. (I)
+3. A normal vector that is perpendicular to the object's surface. (N)
+4. The reflection vector, which is computed as the difference of the viewer's direction vector minus the normal
+   vector. This vector points in the direction that light bounces off the surface and it will point to the right
+   cubemap's texel. (R)
+
+After computing the reflection vector, the only thing we need to do in our fragment shader is to sample the
+corresponding texel of the cubemap, which will give us the right colour to show in the object's surface.
+
+Here's the code that calculates reflection:
+
+#+NAME Computing reflection, fragment shader
+#+BEGIN_SRC glsl
+  #version 330 core
+  out vec4 FragColor;
+
+  in vec3 Normal;
+  in vec3 Position;
+
+  uniform vec3 cameraPos;
+  uniform samplerCube skybox;
+
+  void main() {
+      vec3 I = normalize(Position - cameraPos);
+      vec3 R = reflect(I, normalize(Normal));
+      FragColor = vec4(texture(skybox, R).rgb, 1.0);
+  }
+#+END_SRC
+
+Because we're dealing with world-space coordinates here, we have to keep that in mind in our fragment vertex shader:
+
+#+NAME Computing reflection, vertex shader
+#+BEGIN_SRC glsl
+  #version 330 core
+  layout (location = 0) in vec3 aPos;
+  layout (location = 1) in vec3 aNormal;
+
+  out vec3 Normal;
+  out vec3 Position;
+
+  uniform mat4 model;
+  uniform mat4 view;
+  uniform mat4 projection;
+
+  void main() {
+      Normal = mat3(transpose(inverse(model))) * aNormal;
+      Position = vec3(model * vec4(aPos, 1.0));
+      gl_Position = projection * view * vec4(Position, 1.0);
+  }
+#+END_SRC
+
+#+CAPTION: Reflection.png
+#+NAME: Reflection.png
+[[./Reflection.png]]
 
 **** Refraction
-TODO
+It's a phenomenom that happens where light rays changes it's direction when they pass through an object's
+material. Depending on the material, the direction could vary significantly or not.
+
+The lower the _refractive index_, the less the light rays will disperse after going through the material.
+
+Refraction is explained by _Snell's Law_.
+
+The information that we need to simulate refraction is the same as [[Reflection][reflection]]. The only thing that changes is that we
+use the _refract_ function instead of _reflect_.
+
+#+NAME Computing refraction, fragment shader
+#+BEGIN_SRC glsl
+  void main() {
+      float ratio = 1.00 / 1.52; // 1.00 -> air, 1.52 -> glass
+      vec3 I = normalize(Position - cameraPos);
+      vec3 R = refract(I, normalize(Normal), ratio);
+      FragColor = vec4(texture(skybox, R).rgb, 1.0);
+  }
+#+END_SRC
+
+Materials ratios are given in this table:
+
+#+CAPTION: RefractiveIndices.png
+#+NAME: RefractiveIndices.png
+[[./RefractiveIndices.png]]
+
+#+CAPTION: Refraction.png
+#+NAME: Refraction.png
+[[./Refraction.png]]
 
 *** Geometry Shader
-TODO
+It's a stage within the graphics processing pipeline that comes after the _vertex shader_ and before the _fragment
+shader_. Like in those two, we can use our own shaders in here.
+
+This stage receives as input a collection of vertices -that form a primitive- and its goal is to generate shapes based
+on those vertices.
+
+Sometimes, this stage also generates or edits vertices and shapes to improve the overall performance of the pipeline.
+
+In some cases, we can also use this stage to create cool effects, for example:
+
+- Making objects explode/implode.
+- Drawing normals for debugging.
+
+#+NAME Example of basic geometry shader
+#+BEGIN_SRC glsl
+#version 330 core
+layout (points) in;
+layout (line_strip, max_vertices = 2) out;
+
+void main() {
+    gl_Position = gl_in[0].gl_Position + vec4(-0.1, 0.0, 0.0, 0.0);
+    EmitVertex();
+
+    gl_Position = gl_in[0].gl_Position + vec4( 0.1, 0.0, 0.0, 0.0);
+    EmitVertex();
+
+    EndPrimitive();
+}
+#+END_SRC
+
+Let's explain this code snippet:
+
+- *layout(points) in*: it specifies the type of primitive input for our geometry shader. In this case, by specifying
+  _points_, we're saying that the callee is using GL_POINTS when drawing primitives. In other words, input vertices form
+  points in the scene.
+
+  There are different options:
+
+  - _points_: when drawing GL_POINTS.
+  - _lines_: when drawing GL_LINES or GL_LINE_STRIP.
+  - _lines_adjacency_: when drawing GL_LINES_ADJACENCY or GL_LINE_STRIP_ADJACENCY.
+  - _triangles_: when drawing GL_TRIANGLES, GL_TRIANGLE_STRIP or GL_TRIANGLE_FAN.
+  - _triangles_adjacency_: when drawing GL_TRIANGLES_ADJACENCY or GL_TRIANGLE_STRIP_ADJACENCY.
+
+- *layout(line_strip, max_vertices = 2) out*: it specifies the type of output we're going to produce and also the maximum
+  amount of vertices. It can have these values:
+
+  - points
+  - line_strip
+  - triangle_strip
+
+- *gl_in[]*: it contains the output of the previous shader stage, namely, the vertex shader. It's an array that contains
+  the vertices that form a single primitive. Its components are:
+
+  - *gl_Position*: it contains the vector position of the vertex that was produced in the vertex shader.
+  - *gl_PointSize*: it contains the size of the vertex.
+  - *gl_ClipDistance[]*: to perform user-defined clipping.
+
+- *EmitVertex()*: it's a function that allows us to create new vertices. The new vertex is created with the current values
+  of gl_Position.
+
+- *EndPrimitive()*: all emitted vertices with EmitVertex() and now combined to form the primitive.
+
+_A common use of the geometry shader is to output object's normals. This is a good debugging technique because most of
+the times visual bugs are related with incorrect normals._
+
+How do we do that?
+
+- Draw the scene as normal, without the geometry shader.
+- Draw the scene again, but only displaying the normal vectors that we'll generate in the geometry shader. This geometry
+  shader takes as input a triangle and generates 3 lines from them in the direction of their normals.
+
+_The data that the geometry shader receives is in view-space coordinates!_
+
+This would be the corresponding vertex shader, which outputs the normal vector for the geometry shader to use:
+
+#+NAME Vertex shader for drawing normals for debugging purposes
+#+BEGIN_SRC glsl
+  #version 330 core
+  layout (location = 0) in vec3 aPos;
+  layout (location = 1) in vec3 aNormal;
+
+  out VS_OUT {
+      vec3 normal;
+  } vs_out;
+
+  uniform mat4 view;
+  uniform mat4 model;
+
+  void main() {
+      gl_Position = view * model * vec4(aPos, 1.0); 
+      mat3 normalMatrix = mat3(transpose(inverse(view * model)));
+      vs_out.normal = normalize(vec3(vec4(normalMatrix * aNormal, 0.0)));
+  }
+#+END_SRC
+
+#+NAME Geometry shader for drawing normals for debugging purposes
+#+BEGIN_SRC glsl
+#version 330 core
+layout (triangles) in;
+layout (line_strip, max_vertices = 6) out;
+
+in VS_OUT {
+    vec3 normal;
+} gs_in[];
+
+const float MAGNITUDE = 0.4;
+
+uniform mat4 projection;
+
+void GenerateLine(int index) {
+    gl_Position = projection * gl_in[index].gl_Position;
+    EmitVertex();
+    gl_Position = projection * (gl_in[index].gl_Position + 
+                                vec4(gs_in[index].normal, 0.0) * MAGNITUDE);
+    EmitVertex();
+    EndPrimitive();
+}
+
+void main() {
+    GenerateLine(0); // first vertex normal
+    GenerateLine(1); // second vertex normal
+    GenerateLine(2); // third vertex normal
+}
+#+END_SRC
+
+#+NAME Fragment shader for drawing normals for debugging purposes
+#+BEGIN_SRC glsl
+#version 330 core
+out vec4 FragColor;
+
+void main() {
+    FragColor = vec4(1.0, 1.0, 0.0, 1.0);
+}
+#+END_SRC
 
 *** Instancing
 TODO
