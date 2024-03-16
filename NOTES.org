@@ -1446,10 +1446,180 @@ void main() {
 #+END_SRC
 
 *** Instancing
-TODO
+It's an optimization technique that's used when drawing a collection of objects where the mesh data is the same but
+their location, colours, scalation, rotation or something else is different.
+
+For example, if we were draw a forest where all trees share the same meshes, the only thing that really changes is the
+location where we have to put each tree. If we don't use instancing and have, say, 1000 trees, then we'd make 1000 calls
+to the shader, which has a performance penalty.
+
+With instancing, however, we'd only make a single call, reducing CPU-GPU communications.
+
+_How can we do instancing?_
+
+The first thing to do is change these function calls:
+
+- glDrawArrays -> glDrawArraysInstanced
+- glDrawElements -> glDrawElementsInstanced
+
+The second thing we need to do is using the global variable _gl_InstanceID_. This stores the current id of the instance
+being drawn. This variable is accessible in the _vertex shader_.
+
+The third thing we should keep in mind is using _instanced arrays_.
+
+Instanced arrays come in handy when we need to pass different transformation data for each vertex. If we were to use a
+uniform variable to store the data there, we'd reach a limit of the amount of data we can store in the shader pretty
+soon. However, instanced arrays allows us to pass way more data than using uniforms.
+
+They're also very good for performance because the vertex shader won't update the data per each vertex, but rather per
+instance. That means that the GPU will only retrieve new transformation data (that vertex attribute) when the instance
+changes, but not when the vertex changes.
+
+#+NAME Example of setting up instanced arrays and instacing
+#+BEGIN_SRC c
+  // Create a VBO for the array instance.
+  unsigned int instanceVBO;
+  glGenBuffers(1, &instanceVBO);
+  glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * instancesNumber, &translations[0], GL_STATIC_DRAW);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  // Now we set the vertex attribute pointer.
+  glEnableVertexAttribArray(2);
+  glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glVertexAttribDivisor(2, 1); // This tells OpenGL when to update the contents of the vertex attribute to the next element.
+#+END_SRC
+
+The key here is the function _glVertexAttribDivisor_: it tells OpenGL when to update the contents of the vertex attribute
+to the next element. It has two arguments:
+
+- First argument: the vertex attribute in question.
+- Second argument: it's the _attribute divisor_. By default, the attribute divisor is 0 which tells OpenGL to update the
+  content of the vertex attribute each iteration of the vertex shader. By setting this attribute to 1 we're telling
+  OpenGL that we want to update the content of the vertex attribute when we start to render a new instance. By setting
+  it to 2 we'd update the content every 2 instances and so on.
+
+_NOTE_: when we declare a vertex attribute whose size is greater than glm::vec4, then we have to split it up in different
+vertex attributes. For example, if we have to pass a glm::mat4, we'd have to create 4 different vertex attributes.
 
 *** Anti Aliasing
-TODO
+Aliasing is the effect that we can see in some games where object's borders sometimes look with a jagged saw-like
+pattern.
+
+These jagged edges appear because of how the rasterizer transforms the vertex data into fragments.
+
+The techniques that try to solve this problem are called anti-aliasing techniques. Nowadays, we have two:
+
+- Super sample anti-aliasing (SSAA): deprecated. Not used anymore because of performance reasons.
+- Multisample anti-aliasing (MSAA): builds on top of SSAA.
+
+**** MSAA
+MSAA (Multisample Anti-Aliasing) is an anti-aliasing technique that enhances the visual quality of rendered images by
+smoothing out jagged edges. It operates by rendering a scene at a higher internal resolution and then downscaling the
+image to match the display resolution. This method is less computationally intensive than SSAA (Supersample
+Anti-Aliasing), making it a more performance-friendly option.
+
+In MSAA, multiple samples are taken per pixel to determine the final color of each pixel. Typically, this involves 2, 4,
+or 8 samples per pixel. The process involves analyzing the pixel geometry edges and computing anti-aliasing values per
+pixel before downscaling the image to the display resolution. The number of samples per pixel directly influences the
+quality of the anti-aliasing effect, with higher sample counts generally resulting in smoother edges but at the cost of
+performance.
+
+The technique works by using the coverage information (how many samples are covered by a pixel) to determine the final
+colour. This process is known as resolving the render target. The resolve process typically involves averaging the
+colours of the covered samples to produce the final colour for each pixel. It's important to note that MSAA doesn't
+directly determine the colour of a pixel based on the number of covered sample points. Instead, it uses the coverage
+information to determine the final colour.
+
+The fragment shader, which is responsible for determining the colour of each pixel, operates on the resolved samples
+rather than the original geometry. The fragment shader does run, but its input is the resolved colour information, not
+the raw geometry data.
+
+MSAA effectively creates a smooth edge effect by averaging the colours of the covered samples, which can reduce the
+appearance of jagged edges in rendered images. However, it's worth noting that MSAA can introduce some blurring effects,
+especially in scenes with high-frequency details or transparency.
+
+In OpenGL we can use MSAA like this:
+
+#+NAME Enabling MSAA for the default framebuffer.
+#+BEGIN_SRC c
+  glfwWindowHint(GLFW_SAMPLES, 4);
+  glEnable(GL_MULTISAMPLE);
+#+END_SRC
+
+If we want to apply MSAA off-screen, we'd have to create our own framebuffer and generate our multisampled buffers.
+
+We have two ways of doing this:
+
+- Using multisampled texture attachments: we need to create our texture as usual first, and then bind it using
+  GL_TEXTURE_2D_MULTISAMPLE:
+
+#+NAME Binding a 2D texture with multisample.
+#+BEGIN_SRC c
+  glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, tex);
+  glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples /* 2, 4, 6, 8 */, GL_RGB, width, height, GL_TRUE);
+  glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+#+END_SRC
+
+Then, to attach this texture to a framebuffer, we'd do:
+
+#+NAME Attaching 2D texture with multisample to a framebuffer
+#+BEGIN_SRC c
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, tex, 0);
+#+END_SRC
+
+- Using multisampled renderbuffer objects: it's the same as creating a regular renderbuffer object but we use
+  glRenderbufferStorageMultisample instead of glRenderbufferStorage:
+
+#+NAME Multisampled renderbuffer object
+#+BEGIN_SRC c
+  glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH24_STENCIL8, width, height);
+#+END_SRC
+
+_To render to our framebuffer, we need to:_
+
+- Resolve the image: calling glBlitFramebuffer, which copies a region from one framebuffer to the other while also
+  resolving any multisampled buffers.
+
+#+NAME: Resolving the image
+#+BEGIN_SRC c
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, multisampledFBO);
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+  glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST); 
+#+END_SRC
+
+_NOTE_: if we want to use the texture result of a multisampled framebuffer to do post-processing, for example, then we'd
+have to create an intermediate framebuffer object because we _can't use multisampled textures directly in the fragment
+shader_.
+
+This would be an example:
+
+#+NAME: Using an intermediate framebuffer to store the multisampled texture to then use it on our fragment shader.
+#+BEGIN_SRC c
+unsigned int msFBO = CreateFBOWithMultiSampledAttachments();
+// then create another FBO with a normal texture color attachment
+[...]
+glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);
+[...]
+while(!glfwWindowShouldClose(window)) {
+    [...]
+    glBindFramebuffer(msFBO);
+    ClearFrameBuffer();
+    DrawScene();
+    // now resolve multisampled buffer(s) into intermediate FBO
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, msFBO);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    // now scene is stored as 2D texture image, so use that image for post-processing
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    ClearFramebuffer();
+    glBindTexture(GL_TEXTURE_2D, screenTexture);
+    DrawPostProcessingQuad();
+    [...]
+}
+#+END_SRC
 
 ** Mathematics
 *** Basics of Trigonometry
