@@ -29,6 +29,9 @@ bool firstMouse = true;
 float lastX = windowWidth / 2.f;
 float lastY = windowHeight / 2.f;
 
+bool blinn{ false };
+bool blinnKeyPressed{ false };
+
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
 int main() {
@@ -39,7 +42,6 @@ int main() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_SAMPLES, 4);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     auto *window = glfwCreateWindow(windowWidth, windowHeight, "Unloved", nullptr, nullptr);
@@ -64,135 +66,38 @@ int main() {
     glViewport(0, 0, windowWidth, windowHeight);
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_MULTISAMPLE);
 
-    constexpr std::array<float, 120> vertices{
-        // positions
-        -0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-         0.5f,  0.5f, -0.5f,
-         0.5f,  0.5f, -0.5f,
-        -0.5f,  0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
+    constexpr std::array<float, 48> planeVertices{
+        // positions            // normals         // texcoords
+         10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,  10.0f,  0.0f,
+        -10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
+        -10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,   0.0f, 10.0f,
 
-        -0.5f, -0.5f,  0.5f,
-         0.5f, -0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
-        -0.5f, -0.5f,  0.5f,
-
-        -0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-        -0.5f, -0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
-
-         0.5f,  0.5f,  0.5f,
-         0.5f,  0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-
-        -0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f,  0.5f,
-         0.5f, -0.5f,  0.5f,
-        -0.5f, -0.5f,  0.5f,
-        -0.5f, -0.5f, -0.5f,
-
-        -0.5f,  0.5f, -0.5f,
-         0.5f,  0.5f, -0.5f,
-         0.5f,  0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f, -0.5f,
+         10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,  10.0f,  0.0f,
+        -10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,   0.0f, 10.0f,
+         10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,  10.0f, 10.0f,
     };
 
-    constexpr std::array<float, 24> quadVertices{
-        // positions   // texCoords
-        -1.0f,  1.0f,  0.0f, 1.0f,
-        -1.0f, -1.0f,  0.0f, 0.0f,
-         1.0f, -1.0f,  1.0f, 0.0f,
-
-        -1.0f,  1.0f,  0.0f, 1.0f,
-         1.0f, -1.0f,  1.0f, 0.0f,
-         1.0f,  1.0f,  1.0f, 1.0f,
-    };
-
-    unsigned int cubeVAO{ 0 }, cubeVBO{ 0 };
-    glGenVertexArrays(1, &cubeVAO);
-    glGenBuffers(1, &cubeVBO);
-    glBindVertexArray(cubeVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
+    unsigned int planeVAO{ 0 }, planeVBO{ 0 };
+    glGenVertexArrays(1, &planeVAO);
+    glGenBuffers(1, &planeVBO);
+    glBindVertexArray(planeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), &planeVertices[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-    glBindVertexArray(0);
-
-    unsigned int quadVAO{ 0 }, quadVBO{ 0 };
-    glGenVertexArrays(1, &quadVAO);
-    glGenBuffers(1, &quadVBO);
-    glBindVertexArray(quadVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices[0], GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)(2 * sizeof(float)));
-    glBindVertexArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
 
-    constexpr unsigned int samples{ 4 };
+    const unsigned int planeTexture{ loadTexture("./assets/wood.png") };
 
-    unsigned int framebuffer{ 0 };
-    glGenFramebuffers(1, &framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    constexpr glm::vec3 lightPosition(0.f, 0.f, 0.f);
 
-    unsigned int textureColourBufferMultiSampled{ 0 };
-    glGenTextures(1, &textureColourBufferMultiSampled);
-    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureColourBufferMultiSampled);
-    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGB, windowWidth, windowHeight, GL_TRUE);
-    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, textureColourBufferMultiSampled, 0);
-
-    unsigned int rbo{ 0 };
-    glGenRenderbuffers(1, &rbo);
-    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH24_STENCIL8, windowWidth, windowHeight);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-
-    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        std::cerr << "Your framebuffer is not complete, bro.\n";
-        return EXIT_FAILURE;
-    }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    unsigned int intermediateFBO{ 0 };
-    glGenFramebuffers(1, &intermediateFBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
-
-    unsigned int screenTexture{ 0 };
-    glGenTextures(1, &screenTexture);
-    glBindTexture(GL_TEXTURE_2D, screenTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, windowWidth, windowHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);
-
-    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        std::cerr << "Your framebuffer is not complete, bro.\n";
-        return EXIT_FAILURE;
-    }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    Shader shader("./shaders/msaa.vs", "./shaders/msaa.fs");
-    Shader screenShader("./shaders/msaaPost.vs", "./shaders/msaaPost.fs");
-
-    screenShader.use();
-    screenShader.setUniformInt("screenTexture", 0);
+    Shader shader("./shaders/blinnPhong.vs", "./shaders/blinnPhong.fs");
+    shader.use();
+    shader.setUniformInt("planeTexture", 0);
 
     while(!glfwWindowShouldClose(window)) {
         const float currentFrame = static_cast<float>(glfwGetTime());
@@ -204,39 +109,24 @@ int main() {
         glClearColor(.1f, .1f, .1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-        glClearColor(.1f, .1f, .1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glEnable(GL_DEPTH_TEST);
+        const glm::mat4 projection{ glm::perspective(glm::radians(camera.zoom), static_cast<float>(windowWidth) / windowHeight, .1f, 1000.f) };
+        const glm::mat4 view{ camera.getViewMatrix() };
 
-        // 1. Draw scene as normal using multisampled buffers.
-        shader.use();
-        glm::mat4 projection{ glm::perspective(glm::radians(camera.zoom), static_cast<float>(windowWidth) / windowHeight, .1f, 100.f) };
-        glm::mat4 view{ camera.getViewMatrix() };
-        glm::mat4 model{ glm::mat4(1.f) };
-
+        shader.setVec3("viewerPosition", camera.position);
+        shader.setVec3("lightPosition", lightPosition);
         shader.setMat4("projection", projection);
-        shader.setMat4("model", model);
         shader.setMat4("view", view);
-        glBindVertexArray(cubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        // glBindVertexArray(0);
+        shader.setUniformInt("blinn", blinn);
 
-        // 2. Now blit multisampled buffers to normal colourbuffer of intermediate FBO. Image is then stored in screenTexture.
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
-        glBlitFramebuffer(0, 0, windowWidth, windowHeight, 0, 0, windowWidth, windowHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        if(blinn) {
+            std::cout << "you're using blinn, bro" << std::endl;
+        } else {
+            std::cout << "you're not using blinn, bro" << std::endl;
+        }
 
-        // 3. Now render quad with scene's visuals as its texture image.
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glClearColor(1.f, 1.f, 1.f, 1.f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        glDisable(GL_DEPTH_TEST);
-
-        screenShader.use();
+        glBindVertexArray(planeVAO);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, screenTexture);
-        glBindVertexArray(quadVAO);
+        glBindTexture(GL_TEXTURE_2D, planeTexture);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // Render everything we computed.
@@ -264,6 +154,18 @@ void process_input(GLFWwindow* window) {
         camera.processKeyboard(CameraMovementOptions::RIGHT, deltaTime);
     } else if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
         camera.processKeyboard(CameraMovementOptions::LEFT, deltaTime);
+    } else if(glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
+        camera.processKeyboard(CameraMovementOptions::DOWN, deltaTime);
+    } else if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
+        camera.processKeyboard(CameraMovementOptions::UP, deltaTime);
+    }
+
+    if(glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS && !blinnKeyPressed) {
+        blinn = (blinn) ? false : true;
+        blinnKeyPressed = true;
+    }
+    if(glfwGetKey(window, GLFW_KEY_L) == GLFW_RELEASE) {
+        blinnKeyPressed = false;
     }
 }
 

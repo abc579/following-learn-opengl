@@ -11,7 +11,9 @@ enum class CameraMovementOptions {
     FORWARD,
     BACKWARD,
     LEFT,
-    RIGHT
+    RIGHT,
+    UP,
+    DOWN,
 };
 
 constexpr float Yaw{ -90.f };
@@ -95,6 +97,10 @@ public:
             position -= right * velocity;
         } else if(direction == CameraMovementOptions::RIGHT) {
             position += right * velocity;
+        } else if(direction == CameraMovementOptions::UP) {
+            position += up * velocity;
+        } else if(direction == CameraMovementOptions::DOWN) {
+            position -= up * velocity;
         }
 
         // XXX: nasty way of fixing the player to the XZ plane.

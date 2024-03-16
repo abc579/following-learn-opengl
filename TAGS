@@ -4702,30 +4702,32 @@ inline const T &GetGenericProperty(GetGenericProperty75,2635
 inline void SetGenericPropertyPtr(92,3271
 inline bool HasGenericProperty(120,4083
 
-include/Camera.hpp,670
+include/Camera.hpp,703
 enum class CameraMovementOptions 10,157
     FORWARD,11,192
     BACKWARD,12,205
     LEFT,13,219
-    RIGHT14,229
-class Camera 24,540
-    glm::vec3 position;26,563
-    glm::vec3 front;27,587
-    glm::vec3 up;28,608
-    glm::vec3 right;29,626
-    glm::vec3 worldUp;30,647
-    float yaw;33,692
-    float pitch;34,707
-    float movementSpeed;37,748
-    float mouseSensitivity;38,773
-    float zoom;39,801
-    Camera(42,850
-    glm::mat4 getViewMatrix(55,1273
-    glm::mat4 getMyOwnShittyViewMatrix(59,1378
-    void processKeyboard(87,2524
-    void processMouseMovement(104,3203
-    void processMouseScroll(122,3651
-    void updateCameraVectors(133,3859
+    RIGHT,14,229
+    UP,15,240
+    DOWN,16,248
+class Camera 26,559
+    glm::vec3 position;28,582
+    glm::vec3 front;29,606
+    glm::vec3 up;30,627
+    glm::vec3 right;31,645
+    glm::vec3 worldUp;32,666
+    float yaw;35,711
+    float pitch;36,726
+    float movementSpeed;39,767
+    float mouseSensitivity;40,792
+    float zoom;41,820
+    Camera(44,869
+    glm::mat4 getViewMatrix(57,1292
+    glm::mat4 getMyOwnShittyViewMatrix(61,1397
+    void processKeyboard(89,2543
+    void processMouseMovement(110,3422
+    void processMouseScroll(128,3870
+    void updateCameraVectors(139,4078
 
 include/Mesh.hpp,574
 enum class TextureType 7,73
@@ -15935,7 +15937,7 @@ static int find_extensionsGL(1057,57652
 static void find_coreGL(1064,57762
 int gladLoadGLLoader(1118,59593
 
-src/main.cpp,441
+src/main.cpp,509
 #define STB_IMAGE_IMPLEMENTATION13,202
 constexpr int windowWidth 23,567
 constexpr int windowHeight 24,601
@@ -15944,13 +15946,15 @@ float lastFrame 27,661
 bool firstMouse 28,685
 float lastX 29,709
 float lastY 30,742
-int main(34,822
-void framebuffer_size_callback(252,8638
-void process_input(256,8770
-void mouse_callback(270,9472
-void scroll_callback(285,9993
-unsigned int loadTexture(290,10163
-unsigned int loadCubeMap(331,11521
+bool blinn{blinn32,777
+bool blinnKeyPressed{blinnKeyPressed33,798
+int main(37,875
+void framebuffer_size_callback(142,4639
+void process_input(146,4771
+void mouse_callback(172,5989
+void scroll_callback(187,6510
+unsigned int loadTexture(192,6680
+unsigned int loadCubeMap(233,8038
 
 src/Mesh.cpp,86
 Mesh::Mesh(8,90
