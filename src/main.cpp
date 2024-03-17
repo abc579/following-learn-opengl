@@ -66,6 +66,7 @@ int main() {
     glViewport(0, 0, windowWidth, windowHeight);
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_FRAMEBUFFER_SRGB);
 
     constexpr std::array<float, 48> planeVertices{
         // positions            // normals         // texcoords
@@ -117,12 +118,6 @@ int main() {
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
         shader.setUniformInt("blinn", blinn);
-
-        if(blinn) {
-            std::cout << "you're using blinn, bro" << std::endl;
-        } else {
-            std::cout << "you're not using blinn, bro" << std::endl;
-        }
 
         glBindVertexArray(planeVAO);
         glActiveTexture(GL_TEXTURE0);
@@ -202,16 +197,19 @@ unsigned int loadTexture(const char* const path) {
     }
 
     GLenum format = GL_RED;
+    GLenum format2 = GL_RGB;
     if(nrComponents == 1) {
         format = GL_RED;
     } else if(nrComponents == 3) {
-        format = GL_RGB;
+        format = GL_SRGB;
+        // format = GL_RGB;
     } else if(nrComponents == 4) {
-        format = GL_RGBA;
+        format = GL_SRGB_ALPHA;
+        // format = GL_RGBA;
     }
 
     glBindTexture(GL_TEXTURE_2D, textureID);
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format2, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
     if(nrComponents == 4) {
