@@ -20,17 +20,26 @@ float shadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightDirection
     vec3 projectionCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
 
     // Transform NDC to range [0, 1].
-    projectionCoords = projectionCoords * 0.5 + 0.5;
-
-    float closestDepth = texture(shadowMap, projectionCoords.xy).r;
-    float currentDepth = projectionCoords.z;
+    projectionCoords = projectionCoords * 0.5f + 0.5f;
 
     if(projectionCoords.z > 1.f) {
         return 0.f;
     }
 
+    float closestDepth = texture(shadowMap, projectionCoords.xy).r;
+    float currentDepth = projectionCoords.z;
+
+    float shadow = 0.f;
     float bias = max(.05f * (1.f - dot(normal, lightDirection)), .005f);
-    return (currentDepth - bias > closestDepth) ? 1.f : 0.f;
+    vec2 texelSize = 1.f / textureSize(shadowMap, 0);
+    for(int x = -1; x <= 4; ++x) {
+        for(int y = -1; y <= 4; ++y) {
+            float pcfDepth = texture(shadowMap, projectionCoords.xy + vec2(x, y) * texelSize).r;
+            shadow += currentDepth - bias > pcfDepth ? 1.f : 0.f;
+        }
+    }
+
+    return shadow / 36.f; // 9 -> number of iterations
 }
 
 void main() {

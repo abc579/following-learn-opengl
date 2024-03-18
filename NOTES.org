@@ -2074,6 +2074,10 @@ In order:
 - https://blog.johnnovak.net/2016/09/21/what-every-coder-should-know-about-gamma/
 - https://www.cambridgeincolour.com/tutorials/gamma-correction.htm
 - http://blog.wolfire.com/2010/02/Gamma-correct-lighting
+- http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
+- https://www.youtube.com/watch?v=EsccgeUpdsM
+- https://learn.microsoft.com/en-us/windows/win32/dxtecharts/common-techniques-to-improve-shadow-depth-maps?redirectedfrom=MSDN
+- https://www.youtube.com/watch?v=uueB2kVvbHo
 
 We need to understand the explanation and REALLY how the two exercises of the "Transformations" chapter work. If we
 don't, we'll never get good at this.
