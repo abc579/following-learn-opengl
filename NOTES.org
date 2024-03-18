@@ -636,6 +636,12 @@ TODO
 *** Shadow Mapping
 TODO
 
+**** Omnidirectional Shadow Maps
+TODO
+
+**** Cascaded Shadow Maps
+TODO
+
 *** Point Shadows
 TODO
 
