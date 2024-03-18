@@ -15,7 +15,7 @@ uniform sampler2D shadowMap;
 uniform vec3 lightPosition;
 uniform vec3 viewerPosition;
 
-float shadowCalculation(vec4 fragPosLightSpace) {
+float shadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightDirection) {
     // Work with range [-1, 1].
     vec3 projectionCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
 
@@ -25,7 +25,12 @@ float shadowCalculation(vec4 fragPosLightSpace) {
     float closestDepth = texture(shadowMap, projectionCoords.xy).r;
     float currentDepth = projectionCoords.z;
 
-    return (currentDepth > closestDepth) ? 1.f : 0.f;
+    if(projectionCoords.z > 1.f) {
+        return 0.f;
+    }
+
+    float bias = max(.05f * (1.f - dot(normal, lightDirection)), .005f);
+    return (currentDepth - bias > closestDepth) ? 1.f : 0.f;
 }
 
 void main() {
@@ -48,7 +53,7 @@ void main() {
     vec3 specular = specularFactor * lightColour;
 
     // Shadow
-    float shadowFactor = shadowCalculation(fs_in.fragPosLightSpace);
+    float shadowFactor = shadowCalculation(fs_in.fragPosLightSpace, normal, lightDirection);
     vec3 lighting = (ambient + (1.f - shadowFactor) * (diffuse + specular)) * colour;
 
     FragColor = vec4(lighting, 1.f);

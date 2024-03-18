@@ -20,8 +20,8 @@ void scroll_callback(GLFWwindow* , double, double);
 unsigned int loadTexture(const char* const path);
 unsigned int loadCubeMap(const std::array<std::string, 6>& faces);
 
-constexpr int windowWidth = 1920;
-constexpr int windowHeight = 1080;
+constexpr int windowWidth{ 1920 };
+constexpr int windowHeight{ 1080 };
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -79,8 +79,10 @@ int main() {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadowWidth, shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    constexpr std::array<float, 4> borderColour{ 1.f, 1.f, 1.f, 1.f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, &borderColour[0]);
 
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
@@ -191,6 +193,8 @@ int main() {
     lightShader.setUniformInt("diffuseTexture", 0);
     lightShader.setUniformInt("shadowMap", 1);
 
+    // glEnable(GL_CULL_FACE);
+
     while(!glfwWindowShouldClose(window)) {
         const float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
@@ -201,6 +205,7 @@ int main() {
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // glCullFace(GL_BACK);
         // 1. First render to the depth map.
         simpleDepthShader.use();
         simpleDepthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
@@ -215,6 +220,7 @@ int main() {
         glBindVertexArray(planeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
+        // glCullFace(GL_FRONT);
         // First cube.
         model = glm::mat4(1.f);
         model = glm::translate(model, glm::vec3(0.f, 1.5f, 0.f));
@@ -246,6 +252,7 @@ int main() {
         // const glm::mat4 projection{ glm::perspective(glm::radians(camera.zoom), static_cast<float>(windowWidth) / windowHeight, .1f, 100.f) };
         // const glm::mat4 view{ camera.getViewMatrix() };
         // glm::mat4 model{ glm::mat4(1.f) };
+        // glCullFace(GL_BACK);
         glViewport(0, 0, windowWidth, windowHeight);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
