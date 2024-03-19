@@ -15937,24 +15937,31 @@ static int find_extensionsGL(1057,57652
 static void find_coreGL(1064,57762
 int gladLoadGLLoader(1118,59593
 
-src/main.cpp,540
+src/main.cpp,914
 #define STB_IMAGE_IMPLEMENTATION13,202
-constexpr int windowWidth{windowWidth23,567
-constexpr int windowHeight{windowHeight24,602
-float deltaTime 26,639
-float lastFrame 27,663
-bool firstMouse 28,687
-float lastX 29,711
-float lastY 30,744
-bool blinn{blinn32,779
-bool blinnKeyPressed{blinnKeyPressed33,800
-int main(37,877
-void framebuffer_size_callback(314,13659
-void process_input(318,13791
-void mouse_callback(344,15009
-void scroll_callback(359,15530
-unsigned int loadTexture(364,15700
-unsigned int loadCubeMap(408,17151
+static constexpr int windowWidth{windowWidth25,608
+static constexpr int windowHeight{windowHeight26,650
+static float deltaTime 28,694
+static float lastFrame 29,725
+static bool firstMouse 30,756
+static float lastX 31,787
+static float lastY 32,827
+static bool blinn{blinn34,869
+static bool blinnKeyPressed{blinnKeyPressed35,897
+static glm::vec3 lightPosition(0.f, 0.f, 0.f)f39,988
+constexpr unsigned int ShadowWidth{ShadowWidth41,1036
+constexpr unsigned int ShadowWidth{ 1024 }, ShadowHeight{ShadowHeight41,1036
+int main(43,1103
+void framebuffer_size_callback(146,5120
+void process_input(150,5252
+void mouse_callback(176,6470
+void scroll_callback(191,6991
+unsigned int loadTexture(196,7161
+void configureShaderAndMatrices(240,8612
+void renderScene(278,11104
+unsigned int cubeVAO 317,12689
+unsigned int cubeVBO 318,12715
+void renderCube(319,12741
 
 src/Mesh.cpp,86
 Mesh::Mesh(8,90
