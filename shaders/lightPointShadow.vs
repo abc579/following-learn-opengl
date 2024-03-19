@@ -14,9 +14,15 @@ uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
 
+uniform bool reverse_normals;
+
 void main() {
     vs_out.FragPos = vec3(model * vec4(aPos, 1.f));
-    vs_out.Normal = transpose(inverse(mat3(model))) * aNormal;
+    if(reverse_normals) {
+        vs_out.Normal = transpose(inverse(mat3(model))) * (1.f - aNormal);
+    } else {
+        vs_out.Normal = transpose(inverse(mat3(model))) * aNormal;
+    }
     vs_out.TexCoords = aTexCoords;
 
     gl_Position = projection * view * model * vec4(aPos, 1.f);
