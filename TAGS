@@ -15937,21 +15937,22 @@ static int find_extensionsGL(1057,57652
 static void find_coreGL(1064,57762
 int gladLoadGLLoader(1118,59593
 
-src/main.cpp,542
+src/main.cpp,593
 #define STB_IMAGE_IMPLEMENTATION16,271
 static constexpr unsigned int WindowWidth{WindowWidth27,678
 static constexpr unsigned int WindowHeight{WindowHeight28,729
 static bool shadows{shadows29,781
 static bool shadowsKeyPressed{shadowsKeyPressed30,810
 static bool firstMouse{firstMouse35,1022
-int main(40,1118
-void renderScene(167,6472
-void renderCube(205,8140
-void processInput(277,12181
-void framebuffer_size_callback(296,13136
-void mouse_callback(300,13268
-void scroll_callback(319,13765
-unsigned int loadTexture(323,13935
+static glm::vec3 lightPos(0.f, 0.f, 0.f)f41,1198
+int main(43,1241
+void renderScene(178,7023
+void renderCube(216,8691
+void processInput(288,12732
+void framebuffer_size_callback(307,13687
+void mouse_callback(311,13819
+void scroll_callback(330,14316
+unsigned int loadTexture(334,14486
 
 src/Mesh.cpp,86
 Mesh::Mesh(8,90

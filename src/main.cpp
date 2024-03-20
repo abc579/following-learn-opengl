@@ -157,6 +157,15 @@ int main() {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
         renderScene(shader);
+        // Render my light cube
+        pointLightCube.use();
+        pointLightCube.setMat4("projection", projection);
+        pointLightCube.setMat4("view", view);
+        glm::mat4 model{ glm::mat4(1.f) };
+        model = glm::translate(model, lightPos);
+        model = glm::scale(model, glm::vec3(.3f));
+        pointLightCube.setMat4("model", model);
+        renderCube();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
