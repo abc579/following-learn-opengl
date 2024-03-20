@@ -645,6 +645,9 @@ TODO
 *** Point Shadows
 TODO
 
+*** Normal Mapping
+TODO
+
 *** Global Illumination Algorithms
 Algorithms that compute light's behavior when light particles bounce and scatter all around, taking into consideration
 reflection on objects and much more stuff. They're expensive to compute, though, that's why we use a simple algorithm
@@ -2078,6 +2081,7 @@ In order:
 - https://www.youtube.com/watch?v=EsccgeUpdsM
 - https://learn.microsoft.com/en-us/windows/win32/dxtecharts/common-techniques-to-improve-shadow-depth-maps?redirectedfrom=MSDN
 - https://www.youtube.com/watch?v=uueB2kVvbHo
+- http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-13-normal-mapping/
 
 We need to understand the explanation and REALLY how the two exercises of the "Transformations" chapter work. If we
 don't, we'll never get good at this.

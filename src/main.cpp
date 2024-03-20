@@ -21,13 +21,9 @@ static void mouse_callback(GLFWwindow*, double, double);
 static void scroll_callback(GLFWwindow*, double, double);
 static void processInput(GLFWwindow*);
 [[nodiscard]] static unsigned int loadTexture(const std::string&);
-static void renderScene(const Shader&);
-static void renderCube();
 
 static constexpr unsigned int WindowWidth{ 1920 };
 static constexpr unsigned int WindowHeight{ 1080 };
-static bool shadows{ true };
-static bool shadowsKeyPressed{ false };
 
 static Camera camera(glm::vec3(0.f, 0.f, 3.f));
 static float lastX{ static_cast<float>(WindowWidth) / 2.f };
@@ -36,9 +32,6 @@ static bool firstMouse{ true };
 
 static float deltaTime{ 0.f };
 static float lastFrame{ 0.f };
-
-// Put this as a global to change its position and draw the corresponding cube.
-static glm::vec3 lightPos(0.f, 0.f, 0.f);
 
 int main() {
     glfwInit();
@@ -66,46 +59,161 @@ int main() {
     }
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
 
-    Shader shader("./shaders/lightPointShadow.vs", "./shaders/lightPointShadow.fs");
-    Shader simpleDepthShader("./shaders/pointShadow.vs", "./shaders/pointShadow.gs", "./shaders/pointShadow.fs");
-    Shader pointLightCube("./shaders/pointLightCube.vs", "./shaders/pointLightCube.fs");
+    // Positions.
+    glm::vec3 upperLeft(-1.f, 1.f, 0.f); // pos1
+    glm::vec3 bottomLeft(-1.f, -1.f, 0.f); // pos2
+    glm::vec3 bottomRight(1.f, -1.f, 0.f); // pos3
+    glm::vec3 upperRight(1.f, 1.f, 0.f); // pos4
 
-    auto woodTexture = loadTexture("./assets/wood.png");
+    // Texture coordinates.
+    glm::vec2 uv1(0.f, 1.f);
+    glm::vec2 uv2(0.f, 0.f);
+    glm::vec2 uv3(1.f, 0.f);
+    glm::vec2 uv4(1.f, 1.f);
 
-    constexpr unsigned int ShadowWidth{ 1024 }, ShadowHeight{ 1024 };
+    // Normal vector.
+    glm::vec3 normal(0.f, 0.f, 1.f);
 
-    unsigned int depthMapFBO{ 0 };
-    glGenFramebuffers(1, &depthMapFBO);
+    glm::vec3 edge1{ bottomLeft - upperLeft };
+    glm::vec3 edge2{ bottomRight - upperLeft };
+    glm::vec2 deltaUV1{ uv2 - uv1 };
+    glm::vec2 deltaUV2{ uv3 - uv1 };
 
-    unsigned int depthCubemap{ 0 };
-    glGenTextures(1, &depthCubemap);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
-    for(unsigned int i = 0; i < 6; ++i) {
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, ShadowWidth, ShadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-    }
+    float f{ 1.f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y) };
 
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    // Tangent and bitangent for the first triangle.
+    const glm::vec3 tangent1{
+        glm::vec3(f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x),
+                  f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y),
+                  f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z))
+    };
 
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubemap, 0);
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    const glm::vec3 bitangent1{
+        glm::vec3(f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x),
+                  f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y),
+                  f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z))
+    };
+
+    edge1 = bottomRight - upperLeft;
+    edge2 = upperRight - upperLeft;
+    deltaUV1 = uv3 - uv1;
+    deltaUV2 = uv4 - uv1;
+
+    f = 1.f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+    // Tangent and bitangent for the second triangle.
+    const glm::vec3 tangent2{
+        glm::vec3(f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x),
+                  f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y),
+                  f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z))
+    };
+
+    const glm::vec3 bitangent2{
+        glm::vec3(f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x),
+                  f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y),
+                  f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z))
+    };
+
+    const std::array<float, 84> planeVertices{
+        // positions                                 // normal                     // texcoords  // tangent                          // bitangent
+        upperLeft.x, upperLeft.y, upperLeft.z,       normal.x, normal.y, normal.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+        bottomLeft.x, bottomLeft.y, bottomLeft.z,    normal.x, normal.y, normal.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+        bottomRight.x, bottomRight.y, bottomRight.z, normal.x, normal.y, normal.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+
+        upperLeft.x, upperLeft.y, upperLeft.z,       normal.x, normal.y, normal.z, uv1.x, uv1.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+        bottomRight.x, bottomRight.y, bottomRight.z, normal.x, normal.y, normal.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+        upperRight.x, upperRight.y, upperRight.z,    normal.x, normal.y, normal.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z
+    };
+
+    constexpr std::array<float, 108> cubeVertices{
+        // back face
+        -1.0f, -1.0f, -1.0f, // bottom-left
+         1.0f,  1.0f, -1.0f, // top-right
+         1.0f, -1.0f, -1.0f, // bottom-right
+         1.0f,  1.0f, -1.0f, // top-right
+        -1.0f, -1.0f, -1.0f, // bottom-left
+        -1.0f,  1.0f, -1.0f, // top-left
+        // front face
+        -1.0f, -1.0f,  1.0f, // bottom-left
+         1.0f, -1.0f,  1.0f, // bottom-right
+         1.0f,  1.0f,  1.0f, // top-right
+         1.0f,  1.0f,  1.0f, // top-right
+        -1.0f,  1.0f,  1.0f, // top-left
+        -1.0f, -1.0f,  1.0f, // bottom-left
+        // left face
+        -1.0f,  1.0f,  1.0f, // top-right
+        -1.0f,  1.0f, -1.0f, // top-left
+        -1.0f, -1.0f, -1.0f, // bottom-left
+        -1.0f, -1.0f, -1.0f, // bottom-left
+        -1.0f, -1.0f,  1.0f, // bottom-right
+        -1.0f,  1.0f,  1.0f, // top-right
+        // right face
+         1.0f,  1.0f,  1.0f, // top-left
+         1.0f, -1.0f, -1.0f, // bottom-right
+         1.0f,  1.0f, -1.0f, // top-right
+         1.0f, -1.0f, -1.0f, // bottom-right
+         1.0f,  1.0f,  1.0f, // top-left
+         1.0f, -1.0f,  1.0f, // bottom-left
+        // bottom face
+        -1.0f, -1.0f, -1.0f, // top-right
+         1.0f, -1.0f, -1.0f, // top-left
+         1.0f, -1.0f,  1.0f, // bottom-left
+         1.0f, -1.0f,  1.0f, // bottom-left
+        -1.0f, -1.0f,  1.0f, // bottom-right
+        -1.0f, -1.0f, -1.0f, // top-right
+        // top face
+        -1.0f,  1.0f, -1.0f, // top-left
+         1.0f,  1.0f , 1.0f, // bottom-right
+         1.0f,  1.0f, -1.0f, // top-right
+         1.0f,  1.0f,  1.0f, // bottom-right
+        -1.0f,  1.0f, -1.0f, // top-left
+        -1.0f,  1.0f,  1.0f, // bottom-left
+    };
+
+    unsigned int planeVAO{ 0 }, planeVBO{ 0 };
+    glGenVertexArrays(1, &planeVAO);
+    glGenBuffers(1, &planeVBO);
+    glBindVertexArray(planeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
+
+    glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), &planeVertices[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void *)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void *)(3 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void *)(6 * sizeof(float)));
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void *)(8 * sizeof(float)));
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void *)(11 * sizeof(float)));
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    unsigned int cubeVAO{ 0 }, cubeVBO{ 0 };
+    glGenVertexArrays(1, &cubeVAO);
+    glGenBuffers(1, &cubeVBO);
+    glBindVertexArray(cubeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    Shader shader("./shaders/brickwall.vs", "./shaders/brickwall.fs");
+    Shader lightCubeShader("./shaders/pointLightCube.vs", "./shaders/pointLightCube.fs");
+
+    const auto brickwallTexture{ loadTexture("./assets/brickwall.jpg") };
+    const auto brickwallNormalTexture{ loadTexture("./assets/brickwall_normal.jpg") };
 
     shader.use();
     shader.setUniformInt("diffuseTexture", 0);
-    shader.setUniformInt("depthMap", 1);
+    shader.setUniformInt("normalTexture", 1);
 
-    constexpr float NearPlane{ 1.0f };
-    constexpr float FarPlane{ 25.0f };
-
-    glm::mat4 shadowProj{ glm::perspective(glm::radians(90.f), static_cast<float>(ShadowWidth) / ShadowHeight, NearPlane, FarPlane) };
+    glm::vec3 lightPosition{ glm::vec3(.5f, 1.f, .3f) };
 
     while(!glfwWindowShouldClose(window)) {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -114,58 +222,41 @@ int main() {
 
         processInput(window);
 
-        lightPos.z = static_cast<float>(sin(glfwGetTime() * .5f) * 3.f);
-
-        glClearColor(.1f, .1f, .1f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(.3f, .3f, .3f, 1.f);
 
-        const std::array<glm::mat4, 6> shadowTransforms{
-            shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 1.f,  0.f,  0.f), glm::vec3(0.f, -1.f,  0.f)),
-            shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.f,  0.f,  0.f), glm::vec3(0.f, -1.f,  0.f)),
-            shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.f,  1.f,  0.f), glm::vec3(0.f,  0.f,  1.f)),
-            shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.f, -1.f,  0.f), glm::vec3(0.f,  0.f, -1.f)),
-            shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.f,  0.f,  1.f), glm::vec3(0.f, -1.f,  0.f)),
-            shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.f,  0.f, -1.f), glm::vec3(0.f, -1.f,  0.f)),
-        };
+        // lightPosition.z = static_cast<float>(std::cos(glfwGetTime()));
+        // lightPosition.x = static_cast<float>(std::sin(glfwGetTime()));
 
-        glViewport(0, 0, ShadowWidth, ShadowHeight);
-        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        simpleDepthShader.use();
-        for(unsigned int i{ 0 }; i < shadowTransforms.size(); ++i) {
-            simpleDepthShader.setMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
-        }
-        simpleDepthShader.setUniformFloat("far_plane", FarPlane);
-        simpleDepthShader.setVec3("lightPos", lightPos);
-        renderScene(simpleDepthShader);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        glViewport(0, 0, WindowWidth, WindowHeight);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        shader.use();
-        glm::mat4 projection{ glm::perspective(glm::radians(camera.zoom), (float)WindowWidth / (float)WindowHeight, .1f, 100.f) };
+        glm::mat4 projection{ glm::perspective(glm::radians(camera.zoom), static_cast<float>(WindowWidth) / WindowHeight, .1f, 100.f) };
         glm::mat4 view{ camera.getViewMatrix() };
+        glm::mat4 model{ glm::mat4(1.f) };
+
+        shader.use();
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
-        shader.setVec3("lightPos", lightPos);
-        shader.setVec3("viewPos", camera.position);
-        // Enable/disable shadows by pressing SPACE.
-        shader.setUniformInt("shadows", shadows);
-        shader.setUniformFloat("far_plane", FarPlane);
+        shader.setMat4("model", model);
+        shader.setVec3("lightPosition", lightPosition);
+        shader.setVec3("viewerPosition", camera.position);
+
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, woodTexture);
+        glBindTexture(GL_TEXTURE_2D, brickwallTexture);
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
-        renderScene(shader);
-        // Render my light cube
-        pointLightCube.use();
-        pointLightCube.setMat4("projection", projection);
-        pointLightCube.setMat4("view", view);
-        glm::mat4 model{ glm::mat4(1.f) };
-        model = glm::translate(model, lightPos);
+        glBindTexture(GL_TEXTURE_2D, brickwallNormalTexture);
+
+        glBindVertexArray(planeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(0);
+
+        lightCubeShader.use();
+        shader.setMat4("projection", projection);
+        shader.setMat4("view", view);
+        model = glm::translate(model, lightPosition);
         model = glm::scale(model, glm::vec3(.3f));
-        pointLightCube.setMat4("model", model);
-        renderCube();
+        shader.setMat4("model", model);
+        glBindVertexArray(cubeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -173,116 +264,6 @@ int main() {
 
     glfwTerminate();
     return EXIT_SUCCESS;
-}
-
-void renderScene(const Shader& shader) {
-    glm::mat4 model = glm::mat4(1.f);
-    model = glm::scale(model, glm::vec3(5.f));
-    shader.setMat4("model", model);
-    glDisable(GL_CULL_FACE); // note that we disable culling here since we render 'inside' the cube instead of the usual 'outside' which throws off the normal culling methods.
-    shader.setUniformInt("reverse_normals", 1); // A small little hack to invert normals when drawing cube from the inside so lighting still works.
-    renderCube();
-    shader.setUniformInt("reverse_normals", 0); // and of course disable it
-    glEnable(GL_CULL_FACE);
-
-    model = glm::mat4(1.f);
-    model = glm::translate(model, glm::vec3(4.f, -3.5f, 0.f));
-    model = glm::scale(model, glm::vec3(.5f));
-    shader.setMat4("model", model);
-    renderCube();
-    model = glm::mat4(1.f);
-    model = glm::translate(model, glm::vec3(2.f, 3.f, 1.f));
-    model = glm::scale(model, glm::vec3(.75f));
-    shader.setMat4("model", model);
-    renderCube();
-    model = glm::mat4(1.f);
-    model = glm::translate(model, glm::vec3(-3.f, -1.f, 0.f));
-    model = glm::scale(model, glm::vec3(.5f));
-    shader.setMat4("model", model);
-    renderCube();
-    model = glm::mat4(1.f);
-    model = glm::translate(model, glm::vec3(-1.5f, 1.f, 1.5f));
-    model = glm::scale(model, glm::vec3(.5f));
-    shader.setMat4("model", model);
-    renderCube();
-    model = glm::mat4(1.f);
-    model = glm::translate(model, glm::vec3(-1.5f, 2.f, -3.f));
-    model = glm::rotate(model, glm::radians(60.f), glm::normalize(glm::vec3(1.f, 0.f, 1.f)));
-    model = glm::scale(model, glm::vec3(.75f));
-    shader.setMat4("model", model);
-    renderCube();
-}
-
-void renderCube() {
-    static unsigned int cubeVAO{ 0 };
-    static unsigned int cubeVBO{ 0 };
-
-    if(cubeVAO == 0) {
-        std::array<float, 320> vertices{
-            // back face
-            -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
-             1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
-             1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f, // bottom-right
-             1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
-            -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
-            -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f, // top-left
-            // front face
-            -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
-             1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 0.0f, // bottom-right
-             1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
-             1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
-            -1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 1.0f, // top-left
-            -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
-            // left face
-            -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
-            -1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-left
-            -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
-            -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
-            -1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-right
-            -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
-            // right face
-             1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
-             1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
-             1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-right
-             1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
-             1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
-             1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-left
-            // bottom face
-            -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
-             1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f, // top-left
-             1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
-             1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
-            -1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f, // bottom-right
-            -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
-            // top face
-            -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
-             1.0f,  1.0f , 1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
-             1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f, // top-right
-             1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
-            -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
-            -1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left
-        };
-
-        glGenVertexArrays(1, &cubeVAO);
-        glGenBuffers(1, &cubeVBO);
-
-        glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
-
-        glBindVertexArray(cubeVAO);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
-    }
-
-    glBindVertexArray(cubeVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
 }
 
 void processInput(GLFWwindow *window) {
@@ -295,12 +276,7 @@ void processInput(GLFWwindow *window) {
     } else if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
         camera.processKeyboard(CameraMovementOptions::LEFT, deltaTime);
     } else if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        camera.processKeyboard(CameraMovementOptions::RIGHT, deltaTime); 
-    } else if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !shadowsKeyPressed) {
-        shadows = !shadows;
-        shadowsKeyPressed = true;
-    } else if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
-        shadowsKeyPressed = false;
+        camera.processKeyboard(CameraMovementOptions::RIGHT, deltaTime);
     }
 }
 
