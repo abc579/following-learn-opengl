@@ -651,6 +651,9 @@ TODO
 *** Parallax Mapping
 TODO
 
+*** HDR
+TODO
+
 *** Global Illumination Algorithms
 Algorithms that compute light's behavior when light particles bounce and scatter all around, taking into consideration
 reflection on objects and much more stuff. They're expensive to compute, though, that's why we use a simple algorithm

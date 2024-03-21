@@ -20,7 +20,7 @@ static void framebuffer_size_callback(GLFWwindow*, int, int);
 static void mouse_callback(GLFWwindow*, double, double);
 static void scroll_callback(GLFWwindow*, double, double);
 static void processInput(GLFWwindow*);
-[[nodiscard]] static unsigned int loadTexture(const std::string&);
+[[nodiscard]] static unsigned int loadTexture(const std::string&, bool);
 
 static constexpr unsigned int WindowWidth{ 1920 };
 static constexpr unsigned int WindowHeight{ 1080 };
@@ -29,9 +29,15 @@ static Camera camera(glm::vec3(0.f, 0.f, 3.f));
 static float lastX{ static_cast<float>(WindowWidth) / 2.f };
 static float lastY{ static_cast<float>(WindowHeight) / 2.f };
 static bool firstMouse{ true };
+static void renderCube();
+static void renderQuad();
 
 static float deltaTime{ 0.f };
 static float lastFrame{ 0.f };
+
+static bool hdr{ true };
+static bool hdrKeyPressed{ false };
+static float exposure{ 1.f };
 
 int main() {
     glfwInit();
@@ -60,163 +66,57 @@ int main() {
 
     glEnable(GL_DEPTH_TEST);
 
-    // Positions.
-    glm::vec3 upperLeft(-1.f, 1.f, 0.f); // pos1
-    glm::vec3 bottomLeft(-1.f, -1.f, 0.f); // pos2
-    glm::vec3 bottomRight(1.f, -1.f, 0.f); // pos3
-    glm::vec3 upperRight(1.f, 1.f, 0.f); // pos4
+    Shader shader("./shaders/hdrLighting.vs", "./shaders/hdrLighting.fs");
+    Shader hdrShader("./shaders/hdrLighting2.vs", "./shaders/hdrLighting2.fs");
 
-    // Texture coordinates.
-    glm::vec2 uv1(0.f, 1.f);
-    glm::vec2 uv2(0.f, 0.f);
-    glm::vec2 uv3(1.f, 0.f);
-    glm::vec2 uv4(1.f, 1.f);
+    const auto woodTexture = loadTexture("./assets/wood.png", true);
 
-    // Normal vector.
-    glm::vec3 normal(0.f, 0.f, 1.f);
+    unsigned int hdrFBO{ 0 };
+    glGenFramebuffers(1, &hdrFBO);
 
-    glm::vec3 edge1{ bottomLeft - upperLeft };
-    glm::vec3 edge2{ bottomRight - upperLeft };
-    glm::vec2 deltaUV1{ uv2 - uv1 };
-    glm::vec2 deltaUV2{ uv3 - uv1 };
+    // Floating point colour buffer.
+    unsigned int colourBuffer{ 0 };
+    glGenTextures(1, &colourBuffer);
+    glBindTexture(GL_TEXTURE_2D, colourBuffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, WindowWidth, WindowHeight, 0, GL_RGBA, GL_FLOAT, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    float f{ 1.f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y) };
+    // Depth buffer (renderbuffer)
+    unsigned int rboDepth{ 0 };
+    glGenRenderbuffers(1, &rboDepth);
+    glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, WindowWidth, WindowHeight);
+    // Attach buffers to renderbuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colourBuffer, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        std::cerr << "Framebuffer isn't complete, bro.\n";
+        return EXIT_FAILURE;
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    // Tangent and bitangent for the first triangle.
-    const glm::vec3 tangent1{
-        glm::vec3(f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x),
-                  f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y),
-                  f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z))
+    // Lighting data
+    constexpr std::array<glm::vec3, 4> lightPositions{
+        glm::vec3( 0.f,   0.f, 49.5f), // back light
+        glm::vec3(-1.4f, -1.9f, 9.f),
+        glm::vec3( 0.f,  -1.8f, 4.f),
+        glm::vec3( 0.8f, -1.7f, 6.f),
     };
 
-    const glm::vec3 bitangent1{
-        glm::vec3(f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x),
-                  f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y),
-                  f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z))
+    constexpr std::array<glm::vec3, 4> lightColours{
+        glm::vec3(200.f, 200.f, 200.f),
+        glm::vec3(  .1f,   0.f, 0.f),
+        glm::vec3(  0.f,   0.f, .2f),
+        glm::vec3(  0.f,   .1f, 0.f),
     };
-
-    edge1 = bottomRight - upperLeft;
-    edge2 = upperRight - upperLeft;
-    deltaUV1 = uv3 - uv1;
-    deltaUV2 = uv4 - uv1;
-
-    f = 1.f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-    // Tangent and bitangent for the second triangle.
-    const glm::vec3 tangent2{
-        glm::vec3(f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x),
-                  f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y),
-                  f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z))
-    };
-
-    const glm::vec3 bitangent2{
-        glm::vec3(f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x),
-                  f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y),
-                  f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z))
-    };
-
-    const std::array<float, 84> planeVertices{
-        // positions                                 // normal                     // texcoords  // tangent                          // bitangent
-        upperLeft.x, upperLeft.y, upperLeft.z,       normal.x, normal.y, normal.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-        bottomLeft.x, bottomLeft.y, bottomLeft.z,    normal.x, normal.y, normal.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-        bottomRight.x, bottomRight.y, bottomRight.z, normal.x, normal.y, normal.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-
-        upperLeft.x, upperLeft.y, upperLeft.z,       normal.x, normal.y, normal.z, uv1.x, uv1.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
-        bottomRight.x, bottomRight.y, bottomRight.z, normal.x, normal.y, normal.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
-        upperRight.x, upperRight.y, upperRight.z,    normal.x, normal.y, normal.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z
-    };
-
-    constexpr std::array<float, 108> cubeVertices{
-        // back face
-        -1.0f, -1.0f, -1.0f, // bottom-left
-         1.0f,  1.0f, -1.0f, // top-right
-         1.0f, -1.0f, -1.0f, // bottom-right
-         1.0f,  1.0f, -1.0f, // top-right
-        -1.0f, -1.0f, -1.0f, // bottom-left
-        -1.0f,  1.0f, -1.0f, // top-left
-        // front face
-        -1.0f, -1.0f,  1.0f, // bottom-left
-         1.0f, -1.0f,  1.0f, // bottom-right
-         1.0f,  1.0f,  1.0f, // top-right
-         1.0f,  1.0f,  1.0f, // top-right
-        -1.0f,  1.0f,  1.0f, // top-left
-        -1.0f, -1.0f,  1.0f, // bottom-left
-        // left face
-        -1.0f,  1.0f,  1.0f, // top-right
-        -1.0f,  1.0f, -1.0f, // top-left
-        -1.0f, -1.0f, -1.0f, // bottom-left
-        -1.0f, -1.0f, -1.0f, // bottom-left
-        -1.0f, -1.0f,  1.0f, // bottom-right
-        -1.0f,  1.0f,  1.0f, // top-right
-        // right face
-         1.0f,  1.0f,  1.0f, // top-left
-         1.0f, -1.0f, -1.0f, // bottom-right
-         1.0f,  1.0f, -1.0f, // top-right
-         1.0f, -1.0f, -1.0f, // bottom-right
-         1.0f,  1.0f,  1.0f, // top-left
-         1.0f, -1.0f,  1.0f, // bottom-left
-        // bottom face
-        -1.0f, -1.0f, -1.0f, // top-right
-         1.0f, -1.0f, -1.0f, // top-left
-         1.0f, -1.0f,  1.0f, // bottom-left
-         1.0f, -1.0f,  1.0f, // bottom-left
-        -1.0f, -1.0f,  1.0f, // bottom-right
-        -1.0f, -1.0f, -1.0f, // top-right
-        // top face
-        -1.0f,  1.0f, -1.0f, // top-left
-         1.0f,  1.0f , 1.0f, // bottom-right
-         1.0f,  1.0f, -1.0f, // top-right
-         1.0f,  1.0f,  1.0f, // bottom-right
-        -1.0f,  1.0f, -1.0f, // top-left
-        -1.0f,  1.0f,  1.0f, // bottom-left
-    };
-
-    unsigned int planeVAO{ 0 }, planeVBO{ 0 };
-    glGenVertexArrays(1, &planeVAO);
-    glGenBuffers(1, &planeVBO);
-    glBindVertexArray(planeVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
-
-    glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), &planeVertices[0], GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void *)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void *)(3 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void *)(6 * sizeof(float)));
-    glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void *)(8 * sizeof(float)));
-    glEnableVertexAttribArray(4);
-    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void *)(11 * sizeof(float)));
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    unsigned int cubeVAO{ 0 }, cubeVBO{ 0 };
-    glGenVertexArrays(1, &cubeVAO);
-    glGenBuffers(1, &cubeVBO);
-    glBindVertexArray(cubeVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices[0], GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    Shader shader("./shaders/brickwall.vs", "./shaders/brickwall.fs");
-    Shader lightCubeShader("./shaders/pointLightCube.vs", "./shaders/pointLightCube.fs");
-
-    const auto brickwallTexture{ loadTexture("./assets/bricks2.jpg") };
-    const auto brickwallNormalTexture{ loadTexture("./assets/bricks2_normal.jpg") };
-    const auto brickwallDisplacementTexture{ loadTexture("./assets/bricks2_disp.jpg") };
 
     shader.use();
     shader.setUniformInt("diffuseTexture", 0);
-    shader.setUniformInt("normalTexture", 1);
-    shader.setUniformInt("depthTexture", 2);
-    shader.setUniformFloat("heightScale", .1f);
 
-    glm::vec3 lightPosition{ glm::vec3(.5f, 1.f, .3f) };
+    hdrShader.use();
+    hdrShader.setUniformInt("hdrBuffer", 0);
 
     while(!glfwWindowShouldClose(window)) {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -226,39 +126,40 @@ int main() {
         processInput(window);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(.3f, .3f, .3f, 1.f);
+        glClearColor(.1f, .1f, .1f, 1.f);
 
+        // First pass, render stuff onto framebuffer.
+        glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glm::mat4 projection{ glm::perspective(glm::radians(camera.zoom), static_cast<float>(WindowWidth) / WindowHeight, .1f, 100.f) };
         glm::mat4 view{ camera.getViewMatrix() };
-        glm::mat4 model{ glm::mat4(1.f) };
-
         shader.use();
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
-        shader.setMat4("model", model);
-        shader.setVec3("lightPosition", lightPosition);
-        shader.setVec3("viewerPosition", camera.position);
-
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, brickwallTexture);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, brickwallNormalTexture);
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, brickwallDisplacementTexture);
-
-        glBindVertexArray(planeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        glBindVertexArray(0);
-
-        lightCubeShader.use();
-        shader.setMat4("projection", projection);
-        shader.setMat4("view", view);
-        model = glm::translate(model, lightPosition);
-        model = glm::scale(model, glm::vec3(.1f));
+        glBindTexture(GL_TEXTURE_2D, woodTexture);
+        for(unsigned int i{ 0 }; i < lightPositions.size(); ++i) {
+            shader.setVec3("lights[" + std::to_string(i) + "].position", lightPositions[i]);
+            shader.setVec3("lights[" + std::to_string(i) + "].colour", lightColours[i]);
+        }
+        shader.setVec3("viewPosition", camera.position);
+        // Tunnel.
+        glm::mat4 model{ glm::mat4(1.f) };
+        model = glm::translate(model, glm::vec3(0.f, 0.f, 25.f));
+        model = glm::scale(model, glm::vec3(2.5f, 2.5f, 27.5f));
         shader.setMat4("model", model);
-        glBindVertexArray(cubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
+        shader.setUniformInt("inverseNormals", true);
+        renderCube();
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // Second pass, render colour buffer to 2D quad and tonemap HDR colours to default framebuffer's clamped colour range (LDR).
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        hdrShader.use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, colourBuffer);
+        hdrShader.setUniformInt("hdr", hdr);
+        hdrShader.setUniformFloat("exposure", exposure);
+        renderQuad();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -279,6 +180,21 @@ void processInput(GLFWwindow *window) {
         camera.processKeyboard(CameraMovementOptions::LEFT, deltaTime);
     } else if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         camera.processKeyboard(CameraMovementOptions::RIGHT, deltaTime);
+    } else if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !hdrKeyPressed) {
+        hdr = !hdr;
+        hdrKeyPressed = true;
+    } else if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+        if(exposure > 0.f) {
+            exposure -= .001f;
+        } else {
+            exposure = 0.f;
+        }
+    } else if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+        exposure += .001f;
+    }
+
+    if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
+        hdrKeyPressed = false;
     }
 }
 
@@ -309,38 +225,133 @@ void scroll_callback([[maybe_unused]]GLFWwindow* window, [[maybe_unused]]double 
     camera.processMouseScroll(static_cast<float>(yoffset));
 }
 
-unsigned int loadTexture(const std::string& path) {
+unsigned int loadTexture(const std::string& path, const bool gammaCorrection) {
     unsigned int textureID{ 0 };
     glGenTextures(1, &textureID);
 
     int width{ 0 }, height{ 0 }, nrComponents{ 0 };
-    unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
+    unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
     if (!data) {
         std::cerr << "Texture failed to load at path: " << path << '\n';
         stbi_image_free(data);
     }
 
     GLenum format{ GL_RED };
+    GLenum internalFormat{ GL_RED };
 
     if(nrComponents == 1) {
-        format = GL_RED;
+        internalFormat = format = GL_RED;
     } else if(nrComponents == 3) {
+        internalFormat = gammaCorrection ? GL_SRGB : GL_RGB;
         format = GL_RGB;
     } else if(nrComponents == 4) {
+        internalFormat = gammaCorrection ? GL_SRGB_ALPHA : GL_RGBA;
         format = GL_RGBA;
     }
 
     glBindTexture(GL_TEXTURE_2D, textureID);
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
-    // for this tutorial: use GL_CLAMP_TO_EDGE to prevent semi-transparent borders. Due to interpolation it takes texels from next repeat
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     stbi_image_free(data);
 
     return textureID;
+}
+
+static void renderCube() {
+    static unsigned int cubeVAO{ 0 }, cubeVBO{ 0 };
+    if(cubeVAO == 0) {
+        float cubeVertices[] = {
+            // back face
+            -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+             1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
+             1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f, // bottom-right
+             1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
+            -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+            -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f, // top-left
+            // front face
+            -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+             1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 0.0f, // bottom-right
+             1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
+             1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
+            -1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 1.0f, // top-left
+            -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+            // left face
+            -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
+            -1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-left
+            -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
+            -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
+            -1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-right
+            -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
+            // right face
+             1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
+             1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
+             1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-right
+             1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
+             1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
+             1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-left
+            // bottom face
+            -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
+             1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f, // top-left
+             1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
+             1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
+            -1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f, // bottom-right
+            -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
+            // top face
+            -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
+             1.0f,  1.0f , 1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
+             1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f, // top-right
+             1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
+            -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
+            -1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left
+        };
+        glGenVertexArrays(1, &cubeVAO);
+        glGenBuffers(1, &cubeVBO);
+        glBindVertexArray(cubeVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+    }
+    glBindVertexArray(cubeVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(0);
+}
+
+static void renderQuad() {
+    static unsigned int quadVAO{ 0 }, quadVBO{ 0 };
+    if(quadVAO == 0) {
+        float quadVertices[] = {
+            // positions        // texture Coords
+            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        };
+        glGenVertexArrays(1, &quadVAO);
+        glGenBuffers(1, &quadVBO);
+        glBindVertexArray(quadVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+    }
+    glBindVertexArray(quadVAO);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
 }
