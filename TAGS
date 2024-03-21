@@ -15943,11 +15943,11 @@ static constexpr unsigned int WindowWidth{WindowWidth25,612
 static constexpr unsigned int WindowHeight{WindowHeight26,663
 static bool firstMouse{firstMouse31,887
 int main(36,983
-void processInput(269,10551
-void framebuffer_size_callback(283,11252
-void mouse_callback(287,11384
-void scroll_callback(306,11881
-unsigned int loadTexture(310,12051
+void processInput(271,10686
+void framebuffer_size_callback(285,11387
+void mouse_callback(289,11519
+void scroll_callback(308,12016
+unsigned int loadTexture(312,12186
 
 src/Mesh.cpp,86
 Mesh::Mesh(8,90

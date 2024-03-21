@@ -206,12 +206,15 @@ int main() {
     Shader shader("./shaders/brickwall.vs", "./shaders/brickwall.fs");
     Shader lightCubeShader("./shaders/pointLightCube.vs", "./shaders/pointLightCube.fs");
 
-    const auto brickwallTexture{ loadTexture("./assets/brickwall.jpg") };
-    const auto brickwallNormalTexture{ loadTexture("./assets/brickwall_normal.jpg") };
+    const auto brickwallTexture{ loadTexture("./assets/bricks2.jpg") };
+    const auto brickwallNormalTexture{ loadTexture("./assets/bricks2_normal.jpg") };
+    const auto brickwallDisplacementTexture{ loadTexture("./assets/bricks2_disp.jpg") };
 
     shader.use();
     shader.setUniformInt("diffuseTexture", 0);
     shader.setUniformInt("normalTexture", 1);
+    shader.setUniformInt("depthTexture", 2);
+    shader.setUniformFloat("heightScale", .1f);
 
     glm::vec3 lightPosition{ glm::vec3(.5f, 1.f, .3f) };
 
@@ -224,9 +227,6 @@ int main() {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(.3f, .3f, .3f, 1.f);
-
-        // lightPosition.z = static_cast<float>(std::cos(glfwGetTime()));
-        // lightPosition.x = static_cast<float>(std::sin(glfwGetTime()));
 
         glm::mat4 projection{ glm::perspective(glm::radians(camera.zoom), static_cast<float>(WindowWidth) / WindowHeight, .1f, 100.f) };
         glm::mat4 view{ camera.getViewMatrix() };
@@ -243,6 +243,8 @@ int main() {
         glBindTexture(GL_TEXTURE_2D, brickwallTexture);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, brickwallNormalTexture);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, brickwallDisplacementTexture);
 
         glBindVertexArray(planeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -252,7 +254,7 @@ int main() {
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
         model = glm::translate(model, lightPosition);
-        model = glm::scale(model, glm::vec3(.3f));
+        model = glm::scale(model, glm::vec3(.1f));
         shader.setMat4("model", model);
         glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);

@@ -7,7 +7,7 @@ LD_FLAGS := -L./deps -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl -lassimp -l
 INCLUDE_FLAGS := -Iinclude
 
 OUTPUT_DIR := output
-OUTPUT_BIN := mothafucka
+OUTPUT_BIN := cursed
 
 # Pre-compiled header flag
 PCH_HEADER := include/pch.hpp
