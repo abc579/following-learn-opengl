@@ -654,6 +654,9 @@ TODO
 *** HDR
 TODO
 
+*** Bloom
+TODO
+
 *** Global Illumination Algorithms
 Algorithms that compute light's behavior when light particles bounce and scatter all around, taking into consideration
 reflection on objects and much more stuff. They're expensive to compute, though, that's why we use a simple algorithm
@@ -1947,7 +1950,7 @@ Example:
 
 The output matrix is one with (N, M) dimensions, where N is the number of rows of the left-hand side matrix and M is the
 number of columns of the right-hand side matrix.
--Vector Multiplication
+- Vector Multiplication
 If we have a MxN matrix and we have a Nx1 vector, multiplication is defined.
 
 There are interesting properties when we perform these kind of multiplications.
@@ -2088,6 +2091,9 @@ In order:
 - https://learn.microsoft.com/en-us/windows/win32/dxtecharts/common-techniques-to-improve-shadow-depth-maps?redirectedfrom=MSDN
 - https://www.youtube.com/watch?v=uueB2kVvbHo
 - http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-13-normal-mapping/
+- https://photo.stackexchange.com/questions/7630/what-is-tone-mapping-how-does-it-relate-to-hdr
+- https://gamedev.stackexchange.com/questions/62836/does-hdr-rendering-have-any-benefits-if-bloom-wont-be-applied
+- https://www.rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
 
 We need to understand the explanation and REALLY how the two exercises of the "Transformations" chapter work. If we
 don't, we'll never get good at this.
